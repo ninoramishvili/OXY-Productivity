@@ -1,0 +1,59 @@
+import axios from 'axios';
+
+const API_URL = 'http://localhost:5000/api';
+
+// Create axios instance with base configuration
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add token to requests if available
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Authentication API calls
+export const authAPI = {
+  login: async (email, password) => {
+    const response = await api.post('/auth/login', { email, password });
+    return response.data;
+  },
+  
+  logout: async () => {
+    const response = await api.post('/auth/logout');
+    return response.data;
+  },
+};
+
+// Tasks API calls
+export const tasksAPI = {
+  getTasks: async () => {
+    const response = await api.get('/tasks');
+    return response.data;
+  },
+  
+  createTask: async (taskData) => {
+    const response = await api.post('/tasks', taskData);
+    return response.data;
+  },
+  
+  updateTask: async (taskId, taskData) => {
+    const response = await api.put(`/tasks/${taskId}`, taskData);
+    return response.data;
+  },
+  
+  deleteTask: async (taskId) => {
+    const response = await api.delete(`/tasks/${taskId}`);
+    return response.data;
+  },
+};
+
+export default api;
+

@@ -1,0 +1,224 @@
+/* ============================================
+   OXY MODE UNIQUE EFFECTS
+   Special styling that makes OXY Mode distinct
+   ============================================ */
+
+/* OXY Mode: Add decorative elements */
+:root[data-theme="oxy"] .home-container::before {
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(255, 127, 80, 0.08) 0%, transparent 30%),
+    radial-gradient(circle at 85% 80%, rgba(0, 206, 209, 0.08) 0%, transparent 30%);
+}
+
+/* OXY Mode: Card borders with coral/teal accent */
+:root[data-theme="oxy"] .task-card {
+  border-left: 3px solid transparent;
+  border-image: linear-gradient(180deg, rgba(255, 127, 80, 0.3), rgba(0, 206, 209, 0.3)) 1;
+  border-image-slice: 1;
+}
+
+:root[data-theme="oxy"] .task-card:hover {
+  border-left-width: 4px;
+  border-image: linear-gradient(180deg, rgba(255, 127, 80, 0.6), rgba(0, 206, 209, 0.6)) 1;
+}
+
+/* OXY Mode: Stat cards with colored tops */
+:root[data-theme="oxy"] .stat-card {
+  border-top: 3px solid;
+  border-top-color: var(--color-coral);
+}
+
+:root[data-theme="oxy"] .stat-card:nth-child(2) {
+  border-top-color: var(--color-teal);
+}
+
+:root[data-theme="oxy"] .stat-card:nth-child(3) {
+  border-top-color: var(--color-coral);
+}
+
+/* OXY Mode: Priority badges flat style */
+:root[data-theme="oxy"] .priority-high {
+  background: rgba(255, 127, 80, 0.15);
+  border: 2px solid var(--color-coral);
+  color: var(--color-coral);
+  font-weight: 700;
+}
+
+:root[data-theme="oxy"] .priority-medium {
+  background: rgba(0, 206, 209, 0.15);
+  border: 2px solid var(--color-teal);
+  color: var(--color-teal);
+  font-weight: 700;
+}
+
+:root[data-theme="oxy"] .priority-low {
+  background: rgba(255, 222, 173, 0.3);
+  border: 2px solid #FFB84D;
+  color: #D97706;
+  font-weight: 700;
+}
+
+/* OXY Mode: Buttons with solid colors */
+:root[data-theme="oxy"] .btn-primary {
+  background: var(--color-coral);
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.25);
+}
+
+:root[data-theme="oxy"] .btn-primary:hover {
+  background: #FF6347;
+  box-shadow: 0 6px 16px rgba(255, 127, 80, 0.35);
+}
+
+:root[data-theme="oxy"] .btn-secondary {
+  background: rgba(0, 206, 209, 0.12);
+  border-color: var(--color-teal);
+}
+
+:root[data-theme="oxy"] .btn-secondary:hover {
+  background: rgba(0, 206, 209, 0.20);
+}
+
+/* OXY Mode: Sidebar with warm glow */
+:root[data-theme="oxy"] .sidebar {
+  background: rgba(255, 250, 245, 0.98);
+  box-shadow: 4px 0 20px rgba(255, 127, 80, 0.08);
+}
+
+:root[data-theme="oxy"] .sidebar::before {
+  background: linear-gradient(180deg, var(--color-coral) 0%, var(--color-teal) 100%);
+  width: 4px;
+}
+
+/* OXY Mode: Active nav with solid coral background */
+:root[data-theme="oxy"] .nav-item.active {
+  background: rgba(255, 127, 80, 0.12);
+  border: 1px solid rgba(255, 127, 80, 0.3);
+  border-left: 3px solid var(--color-coral);
+}
+
+/* OXY Mode: Logo with alternating colors */
+:root[data-theme="oxy"] .logo-main {
+  background: linear-gradient(90deg, var(--color-coral) 0%, var(--color-teal) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* OXY Mode: Input focus with coral glow */
+:root[data-theme="oxy"] .form-group input:focus {
+  border-color: var(--color-coral);
+  box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.15);
+}
+
+/* OXY Mode: Highlight card with peach tint */
+:root[data-theme="oxy"] .highlight-card {
+  background: rgba(255, 218, 185, 0.2);
+  border: 2px solid rgba(255, 127, 80, 0.25);
+}
+
+:root[data-theme="oxy"] .highlight-card::before {
+  background: linear-gradient(90deg, var(--color-coral), var(--color-teal));
+  height: 4px;
+}
+
+/* OXY Mode: Task action buttons */
+:root[data-theme="oxy"] .task-action {
+  background: rgba(255, 127, 80, 0.12);
+  border: 1px solid rgba(255, 127, 80, 0.3);
+  color: var(--color-coral);
+}
+
+:root[data-theme="oxy"] .task-action:hover {
+  background: var(--color-coral);
+  color: white;
+  border-color: var(--color-coral);
+}
+
+/* OXY Mode: Stat values with gradient */
+:root[data-theme="oxy"] .stat-value {
+  background: linear-gradient(135deg, var(--color-coral) 0%, var(--color-teal) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* OXY Mode: User avatar with solid coral */
+:root[data-theme="oxy"] .user-avatar {
+  background: var(--color-coral);
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
+}
+
+/* OXY Mode: Login card with warm border */
+:root[data-theme="oxy"] .login-card {
+  border: 1px solid rgba(255, 127, 80, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(255, 127, 80, 0.12),
+    0 0 0 1px rgba(255, 127, 80, 0.08);
+}
+
+:root[data-theme="oxy"] .login-card::before {
+  background: linear-gradient(90deg, var(--color-coral) 0%, var(--color-teal) 100%);
+  height: 4px;
+}
+
+/* OXY Mode: Login button solid coral */
+:root[data-theme="oxy"] .login-button {
+  background: var(--color-coral);
+  box-shadow: 0 4px 15px rgba(255, 127, 80, 0.4);
+}
+
+:root[data-theme="oxy"] .login-button:hover:not(:disabled) {
+  background: #FF6347;
+  box-shadow: 0 6px 20px rgba(255, 127, 80, 0.5);
+}
+
+/* OXY Mode: Demo button with teal */
+:root[data-theme="oxy"] .demo-button {
+  background: rgba(0, 206, 209, 0.12);
+  border-color: var(--color-teal);
+  color: var(--color-teal);
+}
+
+:root[data-theme="oxy"] .demo-button:hover:not(:disabled) {
+  background: rgba(0, 206, 209, 0.20);
+}
+
+/* OXY Mode: Section icons with solid colors */
+:root[data-theme="oxy"] .section-icon {
+  color: var(--color-coral);
+  filter: none;
+}
+
+/* OXY Mode: NO backdrop blur */
+:root[data-theme="oxy"] .sidebar,
+:root[data-theme="oxy"] .task-card,
+:root[data-theme="oxy"] .stat-card,
+:root[data-theme="oxy"] .login-card,
+:root[data-theme="oxy"] .highlight-card {
+  backdrop-filter: none !important;
+}
+
+/* OXY Mode: Rounded, friendly feel */
+:root[data-theme="oxy"] .task-card,
+:root[data-theme="oxy"] .stat-card {
+  border-radius: 16px;
+}
+
+/* OXY Mode: Page title with warm gradient */
+:root[data-theme="oxy"] .page-title {
+  background: linear-gradient(135deg, var(--color-coral) 0%, var(--color-teal) 50%, var(--text-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* OXY Mode: Theme selector active state */
+:root[data-theme="oxy"] .theme-selector-trigger {
+  border-color: rgba(255, 127, 80, 0.25);
+}
+
+:root[data-theme="oxy"] .theme-selector-trigger:hover {
+  border-color: rgba(255, 127, 80, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.12);
+}
+
