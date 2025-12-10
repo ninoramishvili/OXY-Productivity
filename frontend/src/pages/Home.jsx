@@ -330,7 +330,12 @@ function Home({ user }) {
               {/* Daily Highlight */}
               <section className="focus-card">
                 <div className="focus-header">
-                  <div className="cute-icon highlight-icon">✨</div>
+                  <div className="modern-icon highlight-icon">
+                    <div className="icon-star">
+                      <div className="star-core"></div>
+                      <div className="star-glow"></div>
+                    </div>
+                  </div>
                   <div>
                     <h3>Daily Highlight</h3>
                     <p className="focus-subtitle">Most Important Task</p>
@@ -404,7 +409,14 @@ function Home({ user }) {
               {/* Eat That Frog */}
               <section className="focus-card frog-card">
                 <div className="focus-header">
-                  <div className="cute-icon frog-icon">🐸</div>
+                  <div className="modern-icon frog-icon">
+                    <div className="icon-frog">
+                      <div className="frog-body"></div>
+                      <div className="frog-eye left"></div>
+                      <div className="frog-eye right"></div>
+                      <div className="frog-mouth"></div>
+                    </div>
+                  </div>
                   <div>
                     <h3>Eat That Frog</h3>
                     <p className="focus-subtitle">Hardest Task First</p>
