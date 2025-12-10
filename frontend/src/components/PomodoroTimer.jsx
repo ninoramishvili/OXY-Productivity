@@ -161,27 +161,14 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
           onUpdateTask(response.task);
         }
         
-        // Increment completed pomodoros
-        const newCount = completedPomodoros + 1;
-        setCompletedPomodoros(newCount);
-        
-        // Start break
-        if (newCount % 4 === 0) {
-          startBreak('longBreak', 30);
-        } else {
-          startBreak('shortBreak', 5);
-        }
+        // Close modal and show completion
+        onComplete();
       } catch (error) {
         console.error('Failed to finish pomodoro early:', error);
       }
     } else if (mode === 'shortBreak' || mode === 'longBreak') {
-      // Skip break
-      setMode('focus');
-      setShowSettings(true);
-      setSessionId(null);
-      setTimeLeft(25 * 60);
-      setDuration(25);
-      setIsRunning(false);
+      // Skip break and close
+      onCancel();
     }
   };
 
@@ -288,7 +275,7 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
             cy="100"
             r="85"
             fill="none"
-            stroke="currentColor"
+            stroke={modeConfig.color}
             strokeWidth="8"
             strokeDasharray={`${2 * Math.PI * 85}`}
             strokeDashoffset={`${2 * Math.PI * 85 * (1 - progress / 100)}`}
@@ -297,7 +284,10 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
         </svg>
         <div className="time-display">
           <span className="time-text">{formatTime(timeLeft)}</span>
-          <span className="time-label">{isRunning ? 'Focus Time' : 'Ready'}</span>
+          <span className="time-label">
+            {mode === 'focus' ? (isRunning ? 'Focus Time' : 'Ready') : 
+             mode === 'shortBreak' ? 'Short Break' : 'Long Break'}
+          </span>
         </div>
       </div>
 
@@ -321,9 +311,9 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
           </button>
         )}
         
-        <button className="btn-pomodoro stop" onClick={handleStop}>
+        <button className="btn-pomodoro cancel" onClick={handleStop}>
           <X size={20} />
-          {mode === 'focus' ? 'Stop' : 'Skip Break'}
+          {mode === 'focus' ? 'Cancel' : 'Skip Break'}
         </button>
       </div>
     </div>
