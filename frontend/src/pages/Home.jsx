@@ -10,8 +10,7 @@ import {
   Sparkles,
   TrendingUp,
   Trash2,
-  Check,
-  FileText
+  Check
 } from 'lucide-react';
 import './Home.css';
 
@@ -25,7 +24,6 @@ function Home({ user }) {
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
   const [sortBy, setSortBy] = useState('created_desc');
-  const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
   // Load tasks and tags on mount
   useEffect(() => {
@@ -197,6 +195,7 @@ function Home({ user }) {
         task={editingTask}
         tags={tags}
         onTagsUpdate={loadTags}
+        onTasksUpdate={loadTasks}
       />
 
       {/* Delete Confirmation Modal */}
@@ -293,32 +292,7 @@ function Home({ user }) {
                           >
                             {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
                           </button>
-                          <div className="task-title-container">
-                            <h3 className="task-title">{task.title}</h3>
-                            {task.description && (
-                              <div 
-                                className="description-indicator"
-                                onMouseEnter={(e) => {
-                                  setHoveredTaskId(task.id);
-                                  const rect = e.currentTarget.getBoundingClientRect();
-                                  const tooltip = e.currentTarget.querySelector('.description-tooltip');
-                                  if (tooltip) {
-                                    tooltip.style.top = `${rect.bottom + 8}px`;
-                                    tooltip.style.left = `${rect.left + rect.width / 2}px`;
-                                    tooltip.style.transform = 'translateX(-50%)';
-                                  }
-                                }}
-                                onMouseLeave={() => setHoveredTaskId(null)}
-                              >
-                                <FileText size={14} />
-                                {hoveredTaskId === task.id && (
-                                  <div className="description-tooltip">
-                                    {task.description}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
+                          <h3 className="task-title">{task.title}</h3>
                         </div>
                         <span className={`priority-badge priority-${task.priority}`}>
                           {task.priority}

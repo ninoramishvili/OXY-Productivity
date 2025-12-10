@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { X, Tag as TagIcon, Plus, Trash2 } from 'lucide-react';
+import { X, Tag as TagIcon, Plus } from 'lucide-react';
 import { tagsAPI } from '../utils/api';
+import ConfirmModal from './ConfirmModal';
 import './TaskModal.css';
 
-function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
+function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksUpdate }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -14,7 +15,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
   const [newTagName, setNewTagName] = useState('');
   const [isCreatingTag, setIsCreatingTag] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [deletingTagId, setDeletingTagId] = useState(null);
+  const [deleteTagConfirm, setDeleteTagConfirm] = useState({ isOpen: false, tag: null });
 
   useEffect(() => {
     if (task) {
@@ -90,10 +91,18 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
       });
       
       if (response.success) {
+        const newTag = response.tag;
         setNewTagName('');
+        
+        // Automatically select the newly created tag
+        setFormData(prev => ({
+          ...prev,
+          tagIds: [...prev.tagIds, newTag.id]
+        }));
+        
         // Notify parent to refresh tags
         if (onTagsUpdate) {
-          onTagsUpdate();
+          await onTagsUpdate();
         }
       }
     } catch (err) {
@@ -103,14 +112,13 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
     }
   };
 
-  const handleDeleteTag = async (tagId, tagName) => {
-    const confirmed = window.confirm(
-      `Delete "${tagName}"?\n\nThis tag will be removed from all tasks using it.`
-    );
-    
-    if (!confirmed) return;
+  const handleDeleteTagClick = (tag) => {
+    setDeleteTagConfirm({ isOpen: true, tag });
+  };
 
-    setDeletingTagId(tagId);
+  const confirmDeleteTag = async () => {
+    const tagId = deleteTagConfirm.tag.id;
+    
     try {
       const response = await tagsAPI.deleteTag(tagId);
       if (response.success) {
@@ -122,27 +130,42 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
         
         // Notify parent to refresh tags
         if (onTagsUpdate) {
-          onTagsUpdate();
+          await onTagsUpdate();
+        }
+        
+        // Notify parent to refresh tasks (to update UI immediately)
+        if (onTasksUpdate) {
+          await onTasksUpdate();
         }
       }
     } catch (err) {
       alert('Failed to delete tag: ' + (err.response?.data?.message || err.message));
     } finally {
-      setDeletingTagId(null);
+      setDeleteTagConfirm({ isOpen: false, tag: null });
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{task ? 'Edit Task' : 'Create New Task'}</h2>
-          <button className="modal-close" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
+    <>
+      {/* Delete Tag Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteTagConfirm.isOpen}
+        onClose={() => setDeleteTagConfirm({ isOpen: false, tag: null })}
+        onConfirm={confirmDeleteTag}
+        title="Delete Tag"
+        message={`Are you sure you want to delete "${deleteTagConfirm.tag?.name}"? This tag will be removed from all tasks using it.`}
+      />
+
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>{task ? 'Edit Task' : 'Create New Task'}</h2>
+            <button className="modal-close" onClick={onClose}>
+              <X size={24} />
+            </button>
+          </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group">
@@ -204,15 +227,13 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
                         borderColor: formData.tagIds.includes(tag.id) ? tag.color : 'transparent'
                       }}
                       onClick={() => toggleTag(tag.id)}
-                      disabled={deletingTagId === tag.id}
                     >
                       {tag.name}
                     </button>
                     <button
                       type="button"
                       className="tag-delete-btn"
-                      onClick={() => handleDeleteTag(tag.id, tag.name)}
-                      disabled={deletingTagId === tag.id}
+                      onClick={() => handleDeleteTagClick(tag)}
                       title="Delete tag"
                     >
                       <X size={12} />
@@ -250,8 +271,9 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
             </button>
           </div>
         </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

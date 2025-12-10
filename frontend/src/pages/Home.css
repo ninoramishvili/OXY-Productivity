@@ -306,14 +306,6 @@
   height: 12px;
 }
 
-.task-title-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
 .task-title {
   font-size: 16px;
   font-weight: 600;
@@ -321,70 +313,6 @@
   flex: 1;
   line-height: 1.4;
   margin: 0;
-}
-
-.description-indicator {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  background: rgba(0, 206, 209, 0.1);
-  border: 1px solid rgba(0, 206, 209, 0.3);
-  color: var(--color-teal);
-  cursor: help;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.description-indicator:hover {
-  background: rgba(0, 206, 209, 0.2);
-  border-color: rgba(0, 206, 209, 0.5);
-  transform: scale(1.1);
-}
-
-.description-tooltip {
-  position: fixed;
-  margin-top: 8px;
-  padding: 12px 16px;
-  background: var(--modal-bg);
-  border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  max-width: 300px;
-  min-width: 200px;
-  z-index: 10000;
-  white-space: normal;
-  word-break: break-word;
-  animation: tooltipFadeIn 0.2s ease;
-  pointer-events: none;
-}
-
-.description-tooltip::before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-bottom-color: var(--border-primary);
-}
-
-@keyframes tooltipFadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
 }
 
 .sort-select-inline {

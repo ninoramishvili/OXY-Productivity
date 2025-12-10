@@ -11,9 +11,7 @@ import {
   Check,
   X,
   ListTodo,
-  AlertCircle,
-  ArrowUpDown,
-  FileText
+  AlertCircle
 } from 'lucide-react';
 import './Backlog.css';
 
@@ -32,7 +30,6 @@ function Backlog() {
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
   const [showFilters, setShowFilters] = useState(false);
-  const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
   useEffect(() => {
     loadTasks();
@@ -215,6 +212,7 @@ function Backlog() {
         task={editingTask}
         tags={tags}
         onTagsUpdate={loadTags}
+        onTasksUpdate={loadTasks}
       />
 
       {/* Delete Confirmation Modal */}
@@ -399,32 +397,7 @@ function Backlog() {
                   
                   <div className="task-content">
                     <div className="task-header-row">
-                      <div className="task-title-container">
-                        <h3 className="task-title">{task.title}</h3>
-                        {task.description && (
-                          <div 
-                            className="description-indicator"
-                            onMouseEnter={(e) => {
-                              setHoveredTaskId(task.id);
-                              const rect = e.currentTarget.getBoundingClientRect();
-                              const tooltip = e.currentTarget.querySelector('.description-tooltip');
-                              if (tooltip) {
-                                tooltip.style.top = `${rect.bottom + 8}px`;
-                                tooltip.style.left = `${rect.left + rect.width / 2}px`;
-                                tooltip.style.transform = 'translateX(-50%)';
-                              }
-                            }}
-                            onMouseLeave={() => setHoveredTaskId(null)}
-                          >
-                            <FileText size={16} />
-                            {hoveredTaskId === task.id && (
-                              <div className="description-tooltip">
-                                {task.description}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                      <h3 className="task-title">{task.title}</h3>
                       <span className={`priority-badge priority-${task.priority}`}>
                         {task.priority}
                       </span>

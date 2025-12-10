@@ -247,11 +247,6 @@
   border-color: var(--tag-color);
 }
 
-.tag-chip:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .tag-delete-btn {
   position: absolute;
   top: -6px;
@@ -278,11 +273,6 @@
 .tag-delete-btn:hover {
   background: #dc2626;
   transform: scale(1.15);
-}
-
-.tag-delete-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 /* Modal Actions */
