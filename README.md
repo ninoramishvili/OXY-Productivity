@@ -1,16 +1,27 @@
-# Productivity & Task Management App
+# OXY Productivity
 
-A modern, clean, and intuitive web application for productivity and task management. Built with React and Node.js.
+A modern, full-stack productivity and task management platform with advanced time management techniques. Built with React, Node.js, and PostgreSQL.
+
+**Live Development:** http://localhost:5173  
+**Repository:** https://github.com/ninoramishvili/OXY-Productivity.git
 
 ---
 
 ## 🎯 Project Overview
 
-This app helps users manage tasks, track habits, and use various productivity techniques like Pomodoro Timer, Daily Highlights, Eisenhower Matrix, and more.
+**OXY Productivity** is a comprehensive productivity platform that combines task management with proven productivity techniques. Named after Oxytocin (happiness) and Oxygen (life), it helps users not just get things done, but do it with mindfulness and well-being.
 
-**Target Users:** Busy, thoughtful people who care about personal growth and productivity.
+**Target Users:** 
+- Busy professionals seeking better productivity
+- Life coaches and their clients
+- People interested in personal growth
+- Anyone wanting to manage tasks mindfully
 
-**Design Philosophy:** Modern, calm, friendly, with lots of breathing room and intuitive interactions.
+**Unique Features:**
+- 3 distinct themes (Dark, Light, OXY Mode)
+- PostgreSQL database for data persistence
+- Modern, futuristic 2025 design
+- Built for productivity AND well-being
 
 ---
 
