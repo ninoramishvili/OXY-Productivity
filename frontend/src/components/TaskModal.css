@@ -166,6 +166,12 @@
   gap: 8px;
 }
 
+.tag-chip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
 .tag-input-row {
   display: flex;
   gap: 6px;
@@ -239,6 +245,44 @@
   background: rgba(255, 127, 80, 0.12);
   color: var(--color-coral);
   border-color: var(--tag-color);
+}
+
+.tag-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tag-delete-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff6b6b;
+  border: 2px solid var(--modal-bg);
+  color: white;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.tag-chip-wrapper:hover .tag-delete-btn {
+  display: flex;
+}
+
+.tag-delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.15);
+}
+
+.tag-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Modal Actions */

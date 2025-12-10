@@ -59,8 +59,19 @@ router.delete('/:id', verifyToken, async (req, res) => {
   const tagId = parseInt(req.params.id);
 
   try {
+    // First, check how many tasks use this tag
+    const taskCountResult = await query(
+      'SELECT COUNT(*) FROM task_tags WHERE tag_id = $1',
+      [tagId]
+    );
+    const taskCount = parseInt(taskCountResult.rows[0].count);
+
+    // Delete tag from task_tags junction table (CASCADE should handle this, but being explicit)
+    await query('DELETE FROM task_tags WHERE tag_id = $1', [tagId]);
+
+    // Delete the tag itself
     const result = await query(
-      'DELETE FROM tags WHERE id = $1 AND user_id = $2 RETURNING id',
+      'DELETE FROM tags WHERE id = $1 AND user_id = $2 RETURNING *',
       [tagId, req.userId]
     );
 
@@ -73,7 +84,9 @@ router.delete('/:id', verifyToken, async (req, res) => {
 
     res.json({ 
       success: true, 
-      message: 'Tag deleted successfully' 
+      message: 'Tag deleted successfully',
+      tag: result.rows[0],
+      removedFromTasks: taskCount
     });
   } catch (error) {
     console.error('Delete tag error:', error);

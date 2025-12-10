@@ -298,7 +298,16 @@ function Home({ user }) {
                             {task.description && (
                               <div 
                                 className="description-indicator"
-                                onMouseEnter={() => setHoveredTaskId(task.id)}
+                                onMouseEnter={(e) => {
+                                  setHoveredTaskId(task.id);
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  const tooltip = e.currentTarget.querySelector('.description-tooltip');
+                                  if (tooltip) {
+                                    tooltip.style.top = `${rect.bottom + 8}px`;
+                                    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+                                    tooltip.style.transform = 'translateX(-50%)';
+                                  }
+                                }}
                                 onMouseLeave={() => setHoveredTaskId(null)}
                               >
                                 <FileText size={14} />

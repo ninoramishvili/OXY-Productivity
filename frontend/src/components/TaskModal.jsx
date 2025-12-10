@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Tag as TagIcon, Plus } from 'lucide-react';
+import { X, Tag as TagIcon, Plus, Trash2 } from 'lucide-react';
 import { tagsAPI } from '../utils/api';
 import './TaskModal.css';
 
@@ -14,6 +14,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
   const [newTagName, setNewTagName] = useState('');
   const [isCreatingTag, setIsCreatingTag] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingTagId, setDeletingTagId] = useState(null);
 
   useEffect(() => {
     if (task) {
@@ -102,6 +103,35 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
     }
   };
 
+  const handleDeleteTag = async (tagId, tagName) => {
+    const confirmed = window.confirm(
+      `Delete "${tagName}"?\n\nThis tag will be removed from all tasks using it.`
+    );
+    
+    if (!confirmed) return;
+
+    setDeletingTagId(tagId);
+    try {
+      const response = await tagsAPI.deleteTag(tagId);
+      if (response.success) {
+        // Remove tag from current task if selected
+        setFormData(prev => ({
+          ...prev,
+          tagIds: prev.tagIds.filter(id => id !== tagId)
+        }));
+        
+        // Notify parent to refresh tags
+        if (onTagsUpdate) {
+          onTagsUpdate();
+        }
+      }
+    } catch (err) {
+      alert('Failed to delete tag: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setDeletingTagId(null);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -165,18 +195,29 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
             {tags && tags.length > 0 && (
               <div className="tags-selector">
                 {tags.map(tag => (
-                  <button
-                    key={tag.id}
-                    type="button"
-                    className={`tag-chip ${formData.tagIds.includes(tag.id) ? 'selected' : ''}`}
-                    style={{ 
-                      '--tag-color': tag.color,
-                      borderColor: formData.tagIds.includes(tag.id) ? tag.color : 'transparent'
-                    }}
-                    onClick={() => toggleTag(tag.id)}
-                  >
-                    {tag.name}
-                  </button>
+                  <div key={tag.id} className="tag-chip-wrapper">
+                    <button
+                      type="button"
+                      className={`tag-chip ${formData.tagIds.includes(tag.id) ? 'selected' : ''}`}
+                      style={{ 
+                        '--tag-color': tag.color,
+                        borderColor: formData.tagIds.includes(tag.id) ? tag.color : 'transparent'
+                      }}
+                      onClick={() => toggleTag(tag.id)}
+                      disabled={deletingTagId === tag.id}
+                    >
+                      {tag.name}
+                    </button>
+                    <button
+                      type="button"
+                      className="tag-delete-btn"
+                      onClick={() => handleDeleteTag(tag.id, tag.name)}
+                      disabled={deletingTagId === tag.id}
+                      title="Delete tag"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
