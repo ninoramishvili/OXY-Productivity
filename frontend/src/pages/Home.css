@@ -183,68 +183,19 @@
   border-bottom: 1px solid var(--border-primary);
 }
 
-/* Playful & Bouncy Icons - Option 2 */
-
-.bouncy-icon {
+/* Simple Emoji Icons */
+.simple-icon {
+  font-size: 20px;
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  position: relative;
 }
 
-/* Highlight Diamond - Rotates and Bounces */
-.highlight-diamond {
-  background: linear-gradient(135deg, #FF7F50 0%, #FF6B9D 100%);
-  transform: rotate(45deg);
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.4);
-  animation: diamondBounceSpin 1.5s ease-in-out infinite;
+.empty-icon {
+  font-size: 32px;
 }
 
-@keyframes diamondBounceSpin {
-  0%, 100% {
-    transform: rotate(45deg) scale(1) translateY(0);
-  }
-  25% {
-    transform: rotate(135deg) scale(1.15) translateY(-4px);
-  }
-  50% {
-    transform: rotate(225deg) scale(1) translateY(0);
-  }
-  75% {
-    transform: rotate(315deg) scale(1.15) translateY(-4px);
-  }
-}
-
-/* Frog Circle - Squishes and Stretches */
-.frog-circle {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
-  border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-  animation: circleSquish 1.2s ease-in-out infinite;
-}
-
-@keyframes circleSquish {
-  0%, 100% {
-    transform: scale(1, 1) translateY(0);
-    border-radius: 50%;
-  }
-  15% {
-    transform: scale(1.2, 0.8) translateY(0);
-    border-radius: 50% 50% 45% 45%;
-  }
-  30% {
-    transform: scale(0.9, 1.1) translateY(-6px);
-    border-radius: 45% 45% 50% 50%;
-  }
-  45% {
-    transform: scale(1.05, 0.95) translateY(0);
-    border-radius: 50% 50% 48% 48%;
-  }
-  60% {
-    transform: scale(0.95, 1.05) translateY(-3px);
-    border-radius: 48% 48% 50% 50%;
-  }
+.task-emoji-indicator {
+  font-size: 14px;
+  margin-left: 6px;
 }
 
 .focus-header h3 {
@@ -797,93 +748,38 @@
 }
 
 .task-action-icon.highlight-btn {
-  position: relative;
-  overflow: visible;
+  font-size: 14px;
+  padding: 7px;
 }
 
 .task-action-icon.highlight-btn::before {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(45deg);
-  background: linear-gradient(135deg, #FF7F50 0%, #FF6B9D 100%);
-  border-radius: 2px;
-  transition: all 0.3s ease;
+  content: '✨';
 }
 
 .task-action-icon.highlight-btn:hover {
   background: rgba(255, 127, 80, 0.2);
   border-color: rgba(255, 127, 80, 0.4);
-}
-
-.task-action-icon.highlight-btn:hover::before {
-  transform: translate(-50%, -50%) rotate(225deg) scale(1.2);
-  box-shadow: 0 0 8px rgba(255, 127, 80, 0.6);
+  transform: scale(1.1);
 }
 
 .task-action-icon.frog-btn {
-  position: relative;
-  overflow: visible;
+  font-size: 14px;
+  padding: 7px;
 }
 
 .task-action-icon.frog-btn::before {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
-  border-radius: 50%;
-  transition: all 0.3s ease;
+  content: '🐸';
 }
 
 .task-action-icon.frog-btn:hover {
   background: rgba(76, 175, 80, 0.2);
   border-color: rgba(76, 175, 80, 0.4);
-}
-
-.task-action-icon.frog-btn:hover::before {
-  transform: translate(-50%, -50%) scale(1.3, 0.7);
-  box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+  transform: scale(1.1);
 }
 
 .task-action-icon.frog-btn.active {
   background: rgba(76, 175, 80, 0.15);
   border-color: rgba(76, 175, 80, 0.5);
-}
-
-.task-action-icon.frog-btn.active::before {
-  animation: circleSquish 1.2s ease-in-out infinite;
-}
-
-.frog-indicator {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
-  border-radius: 50%;
-  margin-left: 4px;
-  vertical-align: middle;
-  animation: circleSquish 1.2s ease-in-out infinite;
-  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4);
-}
-
-.highlight-indicator {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  background: linear-gradient(135deg, #FF7F50 0%, #FF6B9D 100%);
-  transform: rotate(45deg);
-  border-radius: 2px;
-  margin-left: 4px;
-  vertical-align: middle;
-  animation: diamondBounceSpin 1.5s ease-in-out infinite;
-  box-shadow: 0 2px 6px rgba(255, 127, 80, 0.4);
 }
 
 /* Stats Section - Compact */

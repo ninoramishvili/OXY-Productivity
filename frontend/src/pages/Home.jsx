@@ -330,7 +330,7 @@ function Home({ user }) {
               {/* Daily Highlight */}
               <section className="focus-card">
                 <div className="focus-header">
-                  <div className="bouncy-icon highlight-diamond"></div>
+                  <span className="simple-icon">✨</span>
                   <div>
                     <h3>Daily Highlight</h3>
                     <p className="focus-subtitle">Most Important Task</p>
@@ -348,7 +348,7 @@ function Home({ user }) {
                   if (!highlightedTask) {
                     return (
                       <div className="focus-empty">
-                        <div className="bouncy-icon highlight-diamond" style={{ width: '40px', height: '40px' }}></div>
+                        <span className="empty-icon">✨</span>
                         <p>No highlight set</p>
                       </div>
                     );
@@ -404,7 +404,7 @@ function Home({ user }) {
               {/* Eat That Frog */}
               <section className="focus-card frog-card">
                 <div className="focus-header">
-                  <div className="bouncy-icon frog-circle"></div>
+                  <span className="simple-icon">🐸</span>
                   <div>
                     <h3>Eat That Frog</h3>
                     <p className="focus-subtitle">Hardest Task First</p>
@@ -416,7 +416,7 @@ function Home({ user }) {
                   if (!frogTask) {
                     return (
                       <div className="focus-empty">
-                        <div className="bouncy-icon frog-circle" style={{ width: '40px', height: '40px' }}></div>
+                        <span className="empty-icon">🐸</span>
                         <p>No frog set</p>
                       </div>
                     );
@@ -522,8 +522,8 @@ function Home({ user }) {
                               {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
                             </button>
                             <h3 className="task-title">{task.title}</h3>
-                            {isHighlight && <span className="highlight-indicator" title="Daily Highlight"></span>}
-                            {task.is_frog && <span className="frog-indicator" title="Your Frog - Hardest Task"></span>}
+                            {isHighlight && <span className="task-emoji-indicator" title="Daily Highlight">✨</span>}
+                            {task.is_frog && <span className="task-emoji-indicator" title="Your Frog - Hardest Task">🐸</span>}
                           </div>
                           <span className={`priority-badge priority-${task.priority}`}>
                             {task.priority}
