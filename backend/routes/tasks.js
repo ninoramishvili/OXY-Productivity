@@ -270,11 +270,11 @@ router.put('/:id/highlight', verifyToken, async (req, res) => {
     );
     console.log('Cleared', clearResult.rows.length, 'existing highlights for user:', req.userId);
 
-    // Set new highlight
+    // Set new highlight AND remove frog status if this task was a frog
     console.log('Setting task', taskId, 'as highlight with date:', today);
     const result = await query(
       `UPDATE tasks 
-       SET is_daily_highlight = TRUE, highlight_date = $1, updated_at = CURRENT_TIMESTAMP 
+       SET is_daily_highlight = TRUE, highlight_date = $1, is_frog = FALSE, updated_at = CURRENT_TIMESTAMP 
        WHERE id = $2 AND user_id = $3 
        RETURNING *`,
       [today, taskId, req.userId]
@@ -363,10 +363,10 @@ router.put('/:id/frog', verifyToken, async (req, res) => {
       [req.userId]
     );
 
-    // Set new frog
+    // Set new frog AND remove highlight status if this task was a highlight
     const result = await query(
       `UPDATE tasks 
-       SET is_frog = TRUE, updated_at = CURRENT_TIMESTAMP 
+       SET is_frog = TRUE, is_daily_highlight = FALSE, highlight_date = NULL, updated_at = CURRENT_TIMESTAMP 
        WHERE id = $1 AND user_id = $2 
        RETURNING *`,
       [taskId, req.userId]

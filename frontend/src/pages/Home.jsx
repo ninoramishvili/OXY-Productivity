@@ -148,13 +148,6 @@ function Home({ user }) {
 
   const handleSetHighlight = async (taskId) => {
     try {
-      // Check if task is already a frog
-      const task = tasks.find(t => t.id === taskId);
-      if (task?.is_frog) {
-        alert('This task is already your Frog! A task cannot be both Highlight and Frog.');
-        return;
-      }
-      
       // Get user's local date (in their timezone)
       const now = new Date();
       const year = now.getFullYear();
@@ -162,9 +155,7 @@ function Home({ user }) {
       const day = String(now.getDate()).padStart(2, '0');
       const localDate = `${year}-${month}-${day}`;
       
-      console.log('Setting highlight for task:', taskId, 'with date:', localDate);
       const response = await tasksAPI.setHighlight(taskId, localDate);
-      console.log('Set highlight response:', response);
       if (response.success) {
         showSuccess('✨ Task set as Daily Highlight!');
         await loadTasks();
@@ -189,13 +180,6 @@ function Home({ user }) {
 
   const handleSetFrog = async (taskId) => {
     try {
-      // Check if task is already a highlight
-      const task = tasks.find(t => t.id === taskId);
-      if (task?.is_daily_highlight) {
-        alert('This task is already your Daily Highlight! A task cannot be both Highlight and Frog.');
-        return;
-      }
-      
       const response = await tasksAPI.setFrog(taskId);
       if (response.success) {
         showSuccess('🐸 Task marked as your Frog!');
@@ -346,7 +330,7 @@ function Home({ user }) {
               {/* Daily Highlight */}
               <section className="focus-card">
                 <div className="focus-header">
-                  <Star size={20} className="focus-icon highlight-icon" />
+                  <div className="cute-icon highlight-icon">✨</div>
                   <div>
                     <h3>Daily Highlight</h3>
                     <p className="focus-subtitle">Most Important Task</p>
@@ -420,7 +404,7 @@ function Home({ user }) {
               {/* Eat That Frog */}
               <section className="focus-card frog-card">
                 <div className="focus-header">
-                  <span className="focus-icon frog-icon">🐸</span>
+                  <div className="cute-icon frog-icon">🐸</div>
                   <div>
                     <h3>Eat That Frog</h3>
                     <p className="focus-subtitle">Hardest Task First</p>
