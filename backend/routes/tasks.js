@@ -260,13 +260,14 @@ router.put('/:id/highlight', verifyToken, async (req, res) => {
       });
     }
 
-    // Remove existing highlight for today (if any)
+    // Remove ALL existing highlights for this user (regardless of date)
     await query(
       `UPDATE tasks 
        SET is_daily_highlight = FALSE, highlight_date = NULL 
-       WHERE user_id = $1 AND highlight_date = $2`,
-      [req.userId, today]
+       WHERE user_id = $1 AND is_daily_highlight = TRUE`,
+      [req.userId]
     );
+    console.log('Cleared all existing highlights for user:', req.userId);
 
     // Set new highlight
     const result = await query(
