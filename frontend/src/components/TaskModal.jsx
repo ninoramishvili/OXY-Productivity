@@ -13,6 +13,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
   const [errors, setErrors] = useState({});
   const [newTagName, setNewTagName] = useState('');
   const [isCreatingTag, setIsCreatingTag] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -59,10 +60,17 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSaving) return; // Prevent double submission
+    
     if (validate()) {
-      onSave(formData);
+      setIsSaving(true);
+      try {
+        await onSave(formData);
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -134,7 +142,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group form-group-compact">
             <label htmlFor="priority">Priority</label>
             <select
               id="priority"
@@ -143,16 +151,15 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
               onChange={handleChange}
               className="priority-select"
             >
-              <option value="highest" className="priority-option-highest">🔴 Highest</option>
-              <option value="high" className="priority-option-high">🟠 High</option>
-              <option value="medium" className="priority-option-medium">🟡 Medium</option>
-              <option value="low" className="priority-option-low">🟢 Low</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
             </select>
           </div>
 
-          <div className="form-group">
+          <div className="form-group form-group-compact">
             <label>
-              <TagIcon size={16} />
+              <TagIcon size={14} />
               Tags
             </label>
             {tags && tags.length > 0 && (
@@ -177,7 +184,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
               <input
                 type="text"
                 className="tag-input"
-                placeholder="Create new tag..."
+                placeholder="New tag..."
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleCreateTag())}
@@ -188,18 +195,17 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
                 onClick={handleCreateTag}
                 disabled={!newTagName.trim() || isCreatingTag}
               >
-                <Plus size={16} />
-                Add
+                <Plus size={14} />
               </button>
             </div>
           </div>
 
           <div className="modal-actions">
-            <button type="button" className="btn-cancel" onClick={onClose}>
+            <button type="button" className="btn-cancel" onClick={onClose} disabled={isSaving}>
               Cancel
             </button>
-            <button type="submit" className="btn-save">
-              {task ? 'Update Task' : 'Create Task'}
+            <button type="submit" className="btn-save" disabled={isSaving}>
+              {isSaving ? 'Saving...' : (task ? 'Update Task' : 'Create Task')}
             </button>
           </div>
         </form>

@@ -27,9 +27,7 @@
   border-radius: 20px;
   box-shadow: var(--shadow-lg);
   width: 100%;
-  max-width: 540px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 500px;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: none;
 }
@@ -49,12 +47,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px;
+  padding: 20px 20px 16px;
   border-bottom: 1px solid var(--border-secondary);
 }
 
 .modal-header h2 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -80,16 +78,20 @@
 }
 
 .modal-form {
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.form-group-compact {
+  gap: 6px;
 }
 
 .form-group label {
@@ -104,10 +106,10 @@
 .form-group input,
 .form-group textarea,
 .form-group select {
-  padding: 12px 16px;
+  padding: 10px 14px;
   border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  font-size: 15px;
+  border-radius: 10px;
+  font-size: 14px;
   font-family: 'Inter', sans-serif;
   color: var(--text-primary);
   background: var(--bg-input);
@@ -129,7 +131,8 @@
 
 .form-group textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 60px;
+  max-height: 100px;
 }
 
 .error-text {
@@ -142,32 +145,18 @@
 .priority-select {
   font-weight: 600;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FF7F50' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
 }
 
 .priority-select option {
   padding: 10px;
   font-weight: 600;
-}
-
-/* Priority Colors */
-.priority-select option[value="highest"] {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.priority-select option[value="high"] {
-  background: rgba(249, 115, 22, 0.1);
-  color: #f97316;
-}
-
-.priority-select option[value="medium"] {
-  background: rgba(234, 179, 8, 0.1);
-  color: #eab308;
-}
-
-.priority-select option[value="low"] {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
+  background: var(--modal-bg);
+  color: var(--text-primary);
 }
 
 /* Tags Selector */
@@ -179,16 +168,16 @@
 
 .tag-input-row {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 .tag-input {
   flex: 1;
-  padding: 10px 14px;
+  padding: 7px 10px;
   border: 1px solid var(--border-primary);
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13px;
   font-family: 'Inter', sans-serif;
   color: var(--text-primary);
   background: var(--bg-input);
@@ -199,15 +188,15 @@
   outline: none;
   border-color: var(--color-teal);
   background: var(--bg-input-focus);
-  box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.15);
+  box-shadow: 0 0 0 2px rgba(0, 206, 209, 0.12);
 }
 
 .btn-add-tag {
-  padding: 10px 16px;
+  padding: 7px 12px;
   background: rgba(0, 206, 209, 0.15);
   border: 1px solid rgba(0, 206, 209, 0.3);
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
   color: var(--color-teal);
@@ -215,13 +204,12 @@
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .btn-add-tag:hover {
   background: rgba(0, 206, 209, 0.25);
   border-color: rgba(0, 206, 209, 0.5);
-  box-shadow: 0 4px 12px rgba(0, 206, 209, 0.2);
 }
 
 .btn-add-tag:disabled {
@@ -230,12 +218,12 @@
 }
 
 .tag-chip {
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 2px solid transparent;
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1.5px solid transparent;
   background: var(--bg-card-hover);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -256,21 +244,27 @@
 /* Modal Actions */
 .modal-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .btn-cancel,
 .btn-save {
   flex: 1;
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 15px;
+  padding: 11px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 700;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
+}
+
+.btn-save:disabled,
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-cancel {
