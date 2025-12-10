@@ -127,11 +127,15 @@ function Home({ user }) {
         completed: !task.completed
       });
       if (response.success) {
-        // Show celebration if completing a daily highlight
+        // Show celebration if completing a daily highlight or frog
         if (!task.completed && task.is_daily_highlight) {
           setShowCelebration(true);
           setTimeout(() => setShowCelebration(false), 3000);
           showSuccess('🎉 Daily Highlight Completed! Amazing work!');
+        } else if (!task.completed && task.is_frog) {
+          setShowCelebration(true);
+          setTimeout(() => setShowCelebration(false), 3000);
+          showSuccess('🐸 You Ate That Frog! Incredible!');
         } else {
           showSuccess(task.completed ? 'Task reopened!' : 'Task completed!');
         }
@@ -144,6 +148,13 @@ function Home({ user }) {
 
   const handleSetHighlight = async (taskId) => {
     try {
+      // Check if task is already a frog
+      const task = tasks.find(t => t.id === taskId);
+      if (task?.is_frog) {
+        alert('This task is already your Frog! A task cannot be both Highlight and Frog.');
+        return;
+      }
+      
       // Get user's local date (in their timezone)
       const now = new Date();
       const year = now.getFullYear();
@@ -178,6 +189,13 @@ function Home({ user }) {
 
   const handleSetFrog = async (taskId) => {
     try {
+      // Check if task is already a highlight
+      const task = tasks.find(t => t.id === taskId);
+      if (task?.is_daily_highlight) {
+        alert('This task is already your Daily Highlight! A task cannot be both Highlight and Frog.');
+        return;
+      }
+      
       const response = await tasksAPI.setFrog(taskId);
       if (response.success) {
         showSuccess('🐸 Task marked as your Frog!');
@@ -298,15 +316,30 @@ function Home({ user }) {
         ) : (
           <div className="content-grid">
             {/* Celebration Animation */}
-            {showCelebration && (
-              <div className="celebration-overlay">
-                <div className="celebration-content">
-                  <Sparkles size={64} className="celebration-icon" />
-                  <h2>Outstanding! 🎉</h2>
-                  <p>You completed your Daily Highlight!</p>
+            {showCelebration && (() => {
+              const completedTask = tasks.find(t => t.completed && (t.is_daily_highlight || t.is_frog));
+              const isFrog = completedTask?.is_frog;
+              
+              return (
+                <div className="celebration-overlay">
+                  <div className="celebration-content">
+                    {isFrog ? (
+                      <>
+                        <span style={{ fontSize: '80px' }}>🐸</span>
+                        <h2>You Ate That Frog! 🎉</h2>
+                        <p>The hardest task is done!</p>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={64} className="celebration-icon" />
+                        <h2>Outstanding! 🎉</h2>
+                        <p>You completed your Daily Highlight!</p>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Daily Highlight and Frog Section */}
             <div className="focus-sections">
@@ -340,12 +373,6 @@ function Home({ user }) {
                   return (
                     <div className={`focus-task ${highlightedTask.completed ? 'completed' : ''}`}>
                       <div className="focus-task-header">
-                        <button 
-                          className="focus-checkbox"
-                          onClick={() => handleToggleComplete(highlightedTask)}
-                        >
-                          {highlightedTask.completed ? <Check size={18} /> : <div className="checkbox-empty-small" />}
-                        </button>
                         <div className="focus-task-content">
                           <h4 className="focus-task-title">{highlightedTask.title}</h4>
                           {highlightedTask.tags && highlightedTask.tags.length > 0 && (
@@ -369,6 +396,22 @@ function Home({ user }) {
                           <X size={16} />
                         </button>
                       </div>
+                      <button 
+                        className={`focus-complete-btn ${highlightedTask.completed ? 'completed' : ''}`}
+                        onClick={() => handleToggleComplete(highlightedTask)}
+                      >
+                        {highlightedTask.completed ? (
+                          <>
+                            <Check size={18} />
+                            Completed!
+                          </>
+                        ) : (
+                          <>
+                            <Check size={18} />
+                            Complete Highlight
+                          </>
+                        )}
+                      </button>
                     </div>
                   );
                 })()}
@@ -398,12 +441,6 @@ function Home({ user }) {
                   return (
                     <div className={`focus-task ${frogTask.completed ? 'completed' : ''}`}>
                       <div className="focus-task-header">
-                        <button 
-                          className="focus-checkbox"
-                          onClick={() => handleToggleComplete(frogTask)}
-                        >
-                          {frogTask.completed ? <Check size={18} /> : <div className="checkbox-empty-small" />}
-                        </button>
                         <div className="focus-task-content">
                           <h4 className="focus-task-title">{frogTask.title}</h4>
                           {frogTask.tags && frogTask.tags.length > 0 && (
@@ -427,6 +464,22 @@ function Home({ user }) {
                           <X size={16} />
                         </button>
                       </div>
+                      <button 
+                        className={`focus-complete-btn ${frogTask.completed ? 'completed' : ''}`}
+                        onClick={() => handleToggleComplete(frogTask)}
+                      >
+                        {frogTask.completed ? (
+                          <>
+                            <Check size={18} />
+                            Completed!
+                          </>
+                        ) : (
+                          <>
+                            🐸
+                            Eat That Frog
+                          </>
+                        )}
+                      </button>
                     </div>
                   );
                 })()}
