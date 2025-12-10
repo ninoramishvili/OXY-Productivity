@@ -549,10 +549,6 @@
     filter: drop-shadow(0 0 4px currentColor);
   }
 }
-  flex: 1;
-  line-height: 1.4;
-  margin: 0;
-}
 
 .sort-select-inline {
   padding: 8px 12px;
