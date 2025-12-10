@@ -308,91 +308,130 @@ function Home({ user }) {
               </div>
             )}
 
-            {/* Daily Highlight Section */}
-            <section className="highlight-section">
-              <div className="section-header">
-                <div className="section-title">
-                  <Target size={24} className="section-icon" />
-                  <h2>Daily Highlight</h2>
+            {/* Daily Highlight and Frog Section */}
+            <div className="focus-sections">
+              {/* Daily Highlight */}
+              <section className="focus-card">
+                <div className="focus-header">
+                  <Star size={20} className="focus-icon highlight-icon" />
+                  <div>
+                    <h3>Daily Highlight</h3>
+                    <p className="focus-subtitle">Most Important Task</p>
+                  </div>
                 </div>
-                <p>Your most important task today</p>
-              </div>
-              {(() => {
-                // Get user's local date (not UTC)
-                const now = new Date();
-                const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-                console.log('Today date for comparison (local timezone):', today);
-                
-                const highlightedTask = tasks.find(t => {
-                  if (!t.is_daily_highlight) return false;
-                  const taskDate = t.highlight_date ? new Date(t.highlight_date).toISOString().split('T')[0] : null;
-                  console.log('Task', t.id, 'highlight date:', t.highlight_date, 'normalized:', taskDate, 'matches today:', taskDate === today);
-                  return t.is_daily_highlight && taskDate === today;
-                });
-                console.log('Found highlighted task:', highlightedTask);
-                
-                if (!highlightedTask) {
-                  return (
-                    <div className="highlight-card empty">
-                      <div className="empty-state">
-                        <Sparkles size={48} className="empty-icon" />
-                        <p>No highlight set yet</p>
-                        <p className="empty-hint">Pick your most important task for today</p>
+                {(() => {
+                  const now = new Date();
+                  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                  const highlightedTask = tasks.find(t => {
+                    if (!t.is_daily_highlight) return false;
+                    const taskDate = t.highlight_date ? new Date(t.highlight_date).toISOString().split('T')[0] : null;
+                    return t.is_daily_highlight && taskDate === today;
+                  });
+                  
+                  if (!highlightedTask) {
+                    return (
+                      <div className="focus-empty">
+                        <Sparkles size={32} className="empty-icon" />
+                        <p>No highlight set</p>
                       </div>
-                    </div>
-                  );
-                }
-                
-                return (
-                  <div className={`highlight-card ${highlightedTask.completed ? 'completed' : ''}`}>
-                    <div className="highlight-content">
-                      <div className="highlight-header">
+                    );
+                  }
+                  
+                  return (
+                    <div className={`focus-task ${highlightedTask.completed ? 'completed' : ''}`}>
+                      <div className="focus-task-header">
                         <button 
-                          className="highlight-checkbox"
+                          className="focus-checkbox"
                           onClick={() => handleToggleComplete(highlightedTask)}
-                          title={highlightedTask.completed ? 'Mark as incomplete' : 'Complete highlight'}
                         >
-                          {highlightedTask.completed ? <Check size={24} /> : <div className="checkbox-empty-large" />}
+                          {highlightedTask.completed ? <Check size={18} /> : <div className="checkbox-empty-small" />}
                         </button>
-                        <div className="highlight-title-area">
-                          <h3 className="highlight-title">{highlightedTask.title}</h3>
-                          {highlightedTask.description && (
-                            <p className="highlight-description">{highlightedTask.description}</p>
+                        <div className="focus-task-content">
+                          <h4 className="focus-task-title">{highlightedTask.title}</h4>
+                          {highlightedTask.tags && highlightedTask.tags.length > 0 && (
+                            <div className="focus-tags">
+                              {highlightedTask.tags.slice(0, 2).map(tag => (
+                                <span 
+                                  key={tag.id} 
+                                  className="focus-tag"
+                                  style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                                >
+                                  {tag.name}
+                                </span>
+                              ))}
+                            </div>
                           )}
                         </div>
                         <button 
-                          className="highlight-remove"
+                          className="focus-remove"
                           onClick={() => handleRemoveHighlight(highlightedTask.id)}
-                          title="Remove highlight"
                         >
-                          <X size={20} />
+                          <X size={16} />
                         </button>
                       </div>
-                      {highlightedTask.tags && highlightedTask.tags.length > 0 && (
-                        <div className="highlight-tags">
-                          {highlightedTask.tags.map(tag => (
-                            <span 
-                              key={tag.id} 
-                              className="highlight-tag"
-                              style={{ 
-                                backgroundColor: `${tag.color}20`,
-                                color: tag.color,
-                                borderColor: `${tag.color}40`
-                              }}
-                            >
-                              {tag.name}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <span className={`highlight-priority priority-${highlightedTask.priority}`}>
-                        {highlightedTask.priority} priority
-                      </span>
                     </div>
+                  );
+                })()}
+              </section>
+
+              {/* Eat That Frog */}
+              <section className="focus-card frog-card">
+                <div className="focus-header">
+                  <span className="focus-icon frog-icon">🐸</span>
+                  <div>
+                    <h3>Eat That Frog</h3>
+                    <p className="focus-subtitle">Hardest Task First</p>
                   </div>
-                );
-              })()}
-            </section>
+                </div>
+                {(() => {
+                  const frogTask = tasks.find(t => t.is_frog);
+                  
+                  if (!frogTask) {
+                    return (
+                      <div className="focus-empty">
+                        <span style={{ fontSize: '32px' }}>🐸</span>
+                        <p>No frog set</p>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div className={`focus-task ${frogTask.completed ? 'completed' : ''}`}>
+                      <div className="focus-task-header">
+                        <button 
+                          className="focus-checkbox"
+                          onClick={() => handleToggleComplete(frogTask)}
+                        >
+                          {frogTask.completed ? <Check size={18} /> : <div className="checkbox-empty-small" />}
+                        </button>
+                        <div className="focus-task-content">
+                          <h4 className="focus-task-title">{frogTask.title}</h4>
+                          {frogTask.tags && frogTask.tags.length > 0 && (
+                            <div className="focus-tags">
+                              {frogTask.tags.slice(0, 2).map(tag => (
+                                <span 
+                                  key={tag.id} 
+                                  className="focus-tag"
+                                  style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                                >
+                                  {tag.name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <button 
+                          className="focus-remove"
+                          onClick={() => handleRemoveFrog(frogTask.id)}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </section>
+            </div>
 
             {/* Tasks Section */}
             <section className="tasks-section">
