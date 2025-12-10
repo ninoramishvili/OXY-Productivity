@@ -3,6 +3,7 @@ import { tasksAPI, tagsAPI } from '../utils/api';
 import TaskModal from '../components/TaskModal';
 import ConfirmModal from '../components/ConfirmModal';
 import PomodoroTimer from '../components/PomodoroTimer';
+import FloatingTimer from '../components/FloatingTimer';
 import { 
   Target, 
   CheckSquare, 
@@ -168,6 +169,11 @@ function Home({ user }) {
   const [showCelebration, setShowCelebration] = useState(false);
   const [activePomodoroTask, setActivePomodoroTask] = useState(null);
   const [showPomodoroComplete, setShowPomodoroComplete] = useState(false);
+  const [showFloatingTimer, setShowFloatingTimer] = useState(false);
+  const [highlightedTask, setHighlightedTask] = useState(null);
+  const [frogTask, setFrogTask] = useState(null);
+  const [showHighlightCelebration, setShowHighlightCelebration] = useState(false);
+  const [showFrogCelebration, setShowFrogCelebration] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -463,6 +469,10 @@ function Home({ user }) {
 
   return (
     <div className="home-page">
+      {/* Floating Timer */}
+      {showFloatingTimer && (
+        <FloatingTimer onClose={() => setShowFloatingTimer(false)} />
+      )}
       {/* Pomodoro Timer Modal */}
       {activePomodoroTask && (
         <div className="modal-overlay" onClick={handlePomodoroCancel}>
@@ -727,6 +737,13 @@ function Home({ user }) {
                     <option value="name_desc">Name (Z-A)</option>
                     <option value="priority">Priority</option>
                   </select>
+                  <button 
+                    className="btn-secondary" 
+                    onClick={() => setShowFloatingTimer(!showFloatingTimer)}
+                    title="Independent Timer"
+                  >
+                    <Timer size={18} />
+                  </button>
                   <button className="btn-primary" onClick={handleCreateTask}>
                     <Plus size={18} />
                     Add Task

@@ -228,9 +228,11 @@
 .pomodoro-modal {
   max-width: 500px;
   padding: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .pomodoro-celebration {
