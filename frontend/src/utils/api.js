@@ -54,8 +54,8 @@ export const tasksAPI = {
     return response.data;
   },
   
-  setHighlight: async (taskId) => {
-    const response = await api.put(`/tasks/${taskId}/highlight`);
+  setHighlight: async (taskId, date) => {
+    const response = await api.put(`/tasks/${taskId}/highlight`, { date });
     return response.data;
   },
   

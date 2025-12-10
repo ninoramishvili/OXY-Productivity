@@ -236,13 +236,15 @@ router.delete('/:id', verifyToken, async (req, res) => {
 // Set task as daily highlight
 router.put('/:id/highlight', verifyToken, async (req, res) => {
   const taskId = parseInt(req.params.id);
+  const { date } = req.body; // Accept date from frontend
 
   try {
     // Start transaction
     await query('BEGIN');
 
-    // Get today's date
-    const today = new Date().toISOString().split('T')[0];
+    // Use provided date or fallback to server date
+    const today = date || new Date().toISOString().split('T')[0];
+    console.log('Setting highlight for date:', today);
 
     // Check if task belongs to user
     const checkResult = await query(

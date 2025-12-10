@@ -144,8 +144,15 @@ function Home({ user }) {
 
   const handleSetHighlight = async (taskId) => {
     try {
-      console.log('Setting highlight for task:', taskId);
-      const response = await tasksAPI.setHighlight(taskId);
+      // Get user's local date (in their timezone)
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const localDate = `${year}-${month}-${day}`;
+      
+      console.log('Setting highlight for task:', taskId, 'with date:', localDate);
+      const response = await tasksAPI.setHighlight(taskId, localDate);
       console.log('Set highlight response:', response);
       if (response.success) {
         showSuccess('✨ Task set as Daily Highlight!');
@@ -287,8 +294,11 @@ function Home({ user }) {
                 <p>Your most important task today</p>
               </div>
               {(() => {
-                const today = new Date().toISOString().split('T')[0];
-                console.log('Today date for comparison:', today);
+                // Get user's local date (not UTC)
+                const now = new Date();
+                const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                console.log('Today date for comparison (local timezone):', today);
+                
                 const highlightedTask = tasks.find(t => {
                   if (!t.is_daily_highlight) return false;
                   const taskDate = t.highlight_date ? new Date(t.highlight_date).toISOString().split('T')[0] : null;
@@ -394,7 +404,9 @@ function Home({ user }) {
               ) : (
                 <div className="tasks-grid">
                   {getSortedTasks().map((task) => {
-                    const today = new Date().toISOString().split('T')[0];
+                    // Get user's local date (not UTC)
+                    const now = new Date();
+                    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
                     const taskDate = task.highlight_date ? new Date(task.highlight_date).toISOString().split('T')[0] : null;
                     const isHighlight = task.is_daily_highlight && taskDate === today;
                     
