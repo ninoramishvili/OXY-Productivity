@@ -288,7 +288,14 @@ function Home({ user }) {
               </div>
               {(() => {
                 const today = new Date().toISOString().split('T')[0];
-                const highlightedTask = tasks.find(t => t.is_daily_highlight && t.highlight_date === today);
+                console.log('Today date for comparison:', today);
+                const highlightedTask = tasks.find(t => {
+                  if (!t.is_daily_highlight) return false;
+                  const taskDate = t.highlight_date ? new Date(t.highlight_date).toISOString().split('T')[0] : null;
+                  console.log('Task', t.id, 'highlight date:', t.highlight_date, 'normalized:', taskDate, 'matches today:', taskDate === today);
+                  return t.is_daily_highlight && taskDate === today;
+                });
+                console.log('Found highlighted task:', highlightedTask);
                 
                 if (!highlightedTask) {
                   return (
@@ -388,7 +395,8 @@ function Home({ user }) {
                 <div className="tasks-grid">
                   {getSortedTasks().map((task) => {
                     const today = new Date().toISOString().split('T')[0];
-                    const isHighlight = task.is_daily_highlight && task.highlight_date === today;
+                    const taskDate = task.highlight_date ? new Date(task.highlight_date).toISOString().split('T')[0] : null;
+                    const isHighlight = task.is_daily_highlight && taskDate === today;
                     
                     return (
                       <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''} ${isHighlight ? 'is-highlight' : ''}`}>
