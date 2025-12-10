@@ -330,12 +330,7 @@ function Home({ user }) {
               {/* Daily Highlight */}
               <section className="focus-card">
                 <div className="focus-header">
-                  <div className="modern-icon highlight-icon">
-                    <div className="icon-star">
-                      <div className="star-core"></div>
-                      <div className="star-glow"></div>
-                    </div>
-                  </div>
+                  <div className="bouncy-icon highlight-diamond"></div>
                   <div>
                     <h3>Daily Highlight</h3>
                     <p className="focus-subtitle">Most Important Task</p>
@@ -353,7 +348,7 @@ function Home({ user }) {
                   if (!highlightedTask) {
                     return (
                       <div className="focus-empty">
-                        <Sparkles size={32} className="empty-icon" />
+                        <div className="bouncy-icon highlight-diamond" style={{ width: '40px', height: '40px' }}></div>
                         <p>No highlight set</p>
                       </div>
                     );
@@ -409,14 +404,7 @@ function Home({ user }) {
               {/* Eat That Frog */}
               <section className="focus-card frog-card">
                 <div className="focus-header">
-                  <div className="modern-icon frog-icon">
-                    <div className="icon-frog">
-                      <div className="frog-body"></div>
-                      <div className="frog-eye left"></div>
-                      <div className="frog-eye right"></div>
-                      <div className="frog-mouth"></div>
-                    </div>
-                  </div>
+                  <div className="bouncy-icon frog-circle"></div>
                   <div>
                     <h3>Eat That Frog</h3>
                     <p className="focus-subtitle">Hardest Task First</p>
@@ -428,7 +416,7 @@ function Home({ user }) {
                   if (!frogTask) {
                     return (
                       <div className="focus-empty">
-                        <span style={{ fontSize: '32px' }}>🐸</span>
+                        <div className="bouncy-icon frog-circle" style={{ width: '40px', height: '40px' }}></div>
                         <p>No frog set</p>
                       </div>
                     );
@@ -471,7 +459,7 @@ function Home({ user }) {
                           </>
                         ) : (
                           <>
-                            🐸
+                            <Check size={18} />
                             Eat That Frog
                           </>
                         )}
@@ -534,8 +522,8 @@ function Home({ user }) {
                               {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
                             </button>
                             <h3 className="task-title">{task.title}</h3>
-                            {isHighlight && <Star size={16} className="highlight-indicator" fill="currentColor" />}
-                            {task.is_frog && <span className="frog-indicator" title="Your Frog - Hardest Task">🐸</span>}
+                            {isHighlight && <span className="highlight-indicator" title="Daily Highlight"></span>}
+                            {task.is_frog && <span className="frog-indicator" title="Your Frog - Hardest Task"></span>}
                           </div>
                           <span className={`priority-badge priority-${task.priority}`}>
                             {task.priority}
