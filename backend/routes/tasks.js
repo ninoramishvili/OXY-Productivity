@@ -261,15 +261,17 @@ router.put('/:id/highlight', verifyToken, async (req, res) => {
     }
 
     // Remove ALL existing highlights for this user (regardless of date)
-    await query(
+    const clearResult = await query(
       `UPDATE tasks 
        SET is_daily_highlight = FALSE, highlight_date = NULL 
-       WHERE user_id = $1 AND is_daily_highlight = TRUE`,
+       WHERE user_id = $1 AND is_daily_highlight = TRUE
+       RETURNING id`,
       [req.userId]
     );
-    console.log('Cleared all existing highlights for user:', req.userId);
+    console.log('Cleared', clearResult.rows.length, 'existing highlights for user:', req.userId);
 
     // Set new highlight
+    console.log('Setting task', taskId, 'as highlight with date:', today);
     const result = await query(
       `UPDATE tasks 
        SET is_daily_highlight = TRUE, highlight_date = $1, updated_at = CURRENT_TIMESTAMP 
@@ -277,6 +279,7 @@ router.put('/:id/highlight', verifyToken, async (req, res) => {
        RETURNING *`,
       [today, taskId, req.userId]
     );
+    console.log('Updated task result:', result.rows[0].id, 'highlight_date:', result.rows[0].highlight_date, 'is_daily_highlight:', result.rows[0].is_daily_highlight);
 
     // Fetch tags for the task
     const tagsResult = await query(
