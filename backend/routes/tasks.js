@@ -98,7 +98,9 @@ router.post('/', verifyToken, async (req, res) => {
 // Update task
 router.put('/:id', verifyToken, async (req, res) => {
   const taskId = parseInt(req.params.id);
-  const { title, description, completed, priority, scheduledDate, scheduledTime } = req.body;
+  const { title, description, completed, priority, scheduledDate, scheduledTime, tagIds } = req.body;
+
+  console.log('Update task request:', { taskId, tagIds });
 
   try {
     // Check if task belongs to user
@@ -161,10 +163,36 @@ router.put('/:id', verifyToken, async (req, res) => {
       values
     );
 
+    // Update tags if tagIds is provided
+    if (tagIds !== undefined) {
+      console.log('Updating tags for task', taskId, 'New tagIds:', tagIds);
+      
+      // Delete existing tags
+      await query('DELETE FROM task_tags WHERE task_id = $1', [taskId]);
+      
+      // Add new tags
+      if (tagIds && tagIds.length > 0) {
+        for (const tagId of tagIds) {
+          await query(
+            'INSERT INTO task_tags (task_id, tag_id) VALUES ($1, $2)',
+            [taskId, tagId]
+          );
+        }
+      }
+    }
+
+    // Fetch tags for response
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [taskId]
+    );
+
     res.json({ 
       success: true, 
       message: 'Task updated successfully',
-      task: result.rows[0] 
+      task: { ...result.rows[0], tags: tagsResult.rows }
     });
   } catch (error) {
     console.error('Update task error:', error);
