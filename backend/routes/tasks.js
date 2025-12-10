@@ -233,4 +233,113 @@ router.delete('/:id', verifyToken, async (req, res) => {
   }
 });
 
+// Set task as daily highlight
+router.put('/:id/highlight', verifyToken, async (req, res) => {
+  const taskId = parseInt(req.params.id);
+
+  try {
+    // Start transaction
+    await query('BEGIN');
+
+    // Get today's date
+    const today = new Date().toISOString().split('T')[0];
+
+    // Check if task belongs to user
+    const checkResult = await query(
+      'SELECT id FROM tasks WHERE id = $1 AND user_id = $2',
+      [taskId, req.userId]
+    );
+
+    if (checkResult.rows.length === 0) {
+      await query('ROLLBACK');
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
+    }
+
+    // Remove existing highlight for today (if any)
+    await query(
+      `UPDATE tasks 
+       SET is_daily_highlight = FALSE, highlight_date = NULL 
+       WHERE user_id = $1 AND highlight_date = $2`,
+      [req.userId, today]
+    );
+
+    // Set new highlight
+    const result = await query(
+      `UPDATE tasks 
+       SET is_daily_highlight = TRUE, highlight_date = $1, updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $2 AND user_id = $3 
+       RETURNING *`,
+      [today, taskId, req.userId]
+    );
+
+    // Fetch tags for the task
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [taskId]
+    );
+
+    await query('COMMIT');
+
+    res.json({ 
+      success: true, 
+      message: 'Task set as daily highlight',
+      task: { ...result.rows[0], tags: tagsResult.rows }
+    });
+  } catch (error) {
+    await query('ROLLBACK');
+    console.error('Set highlight error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to set daily highlight' 
+    });
+  }
+});
+
+// Remove daily highlight
+router.delete('/:id/highlight', verifyToken, async (req, res) => {
+  const taskId = parseInt(req.params.id);
+
+  try {
+    const result = await query(
+      `UPDATE tasks 
+       SET is_daily_highlight = FALSE, highlight_date = NULL, updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $1 AND user_id = $2 
+       RETURNING *`,
+      [taskId, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
+    }
+
+    // Fetch tags for the task
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [taskId]
+    );
+
+    res.json({ 
+      success: true, 
+      message: 'Daily highlight removed',
+      task: { ...result.rows[0], tags: tagsResult.rows }
+    });
+  } catch (error) {
+    console.error('Remove highlight error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to remove daily highlight' 
+    });
+  }
+});
+
 module.exports = router;

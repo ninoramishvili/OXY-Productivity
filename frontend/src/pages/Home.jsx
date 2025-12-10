@@ -10,7 +10,9 @@ import {
   Sparkles,
   TrendingUp,
   Trash2,
-  Check
+  Check,
+  Star,
+  X
 } from 'lucide-react';
 import './Home.css';
 
@@ -24,6 +26,7 @@ function Home({ user }) {
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
   const [sortBy, setSortBy] = useState('created_desc');
+  const [showCelebration, setShowCelebration] = useState(false);
 
   // Load tasks and tags on mount
   useEffect(() => {
@@ -122,11 +125,42 @@ function Home({ user }) {
         completed: !task.completed
       });
       if (response.success) {
-        showSuccess(task.completed ? 'Task reopened!' : 'Task completed!');
+        // Show celebration if completing a daily highlight
+        if (!task.completed && task.is_daily_highlight) {
+          setShowCelebration(true);
+          setTimeout(() => setShowCelebration(false), 3000);
+          showSuccess('🎉 Daily Highlight Completed! Amazing work!');
+        } else {
+          showSuccess(task.completed ? 'Task reopened!' : 'Task completed!');
+        }
         loadTasks();
       }
     } catch (err) {
       alert('Failed to update task');
+    }
+  };
+
+  const handleSetHighlight = async (taskId) => {
+    try {
+      const response = await tasksAPI.setHighlight(taskId);
+      if (response.success) {
+        showSuccess('✨ Task set as Daily Highlight!');
+        loadTasks();
+      }
+    } catch (err) {
+      alert('Failed to set highlight: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleRemoveHighlight = async (taskId) => {
+    try {
+      const response = await tasksAPI.removeHighlight(taskId);
+      if (response.success) {
+        showSuccess('Highlight removed');
+        loadTasks();
+      }
+    } catch (err) {
+      alert('Failed to remove highlight');
     }
   };
 
@@ -227,6 +261,17 @@ function Home({ user }) {
           </div>
         ) : (
           <div className="content-grid">
+            {/* Celebration Animation */}
+            {showCelebration && (
+              <div className="celebration-overlay">
+                <div className="celebration-content">
+                  <Sparkles size={64} className="celebration-icon" />
+                  <h2>Outstanding! 🎉</h2>
+                  <p>You completed your Daily Highlight!</p>
+                </div>
+              </div>
+            )}
+
             {/* Daily Highlight Section */}
             <section className="highlight-section">
               <div className="section-header">
@@ -236,16 +281,71 @@ function Home({ user }) {
                 </div>
                 <p>Your most important task today</p>
               </div>
-              <div className="highlight-card empty">
-                <div className="empty-state">
-                  <Sparkles size={48} className="empty-icon" />
-                  <p>No highlight set yet</p>
-                  <button className="btn-secondary">
-                    <Plus size={16} />
-                    Set Your Highlight
-                  </button>
-                </div>
-              </div>
+              {(() => {
+                const today = new Date().toISOString().split('T')[0];
+                const highlightedTask = tasks.find(t => t.is_daily_highlight && t.highlight_date === today);
+                
+                if (!highlightedTask) {
+                  return (
+                    <div className="highlight-card empty">
+                      <div className="empty-state">
+                        <Sparkles size={48} className="empty-icon" />
+                        <p>No highlight set yet</p>
+                        <p className="empty-hint">Pick your most important task for today</p>
+                      </div>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <div className={`highlight-card ${highlightedTask.completed ? 'completed' : ''}`}>
+                    <div className="highlight-content">
+                      <div className="highlight-header">
+                        <button 
+                          className="highlight-checkbox"
+                          onClick={() => handleToggleComplete(highlightedTask)}
+                          title={highlightedTask.completed ? 'Mark as incomplete' : 'Complete highlight'}
+                        >
+                          {highlightedTask.completed ? <Check size={24} /> : <div className="checkbox-empty-large" />}
+                        </button>
+                        <div className="highlight-title-area">
+                          <h3 className="highlight-title">{highlightedTask.title}</h3>
+                          {highlightedTask.description && (
+                            <p className="highlight-description">{highlightedTask.description}</p>
+                          )}
+                        </div>
+                        <button 
+                          className="highlight-remove"
+                          onClick={() => handleRemoveHighlight(highlightedTask.id)}
+                          title="Remove highlight"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                      {highlightedTask.tags && highlightedTask.tags.length > 0 && (
+                        <div className="highlight-tags">
+                          {highlightedTask.tags.map(tag => (
+                            <span 
+                              key={tag.id} 
+                              className="highlight-tag"
+                              style={{ 
+                                backgroundColor: `${tag.color}20`,
+                                color: tag.color,
+                                borderColor: `${tag.color}40`
+                              }}
+                            >
+                              {tag.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <span className={`highlight-priority priority-${highlightedTask.priority}`}>
+                        {highlightedTask.priority} priority
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
             </section>
 
             {/* Tasks Section */}
@@ -281,60 +381,75 @@ function Home({ user }) {
                 </div>
               ) : (
                 <div className="tasks-grid">
-                  {getSortedTasks().map((task) => (
-                    <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''}`}>
-                      <div className="task-header">
-                        <div className="task-title-row">
-                          <button 
-                            className="task-checkbox"
-                            onClick={() => handleToggleComplete(task)}
-                            title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
-                          >
-                            {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
-                          </button>
-                          <h3 className="task-title">{task.title}</h3>
-                        </div>
-                        <span className={`priority-badge priority-${task.priority}`}>
-                          {task.priority}
-                        </span>
-                      </div>
-                      
-                      {task.tags && task.tags.length > 0 && (
-                        <div className="task-tags">
-                          {task.tags.map(tag => (
-                            <span 
-                              key={tag.id} 
-                              className="task-tag"
-                              style={{ 
-                                backgroundColor: `${tag.color}20`,
-                                color: tag.color,
-                                borderColor: `${tag.color}40`
-                              }}
+                  {getSortedTasks().map((task) => {
+                    const today = new Date().toISOString().split('T')[0];
+                    const isHighlight = task.is_daily_highlight && task.highlight_date === today;
+                    
+                    return (
+                      <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''} ${isHighlight ? 'is-highlight' : ''}`}>
+                        <div className="task-header">
+                          <div className="task-title-row">
+                            <button 
+                              className="task-checkbox"
+                              onClick={() => handleToggleComplete(task)}
+                              title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
                             >
-                              {tag.name}
-                            </span>
-                          ))}
+                              {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
+                            </button>
+                            <h3 className="task-title">{task.title}</h3>
+                            {isHighlight && <Star size={16} className="highlight-indicator" fill="currentColor" />}
+                          </div>
+                          <span className={`priority-badge priority-${task.priority}`}>
+                            {task.priority}
+                          </span>
                         </div>
-                      )}
-                      
-                      <div className="task-footer">
-                        <button 
-                          className="task-action-icon"
-                          onClick={() => handleEditTask(task)}
-                          title="Edit task"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button 
-                          className="task-action-icon delete"
-                          onClick={() => handleDeleteTask(task.id)}
-                          title="Delete task"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        
+                        {task.tags && task.tags.length > 0 && (
+                          <div className="task-tags">
+                            {task.tags.map(tag => (
+                              <span 
+                                key={tag.id} 
+                                className="task-tag"
+                                style={{ 
+                                  backgroundColor: `${tag.color}20`,
+                                  color: tag.color,
+                                  borderColor: `${tag.color}40`
+                                }}
+                              >
+                                {tag.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        
+                        <div className="task-footer">
+                          {!isHighlight && !task.completed && (
+                            <button 
+                              className="task-action-icon highlight-btn"
+                              onClick={() => handleSetHighlight(task.id)}
+                              title="Set as Daily Highlight"
+                            >
+                              <Star size={16} />
+                            </button>
+                          )}
+                          <button 
+                            className="task-action-icon"
+                            onClick={() => handleEditTask(task)}
+                            title="Edit task"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button 
+                            className="task-action-icon delete"
+                            onClick={() => handleDeleteTask(task.id)}
+                            title="Delete task"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </section>

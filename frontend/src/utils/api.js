@@ -53,6 +53,16 @@ export const tasksAPI = {
     const response = await api.delete(`/tasks/${taskId}`);
     return response.data;
   },
+  
+  setHighlight: async (taskId) => {
+    const response = await api.put(`/tasks/${taskId}/highlight`);
+    return response.data;
+  },
+  
+  removeHighlight: async (taskId) => {
+    const response = await api.delete(`/tasks/${taskId}/highlight`);
+    return response.data;
+  },
 };
 
 // Tags API calls
