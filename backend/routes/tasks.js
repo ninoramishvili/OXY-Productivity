@@ -7,7 +7,7 @@ const { verifyToken } = require('./auth');
 router.get('/', verifyToken, async (req, res) => {
   try {
     const tasksResult = await query(
-      'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC',
+      'SELECT * FROM tasks WHERE user_id = $1 ORDER BY display_order ASC, created_at DESC',
       [req.userId]
     );
     
@@ -443,6 +443,37 @@ router.delete('/:id/frog', verifyToken, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Failed to remove frog status' 
+    });
+  }
+});
+
+// Reorder tasks
+router.post('/reorder', verifyToken, async (req, res) => {
+  const { taskOrders } = req.body; // Array of { id, display_order }
+
+  try {
+    await query('BEGIN');
+
+    // Update display_order for each task
+    for (const taskOrder of taskOrders) {
+      await query(
+        'UPDATE tasks SET display_order = $1 WHERE id = $2 AND user_id = $3',
+        [taskOrder.display_order, taskOrder.id, req.userId]
+      );
+    }
+
+    await query('COMMIT');
+
+    res.json({ 
+      success: true, 
+      message: 'Task order updated' 
+    });
+  } catch (error) {
+    await query('ROLLBACK');
+    console.error('Reorder tasks error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to reorder tasks' 
     });
   }
 });

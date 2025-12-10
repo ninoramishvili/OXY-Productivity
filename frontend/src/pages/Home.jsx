@@ -12,9 +12,120 @@ import {
   Trash2,
   Check,
   Star,
-  X
+  X,
+  GripVertical
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import './Home.css';
+
+// Sortable Task Card Component
+function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onDeleteTask, onSetHighlight, onSetFrog }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`task-card ${task.completed ? 'completed' : ''} ${isHighlight ? 'is-highlight' : ''} ${isDragging ? 'dragging' : ''}`}
+    >
+      <div className="task-header">
+        <div className="task-title-row">
+          <div className="drag-handle" {...attributes} {...listeners}>
+            <GripVertical size={16} />
+          </div>
+          <button 
+            className="task-checkbox"
+            onClick={() => onToggleComplete(task)}
+            title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
+          >
+            {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
+          </button>
+          <h3 className="task-title">{task.title}</h3>
+          {isHighlight && <span className="task-emoji-indicator" title="Daily Highlight">✨</span>}
+          {task.is_frog && <span className="task-emoji-indicator" title="Your Frog - Hardest Task">🐸</span>}
+        </div>
+        <span className={`priority-badge priority-${task.priority}`}>
+          {task.priority}
+        </span>
+      </div>
+      
+      {task.tags && task.tags.length > 0 && (
+        <div className="task-tags">
+          {task.tags.map(tag => (
+            <span 
+              key={tag.id} 
+              className="task-tag"
+              style={{ 
+                backgroundColor: `${tag.color}20`,
+                color: tag.color,
+                borderColor: `${tag.color}40`
+              }}
+            >
+              {tag.name}
+            </span>
+          ))}
+        </div>
+      )}
+      
+      <div className="task-footer">
+        {!isHighlight && !task.completed && (
+          <button 
+            className="task-action-icon highlight-btn"
+            onClick={() => onSetHighlight(task.id)}
+            title="Set as Daily Highlight"
+          ></button>
+        )}
+        {!task.is_frog && !task.completed && (
+          <button 
+            className="task-action-icon frog-btn"
+            onClick={() => onSetFrog(task.id)}
+            title="Mark as Frog (Hardest Task)"
+          ></button>
+        )}
+        <button 
+          className="task-action-icon"
+          onClick={() => onEditTask(task)}
+          title="Edit task"
+        >
+          <Edit2 size={16} />
+        </button>
+        <button 
+          className="task-action-icon delete"
+          onClick={() => onDeleteTask(task.id)}
+          title="Delete task"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function Home({ user }) {
   const [tasks, setTasks] = useState([]);
@@ -28,6 +139,14 @@ function Home({ user }) {
   const [sortBy, setSortBy] = useState('created_desc');
   const [showCelebration, setShowCelebration] = useState(false);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
   // Load tasks and tags on mount
   useEffect(() => {
     loadTasks();
@@ -37,24 +156,59 @@ function Home({ user }) {
   // Sort tasks whenever sortBy changes
   const getSortedTasks = () => {
     const sorted = [...tasks];
-    sorted.sort((a, b) => {
-      switch (sortBy) {
-        case 'created_desc':
-          return new Date(b.created_at) - new Date(a.created_at);
-        case 'created_asc':
-          return new Date(a.created_at) - new Date(b.created_at);
-        case 'name_asc':
-          return a.title.localeCompare(b.title);
-        case 'name_desc':
-          return b.title.localeCompare(a.title);
-        case 'priority':
-          const priorityOrder = { high: 0, medium: 1, low: 2 };
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
-        default:
-          return 0;
-      }
-    });
+    
+    if (sortBy === 'manual') {
+      // Manual order - use display_order
+      sorted.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    } else {
+      sorted.sort((a, b) => {
+        switch (sortBy) {
+          case 'created_desc':
+            return new Date(b.created_at) - new Date(a.created_at);
+          case 'created_asc':
+            return new Date(a.created_at) - new Date(b.created_at);
+          case 'name_asc':
+            return a.title.localeCompare(b.title);
+          case 'name_desc':
+            return b.title.localeCompare(a.title);
+          case 'priority':
+            const priorityOrder = { high: 0, medium: 1, low: 2 };
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
+          default:
+            return 0;
+        }
+      });
+    }
     return sorted;
+  };
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = tasks.findIndex((task) => task.id === active.id);
+      const newIndex = tasks.findIndex((task) => task.id === over.id);
+
+      const newTasks = arrayMove(tasks, oldIndex, newIndex);
+      
+      // Update display_order for all tasks
+      const taskOrders = newTasks.map((task, index) => ({
+        id: task.id,
+        display_order: index
+      }));
+
+      // Optimistically update UI
+      setTasks(newTasks);
+
+      // Save to backend
+      try {
+        await tasksAPI.reorderTasks(taskOrders);
+      } catch (err) {
+        console.error('Failed to save task order:', err);
+        // Revert on error
+        loadTasks();
+      }
+    }
   };
 
   const loadTasks = async () => {
@@ -483,6 +637,7 @@ function Home({ user }) {
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                   >
+                    <option value="manual">Manual Order (Drag)</option>
                     <option value="created_desc">Newest First</option>
                     <option value="created_asc">Oldest First</option>
                     <option value="name_asc">Name (A-Z)</option>
@@ -502,86 +657,38 @@ function Home({ user }) {
                   <p>No tasks yet. Create your first task to get started!</p>
                 </div>
               ) : (
-                <div className="tasks-grid">
-                  {getSortedTasks().map((task) => {
-                    // Get user's local date (not UTC)
-                    const now = new Date();
-                    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-                    const taskDate = task.highlight_date ? new Date(task.highlight_date).toISOString().split('T')[0] : null;
-                    const isHighlight = task.is_daily_highlight && taskDate === today;
-                    
-                    return (
-                      <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''} ${isHighlight ? 'is-highlight' : ''}`}>
-                        <div className="task-header">
-                          <div className="task-title-row">
-                            <button 
-                              className="task-checkbox"
-                              onClick={() => handleToggleComplete(task)}
-                              title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
-                            >
-                              {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
-                            </button>
-                            <h3 className="task-title">{task.title}</h3>
-                            {isHighlight && <span className="task-emoji-indicator" title="Daily Highlight">✨</span>}
-                            {task.is_frog && <span className="task-emoji-indicator" title="Your Frog - Hardest Task">🐸</span>}
-                          </div>
-                          <span className={`priority-badge priority-${task.priority}`}>
-                            {task.priority}
-                          </span>
-                        </div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={getSortedTasks().map(t => t.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="tasks-grid">
+                      {getSortedTasks().map((task) => {
+                        const now = new Date();
+                        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                        const taskDate = task.highlight_date ? new Date(task.highlight_date).toISOString().split('T')[0] : null;
+                        const isHighlight = task.is_daily_highlight && taskDate === today;
                         
-                        {task.tags && task.tags.length > 0 && (
-                          <div className="task-tags">
-                            {task.tags.map(tag => (
-                              <span 
-                                key={tag.id} 
-                                className="task-tag"
-                                style={{ 
-                                  backgroundColor: `${tag.color}20`,
-                                  color: tag.color,
-                                  borderColor: `${tag.color}40`
-                                }}
-                              >
-                                {tag.name}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        
-                        <div className="task-footer">
-                          {!isHighlight && !task.completed && (
-                            <button 
-                              className="task-action-icon highlight-btn"
-                              onClick={() => handleSetHighlight(task.id)}
-                              title="Set as Daily Highlight"
-                            ></button>
-                          )}
-                          {!task.is_frog && !task.completed && (
-                            <button 
-                              className="task-action-icon frog-btn"
-                              onClick={() => handleSetFrog(task.id)}
-                              title="Mark as Frog (Hardest Task)"
-                            ></button>
-                          )}
-                          <button 
-                            className="task-action-icon"
-                            onClick={() => handleEditTask(task)}
-                            title="Edit task"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button 
-                            className="task-action-icon delete"
-                            onClick={() => handleDeleteTask(task.id)}
-                            title="Delete task"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                        return (
+                          <SortableTaskCard
+                            key={task.id}
+                            task={task}
+                            isHighlight={isHighlight}
+                            onToggleComplete={handleToggleComplete}
+                            onEditTask={handleEditTask}
+                            onDeleteTask={handleDeleteTask}
+                            onSetHighlight={handleSetHighlight}
+                            onSetFrog={handleSetFrog}
+                          />
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               )}
             </section>
 

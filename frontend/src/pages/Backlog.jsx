@@ -11,9 +11,104 @@ import {
   Check,
   X,
   ListTodo,
-  AlertCircle
+  AlertCircle,
+  GripVertical
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import './Backlog.css';
+
+// Sortable Task Card Component for Backlog
+function SortableBacklogCard({ task, onToggleComplete, onEditTask, onDeleteTask }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`task-card ${task.completed ? 'completed' : ''} ${isDragging ? 'dragging' : ''}`}
+    >
+      <div className="task-header">
+        <div className="task-title-row">
+          <div className="drag-handle" {...attributes} {...listeners}>
+            <GripVertical size={16} />
+          </div>
+          <button 
+            className="task-checkbox"
+            onClick={() => onToggleComplete(task)}
+            title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
+          >
+            {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
+          </button>
+          <h3 className="task-title">{task.title}</h3>
+        </div>
+        <span className={`priority-badge priority-${task.priority}`}>
+          {task.priority}
+        </span>
+      </div>
+      
+      {task.tags && task.tags.length > 0 && (
+        <div className="task-tags">
+          {task.tags.map(tag => (
+            <span 
+              key={tag.id} 
+              className="task-tag"
+              style={{ 
+                backgroundColor: `${tag.color}20`,
+                color: tag.color,
+                borderColor: `${tag.color}40`
+              }}
+            >
+              {tag.name}
+            </span>
+          ))}
+        </div>
+      )}
+      
+      <div className="task-footer">
+        <button 
+          className="task-action-icon"
+          onClick={() => onEditTask(task)}
+          title="Edit task"
+        >
+          <Edit2 size={16} />
+        </button>
+        <button 
+          className="task-action-icon delete"
+          onClick={() => onDeleteTask(task.id)}
+          title="Delete task"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function Backlog() {
   const [tasks, setTasks] = useState([]);
@@ -24,12 +119,20 @@ function Backlog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('created_desc'); // created_asc, created_desc, name_asc, name_desc, priority
+  const [sortBy, setSortBy] = useState('manual'); // manual, created_asc, created_desc, name_asc, name_desc, priority
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
   const [showFilters, setShowFilters] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   useEffect(() => {
     loadTasks();
@@ -91,25 +194,58 @@ function Backlog() {
     }
 
     // Sorting
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'created_desc':
-          return new Date(b.created_at) - new Date(a.created_at);
-        case 'created_asc':
-          return new Date(a.created_at) - new Date(b.created_at);
-        case 'name_asc':
-          return a.title.localeCompare(b.title);
-        case 'name_desc':
-          return b.title.localeCompare(a.title);
-        case 'priority':
-          const priorityOrder = { high: 0, medium: 1, low: 2 };
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
-        default:
-          return 0;
-      }
-    });
+    if (sortBy === 'manual') {
+      filtered.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    } else {
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case 'created_desc':
+            return new Date(b.created_at) - new Date(a.created_at);
+          case 'created_asc':
+            return new Date(a.created_at) - new Date(b.created_at);
+          case 'name_asc':
+            return a.title.localeCompare(b.title);
+          case 'name_desc':
+            return b.title.localeCompare(a.title);
+          case 'priority':
+            const priorityOrder = { high: 0, medium: 1, low: 2 };
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
+          default:
+            return 0;
+        }
+      });
+    }
 
     setFilteredTasks(filtered);
+  };
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = filteredTasks.findIndex((task) => task.id === active.id);
+      const newIndex = filteredTasks.findIndex((task) => task.id === over.id);
+
+      const newTasks = arrayMove(filteredTasks, oldIndex, newIndex);
+      
+      // Update display_order for all tasks
+      const taskOrders = newTasks.map((task, index) => ({
+        id: task.id,
+        display_order: index
+      }));
+
+      // Optimistically update UI
+      setFilteredTasks(newTasks);
+
+      // Save to backend
+      try {
+        await tasksAPI.reorderTasks(taskOrders);
+        loadTasks(); // Reload to sync
+      } catch (err) {
+        console.error('Failed to save task order:', err);
+        loadTasks(); // Revert on error
+      }
+    }
   };
 
   const showSuccess = (message) => {
@@ -265,6 +401,7 @@ function Backlog() {
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
         >
+          <option value="manual">Manual Order (Drag)</option>
           <option value="created_desc">Newest First</option>
           <option value="created_asc">Oldest First</option>
           <option value="name_asc">Name (A-Z)</option>
@@ -383,65 +520,28 @@ function Backlog() {
             )}
           </div>
         ) : (
-          <div className="tasks-list">
-            {filteredTasks.map((task) => (
-              <div key={task.id} className={`backlog-task-card ${task.completed ? 'completed' : ''}`}>
-                <div className="task-main">
-                  <button 
-                    className="task-checkbox"
-                    onClick={() => handleToggleComplete(task)}
-                    title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
-                  >
-                    {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
-                  </button>
-                  
-                  <div className="task-content">
-                    <div className="task-header-row">
-                      <h3 className="task-title">{task.title}</h3>
-                      <span className={`priority-badge priority-${task.priority}`}>
-                        {task.priority}
-                      </span>
-                    </div>
-                    
-                    {task.tags && task.tags.length > 0 && (
-                      <div className="task-tags">
-                        {task.tags.map(tag => (
-                          <span 
-                            key={tag.id} 
-                            className="task-tag"
-                            style={{ 
-                              backgroundColor: `${tag.color}20`,
-                              color: tag.color,
-                              borderColor: `${tag.color}40`
-                            }}
-                          >
-                            {tag.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="task-actions">
-                  <button 
-                    className="task-action-btn edit"
-                    onClick={() => handleEditTask(task)}
-                    title="Edit task"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button 
-                    className="task-action-btn delete"
-                    onClick={() => handleDeleteTask(task.id)}
-                    title="Delete task"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={filteredTasks.map(t => t.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="tasks-list">
+                {filteredTasks.map((task) => (
+                  <SortableBacklogCard
+                    key={task.id}
+                    task={task}
+                    onToggleComplete={handleToggleComplete}
+                    onEditTask={handleEditTask}
+                    onDeleteTask={handleDeleteTask}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
     </div>

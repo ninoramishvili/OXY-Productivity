@@ -73,6 +73,11 @@ export const tasksAPI = {
     const response = await api.delete(`/tasks/${taskId}/frog`);
     return response.data;
   },
+  
+  reorderTasks: async (taskOrders) => {
+    const response = await api.post('/tasks/reorder', { taskOrders });
+    return response.data;
+  },
 };
 
 // Tags API calls
