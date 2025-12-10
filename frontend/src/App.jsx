@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useState, useEffect } from 'react';
 import Login from './pages/Login';
 import Home from './pages/Home';
+import Backlog from './pages/Backlog';
+import Layout from './components/Layout';
 import './App.css';
 
 function App() {
@@ -48,7 +50,19 @@ function App() {
           path="/home" 
           element={
             isAuthenticated ? 
-            <Home user={user} onLogout={handleLogout} /> : 
+            <Layout user={user} onLogout={handleLogout}>
+              <Home user={user} />
+            </Layout> : 
+            <Navigate to="/login" />
+          } 
+        />
+        <Route 
+          path="/backlog" 
+          element={
+            isAuthenticated ? 
+            <Layout user={user} onLogout={handleLogout}>
+              <Backlog />
+            </Layout> : 
             <Navigate to="/login" />
           } 
         />

@@ -1,27 +1,20 @@
 import { useState, useEffect } from 'react';
-import { tasksAPI, authAPI, tagsAPI } from '../utils/api';
-import ThemeSelector from '../components/ThemeSelector';
+import { tasksAPI, tagsAPI } from '../utils/api';
 import TaskModal from '../components/TaskModal';
 import ConfirmModal from '../components/ConfirmModal';
 import { 
-  Zap, 
-  List, 
-  Timer, 
-  BarChart3, 
   Target, 
   CheckSquare, 
   Plus, 
-  Play, 
   Edit2,
   Sparkles,
   TrendingUp,
-  LogOut,
   Trash2,
   Check
 } from 'lucide-react';
 import './Home.css';
 
-function Home({ user, onLogout }) {
+function Home({ user }) {
   const [tasks, setTasks] = useState([]);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -161,7 +154,7 @@ function Home({ user, onLogout }) {
   const stats = getStats();
 
   return (
-    <div className="home-container">
+    <div className="home-page">
       {/* Success Message */}
       {successMessage && (
         <div className="success-toast">
@@ -189,57 +182,8 @@ function Home({ user, onLogout }) {
         message="Are you sure you want to delete this task? This action cannot be undone."
       />
 
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <div className="logo-container">
-            <div className="logo-main">OXY</div>
-            <div className="logo-sub">Productivity</div>
-          </div>
-        </div>
-
-        <nav className="nav-menu">
-          <a href="#" className="nav-item active">
-            <Zap className="nav-icon" size={20} />
-            <span>Today</span>
-            <span className="nav-badge">2</span>
-          </a>
-          <a href="#" className="nav-item">
-            <List className="nav-icon" size={20} />
-            <span>Backlog</span>
-          </a>
-          <a href="#" className="nav-item">
-            <Timer className="nav-icon" size={20} />
-            <span>Pomodoro</span>
-          </a>
-          <a href="#" className="nav-item">
-            <BarChart3 className="nav-icon" size={20} />
-            <span>Analytics</span>
-          </a>
-        </nav>
-
-        <div className="sidebar-footer">
-          <ThemeSelector />
-          
-          <div className="user-info">
-            <div className="user-avatar">
-              {user?.name?.charAt(0).toUpperCase() || 'U'}
-            </div>
-            <div className="user-details">
-              <div className="user-name">{user?.name || 'User'}</div>
-              <div className="user-email">{user?.email}</div>
-            </div>
-          </div>
-          
-          <button onClick={handleLogout} className="logout-button">
-            <LogOut size={16} />
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
-
       {/* Main Content */}
-      <main className="main-content">
+      <div className="home-main">
         <header className="content-header">
           <div>
             <h1 className="page-title">Good Day, {user?.name?.split(' ')[0] || 'there'}!</h1>
@@ -386,7 +330,7 @@ function Home({ user, onLogout }) {
             </section>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }
