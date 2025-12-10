@@ -61,6 +61,8 @@ function Home({ user }) {
     try {
       const response = await tasksAPI.getTasks();
       if (response.success) {
+        console.log('Loaded tasks:', response.tasks);
+        console.log('First task highlight fields:', response.tasks[0]?.is_daily_highlight, response.tasks[0]?.highlight_date);
         setTasks(response.tasks);
       }
     } catch (err) {
@@ -142,12 +144,15 @@ function Home({ user }) {
 
   const handleSetHighlight = async (taskId) => {
     try {
+      console.log('Setting highlight for task:', taskId);
       const response = await tasksAPI.setHighlight(taskId);
+      console.log('Set highlight response:', response);
       if (response.success) {
         showSuccess('✨ Task set as Daily Highlight!');
-        loadTasks();
+        await loadTasks();
       }
     } catch (err) {
+      console.error('Set highlight error:', err);
       alert('Failed to set highlight: ' + (err.response?.data?.message || err.message));
     }
   };
