@@ -10,7 +10,8 @@ import {
   Sparkles,
   TrendingUp,
   Trash2,
-  Check
+  Check,
+  FileText
 } from 'lucide-react';
 import './Home.css';
 
@@ -23,12 +24,37 @@ function Home({ user }) {
   const [editingTask, setEditingTask] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
+  const [sortBy, setSortBy] = useState('created_desc');
+  const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
   // Load tasks and tags on mount
   useEffect(() => {
     loadTasks();
     loadTags();
   }, []);
+
+  // Sort tasks whenever sortBy changes
+  const getSortedTasks = () => {
+    const sorted = [...tasks];
+    sorted.sort((a, b) => {
+      switch (sortBy) {
+        case 'created_desc':
+          return new Date(b.created_at) - new Date(a.created_at);
+        case 'created_asc':
+          return new Date(a.created_at) - new Date(b.created_at);
+        case 'name_asc':
+          return a.title.localeCompare(b.title);
+        case 'name_desc':
+          return b.title.localeCompare(a.title);
+        case 'priority':
+          const priorityOrder = { high: 0, medium: 1, low: 2 };
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
+        default:
+          return 0;
+      }
+    });
+    return sorted;
+  };
 
   const loadTasks = async () => {
     try {
@@ -230,10 +256,23 @@ function Home({ user }) {
                   <CheckSquare size={24} className="section-icon" />
                   <h2>Your Tasks</h2>
                 </div>
-                <button className="btn-primary" onClick={handleCreateTask}>
-                  <Plus size={18} />
-                  Add Task
-                </button>
+                <div className="section-actions">
+                  <select 
+                    className="sort-select-inline"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                  >
+                    <option value="created_desc">Newest First</option>
+                    <option value="created_asc">Oldest First</option>
+                    <option value="name_asc">Name (A-Z)</option>
+                    <option value="name_desc">Name (Z-A)</option>
+                    <option value="priority">Priority</option>
+                  </select>
+                  <button className="btn-primary" onClick={handleCreateTask}>
+                    <Plus size={18} />
+                    Add Task
+                  </button>
+                </div>
               </div>
               
               {tasks.length === 0 ? (
@@ -243,7 +282,7 @@ function Home({ user }) {
                 </div>
               ) : (
                 <div className="tasks-grid">
-                  {tasks.map((task) => (
+                  {getSortedTasks().map((task) => (
                     <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''}`}>
                       <div className="task-header">
                         <div className="task-title-row">
@@ -254,16 +293,28 @@ function Home({ user }) {
                           >
                             {task.completed ? <Check size={18} /> : <div className="checkbox-empty" />}
                           </button>
-                          <h3 className="task-title">{task.title}</h3>
+                          <div className="task-title-container">
+                            <h3 className="task-title">{task.title}</h3>
+                            {task.description && (
+                              <div 
+                                className="description-indicator"
+                                onMouseEnter={() => setHoveredTaskId(task.id)}
+                                onMouseLeave={() => setHoveredTaskId(null)}
+                              >
+                                <FileText size={14} />
+                                {hoveredTaskId === task.id && (
+                                  <div className="description-tooltip">
+                                    {task.description}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <span className={`priority-badge priority-${task.priority}`}>
                           {task.priority}
                         </span>
                       </div>
-                      
-                      {task.description && (
-                        <p className="task-description">{task.description}</p>
-                      )}
                       
                       {task.tags && task.tags.length > 0 && (
                         <div className="task-tags">

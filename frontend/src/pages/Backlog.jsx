@@ -11,7 +11,9 @@ import {
   Check,
   X,
   ListTodo,
-  AlertCircle
+  AlertCircle,
+  ArrowUpDown,
+  FileText
 } from 'lucide-react';
 import './Backlog.css';
 
@@ -24,11 +26,13 @@ function Backlog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('created_desc'); // created_asc, created_desc, name_asc, name_desc, priority
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
   const [showFilters, setShowFilters] = useState(false);
+  const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
   useEffect(() => {
     loadTasks();
@@ -36,8 +40,8 @@ function Backlog() {
   }, []);
 
   useEffect(() => {
-    filterTasks();
-  }, [tasks, searchQuery, priorityFilter, statusFilter]);
+    filterAndSortTasks();
+  }, [tasks, searchQuery, priorityFilter, statusFilter, sortBy]);
 
   const loadTasks = async () => {
     try {
@@ -63,7 +67,7 @@ function Backlog() {
     }
   };
 
-  const filterTasks = () => {
+  const filterAndSortTasks = () => {
     let filtered = [...tasks];
 
     // Search filter
@@ -88,6 +92,25 @@ function Backlog() {
         filtered = filtered.filter(task => !task.completed);
       }
     }
+
+    // Sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'created_desc':
+          return new Date(b.created_at) - new Date(a.created_at);
+        case 'created_asc':
+          return new Date(a.created_at) - new Date(b.created_at);
+        case 'name_asc':
+          return a.title.localeCompare(b.title);
+        case 'name_desc':
+          return b.title.localeCompare(a.title);
+        case 'priority':
+          const priorityOrder = { high: 0, medium: 1, low: 2 };
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
+        default:
+          return 0;
+      }
+    });
 
     setFilteredTasks(filtered);
   };
@@ -221,7 +244,7 @@ function Backlog() {
         </button>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search, Sort and Filters */}
       <div className="backlog-controls">
         <div className="search-container">
           <Search size={18} className="search-icon" />
@@ -238,6 +261,18 @@ function Backlog() {
             </button>
           )}
         </div>
+
+        <select 
+          className="sort-select"
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="created_desc">Newest First</option>
+          <option value="created_asc">Oldest First</option>
+          <option value="name_asc">Name (A-Z)</option>
+          <option value="name_desc">Name (Z-A)</option>
+          <option value="priority">Priority</option>
+        </select>
 
         <button 
           className={`btn-filter ${showFilters ? 'active' : ''}`}
@@ -364,15 +399,27 @@ function Backlog() {
                   
                   <div className="task-content">
                     <div className="task-header-row">
-                      <h3 className="task-title">{task.title}</h3>
+                      <div className="task-title-container">
+                        <h3 className="task-title">{task.title}</h3>
+                        {task.description && (
+                          <div 
+                            className="description-indicator"
+                            onMouseEnter={() => setHoveredTaskId(task.id)}
+                            onMouseLeave={() => setHoveredTaskId(null)}
+                          >
+                            <FileText size={16} />
+                            {hoveredTaskId === task.id && (
+                              <div className="description-tooltip">
+                                {task.description}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                       <span className={`priority-badge priority-${task.priority}`}>
                         {task.priority}
                       </span>
                     </div>
-                    
-                    {task.description && (
-                      <p className="task-description">{task.description}</p>
-                    )}
                     
                     {task.tags && task.tags.length > 0 && (
                       <div className="task-tags">
