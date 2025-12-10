@@ -55,5 +55,23 @@ export const tasksAPI = {
   },
 };
 
+// Tags API calls
+export const tagsAPI = {
+  getTags: async () => {
+    const response = await api.get('/tags');
+    return response.data;
+  },
+  
+  createTag: async (tagData) => {
+    const response = await api.post('/tags', tagData);
+    return response.data;
+  },
+  
+  deleteTag: async (tagId) => {
+    const response = await api.delete(`/tags/${tagId}`);
+    return response.data;
+  },
+};
+
 export default api;
 

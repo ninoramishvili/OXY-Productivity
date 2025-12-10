@@ -3,17 +3,28 @@ const router = express.Router();
 const { query } = require('../config/database');
 const { verifyToken } = require('./auth');
 
-// Get all tasks for logged-in user
+// Get all tasks for logged-in user with tags
 router.get('/', verifyToken, async (req, res) => {
   try {
-    const result = await query(
+    const tasksResult = await query(
       'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at DESC',
       [req.userId]
     );
     
+    // Get tags for each task
+    const tasks = await Promise.all(tasksResult.rows.map(async (task) => {
+      const tagsResult = await query(
+        `SELECT tags.* FROM tags 
+         JOIN task_tags ON tags.id = task_tags.tag_id 
+         WHERE task_tags.task_id = $1`,
+        [task.id]
+      );
+      return { ...task, tags: tagsResult.rows };
+    }));
+    
     res.json({ 
       success: true, 
-      tasks: result.rows 
+      tasks 
     });
   } catch (error) {
     console.error('Get tasks error:', error);
@@ -26,7 +37,7 @@ router.get('/', verifyToken, async (req, res) => {
 
 // Create new task
 router.post('/', verifyToken, async (req, res) => {
-  const { title, description, priority, scheduledDate, scheduledTime } = req.body;
+  const { title, description, priority, scheduledDate, scheduledTime, tagIds } = req.body;
 
   if (!title) {
     return res.status(400).json({ 
@@ -50,10 +61,30 @@ router.post('/', verifyToken, async (req, res) => {
       ]
     );
 
+    const task = result.rows[0];
+
+    // Add tags if provided
+    if (tagIds && tagIds.length > 0) {
+      for (const tagId of tagIds) {
+        await query(
+          'INSERT INTO task_tags (task_id, tag_id) VALUES ($1, $2)',
+          [task.id, tagId]
+        );
+      }
+    }
+
+    // Fetch tags for response
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [task.id]
+    );
+
     res.status(201).json({ 
       success: true, 
       message: 'Task created successfully',
-      task: result.rows[0]
+      task: { ...task, tags: tagsResult.rows }
     });
   } catch (error) {
     console.error('Create task error:', error);

@@ -1,0 +1,238 @@
+/* Task Modal Styles */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.modal-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.modal-close {
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ff6b6b;
+}
+
+.modal-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 12px 16px;
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-coral);
+  background: var(--bg-input-focus);
+  box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.15);
+}
+
+.form-group input.error {
+  border-color: #ff6b6b;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.error-text {
+  font-size: 13px;
+  color: #ff6b6b;
+  font-weight: 500;
+}
+
+/* Tags Selector */
+.tags-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background: var(--bg-card-hover);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.tag-chip:hover {
+  background: var(--bg-card);
+  transform: translateY(-1px);
+}
+
+.tag-chip.selected {
+  background: rgba(255, 127, 80, 0.12);
+  color: var(--color-coral);
+  border-color: var(--tag-color);
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-cancel,
+.btn-save {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-cancel {
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+
+.btn-cancel:hover {
+  background: var(--bg-card);
+  border-color: var(--border-hover);
+}
+
+.btn-save {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 127, 80, 0.4);
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #FF6347 0%, #FF4500 100%);
+  box-shadow: 0 6px 20px rgba(255, 127, 80, 0.5);
+  transform: translateY(-1px);
+}
+
+/* OXY Mode Overrides */
+:root[data-theme="oxy"] .btn-save {
+  background: var(--color-coral);
+}
+
+:root[data-theme="oxy"] .btn-save:hover {
+  background: #FF6347;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .modal-content {
+    margin: 0;
+    border-radius: 16px;
+  }
+
+  .modal-header {
+    padding: 20px;
+  }
+
+  .modal-form {
+    padding: 20px;
+  }
+}
+

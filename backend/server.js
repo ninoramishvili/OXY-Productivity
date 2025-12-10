@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const { router: authRouter } = require('./routes/auth');
 const tasksRouter = require('./routes/tasks');
+const tagsRouter = require('./routes/tags');
 const { pool } = require('./config/database');
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json()); // Parse JSON request bodies
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/tasks', tasksRouter);
+app.use('/api/tags', tagsRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

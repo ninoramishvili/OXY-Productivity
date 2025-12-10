@@ -402,6 +402,41 @@
   border-color: rgba(255, 127, 80, 0.2);
 }
 
+/* Success Toast */
+.success-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: var(--bg-card);
+  border: 1px solid rgba(78, 203, 113, 0.3);
+  border-left: 4px solid #4ECB71;
+  color: var(--text-primary);
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1001;
+  animation: slideInRight 0.3s ease-out;
+  backdrop-filter: var(--glass-blur);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.success-toast svg {
+  color: #4ECB71;
+}
+
 /* Tasks Section */
 .tasks-grid {
   display: grid;
@@ -419,6 +454,15 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+}
+
+.task-card.completed {
+  opacity: 0.6;
+}
+
+.task-card.completed .task-title {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
 }
 
 .task-card::before {
@@ -451,12 +495,51 @@
   margin-bottom: 12px;
 }
 
+.task-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.task-checkbox {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-input);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 0;
+  margin-top: 2px;
+}
+
+.task-checkbox:hover {
+  border-color: var(--color-coral);
+  background: rgba(255, 127, 80, 0.1);
+}
+
+.task-checkbox svg {
+  color: var(--color-coral);
+}
+
+.checkbox-empty {
+  width: 12px;
+  height: 12px;
+}
+
 .task-title {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
   flex: 1;
   line-height: 1.4;
+  margin: 0;
 }
 
 .priority-badge {
@@ -490,13 +573,31 @@
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+/* Task Tags */
+.task-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   margin-bottom: 16px;
+}
+
+.task-tag {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid;
 }
 
 .task-footer {
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: flex-end;
+  margin-top: 16px;
 }
 
 .task-action {
@@ -540,6 +641,12 @@
   border-color: rgba(0, 206, 209, 0.4);
   color: var(--color-teal);
   transform: scale(1.1);
+}
+
+.task-action-icon.delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ff6b6b;
 }
 
 /* Stats Section */
