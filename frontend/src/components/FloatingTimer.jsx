@@ -7,6 +7,7 @@ function FloatingTimer({ onClose }) {
   const [isRunning, setIsRunning] = useState(false);
   const [duration, setDuration] = useState(25);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [mode, setMode] = useState('focus'); // 'focus', 'shortBreak', 'longBreak'
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -66,19 +67,50 @@ function FloatingTimer({ onClose }) {
     setIsRunning(false);
   };
 
+  const handleModeChange = (newMode) => {
+    setIsRunning(false);
+    setMode(newMode);
+    let newDuration;
+    switch (newMode) {
+      case 'shortBreak':
+        newDuration = 5;
+        break;
+      case 'longBreak':
+        newDuration = 30;
+        break;
+      default:
+        newDuration = 25;
+    }
+    setDuration(newDuration);
+    setTimeLeft(newDuration * 60);
+  };
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const getModeConfig = () => {
+    switch (mode) {
+      case 'shortBreak':
+        return { icon: '☕', color: '#10b981', label: 'Short Break' };
+      case 'longBreak':
+        return { icon: '🌴', color: '#3b82f6', label: 'Long Break' };
+      default:
+        return { icon: '🍅', color: '#ef4444', label: 'Focus' };
+    }
+  };
+
+  const modeConfig = getModeConfig();
   const progress = ((duration * 60 - timeLeft) / (duration * 60)) * 100;
 
   return (
-    <div className={`floating-timer ${isExpanded ? 'expanded' : 'compact'}`}>
+    <div className={`floating-timer ${isExpanded ? 'expanded' : 'compact'}`} data-mode={mode}>
       <div className="floating-timer-header">
-        <div className="timer-icon">
-          <Timer size={16} />
+        <div className="timer-icon" style={{ color: modeConfig.color }}>
+          <span style={{ fontSize: '18px' }}>{modeConfig.icon}</span>
+          <span style={{ fontSize: '12px', marginLeft: '4px' }}>{modeConfig.label}</span>
         </div>
         <button 
           className="btn-icon" 
@@ -94,26 +126,54 @@ function FloatingTimer({ onClose }) {
 
       <div className="floating-timer-body">
         {isExpanded && (
-          <div className="timer-presets">
-            <button 
-              className={`preset-btn ${duration === 25 ? 'active' : ''}`}
-              onClick={() => handleDurationChange(25)}
-            >
-              25m
-            </button>
-            <button 
-              className={`preset-btn ${duration === 15 ? 'active' : ''}`}
-              onClick={() => handleDurationChange(15)}
-            >
-              15m
-            </button>
-            <button 
-              className={`preset-btn ${duration === 5 ? 'active' : ''}`}
-              onClick={() => handleDurationChange(5)}
-            >
-              5m
-            </button>
-          </div>
+          <>
+            <div className="mode-switcher">
+              <button 
+                className={`mode-btn ${mode === 'focus' ? 'active' : ''}`}
+                onClick={() => handleModeChange('focus')}
+                style={{ borderColor: mode === 'focus' ? '#ef4444' : undefined }}
+              >
+                🍅 Focus
+              </button>
+              <button 
+                className={`mode-btn ${mode === 'shortBreak' ? 'active' : ''}`}
+                onClick={() => handleModeChange('shortBreak')}
+                style={{ borderColor: mode === 'shortBreak' ? '#10b981' : undefined }}
+              >
+                ☕ Break
+              </button>
+              <button 
+                className={`mode-btn ${mode === 'longBreak' ? 'active' : ''}`}
+                onClick={() => handleModeChange('longBreak')}
+                style={{ borderColor: mode === 'longBreak' ? '#3b82f6' : undefined }}
+              >
+                🌴 Long
+              </button>
+            </div>
+            
+            {mode === 'focus' && (
+              <div className="timer-presets">
+                <button 
+                  className={`preset-btn ${duration === 25 ? 'active' : ''}`}
+                  onClick={() => handleDurationChange(25)}
+                >
+                  25m
+                </button>
+                <button 
+                  className={`preset-btn ${duration === 15 ? 'active' : ''}`}
+                  onClick={() => handleDurationChange(15)}
+                >
+                  15m
+                </button>
+                <button 
+                  className={`preset-btn ${duration === 5 ? 'active' : ''}`}
+                  onClick={() => handleDurationChange(5)}
+                >
+                  5m
+                </button>
+              </div>
+            )}
+          </>
         )}
 
         <div className="timer-display-compact">
@@ -122,7 +182,10 @@ function FloatingTimer({ onClose }) {
             <div className="progress-bar">
               <div 
                 className="progress-fill" 
-                style={{ width: `${progress}%` }}
+                style={{ 
+                  width: `${progress}%`,
+                  backgroundColor: modeConfig.color 
+                }}
               />
             </div>
           )}

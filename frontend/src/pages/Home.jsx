@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { tasksAPI, tagsAPI } from '../utils/api';
+import { tasksAPI, tagsAPI, pomodoroAPI } from '../utils/api';
 import TaskModal from '../components/TaskModal';
 import ConfirmModal from '../components/ConfirmModal';
 import PomodoroTimer from '../components/PomodoroTimer';
@@ -17,7 +17,8 @@ import {
   X,
   GripVertical,
   Timer,
-  Clock
+  Clock,
+  RotateCcw
 } from 'lucide-react';
 import {
   DndContext,
@@ -36,7 +37,7 @@ import { CSS } from '@dnd-kit/utilities';
 import './Home.css';
 
 // Sortable Task Card Component
-function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onDeleteTask, onSetHighlight, onSetFrog, onStartPomodoro }) {
+function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onDeleteTask, onSetHighlight, onSetFrog, onStartPomodoro, onResetPomodoro }) {
   const {
     attributes,
     listeners,
@@ -110,6 +111,16 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
               🍅 {task.pomodoro_count}
             </span>
           )}
+          <button 
+            className="reset-pomodoro-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onResetPomodoro(task.id);
+            }}
+            title="Reset Pomodoro data"
+          >
+            <RotateCcw size={12} />
+          </button>
         </div>
       )}
       
@@ -272,6 +283,32 @@ function Home({ user }) {
     }
     if (frogTask && frogTask.id === updatedTask.id) {
       setFrogTask(updatedTask);
+    }
+  };
+
+  const handleResetPomodoro = async (taskId) => {
+    if (!window.confirm('Are you sure you want to reset all Pomodoro data for this task? This will delete all time tracking and session history.')) {
+      return;
+    }
+
+    try {
+      const response = await pomodoroAPI.resetTaskPomodoro(taskId);
+      if (response.success && response.task) {
+        setTasks(tasks.map(t => t.id === response.task.id ? response.task : t));
+        
+        // Update highlighted/frog task if needed
+        if (highlightedTask && highlightedTask.id === response.task.id) {
+          setHighlightedTask(response.task);
+        }
+        if (frogTask && frogTask.id === response.task.id) {
+          setFrogTask(response.task);
+        }
+        
+        showSuccess('Pomodoro data reset successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to reset pomodoro:', error);
+      alert('Failed to reset Pomodoro data');
     }
   };
 
@@ -784,6 +821,7 @@ function Home({ user }) {
                             onSetHighlight={handleSetHighlight}
                             onSetFrog={handleSetFrog}
                             onStartPomodoro={handleStartPomodoro}
+                            onResetPomodoro={handleResetPomodoro}
                           />
                         );
                       })}

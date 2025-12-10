@@ -177,6 +177,28 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
     setTimeLeft(newDuration * 60);
   };
 
+  const handleModeChange = (newMode) => {
+    if (isRunning) return; // Can't switch while running
+    
+    setMode(newMode);
+    setSessionId(null);
+    setShowSettings(newMode === 'focus');
+    
+    let newDuration;
+    switch (newMode) {
+      case 'shortBreak':
+        newDuration = 5;
+        break;
+      case 'longBreak':
+        newDuration = 30;
+        break;
+      default:
+        newDuration = 25;
+    }
+    setDuration(newDuration);
+    setTimeLeft(newDuration * 60);
+  };
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -232,7 +254,32 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
         </div>
       </div>
 
-      {showSettings && !sessionId ? (
+      {/* Mode Switcher */}
+      <div className="mode-switcher-pomodoro">
+        <button 
+          className={`mode-btn-pomodoro ${mode === 'focus' ? 'active' : ''}`}
+          onClick={() => handleModeChange('focus')}
+          disabled={isRunning}
+        >
+          🍅 Focus
+        </button>
+        <button 
+          className={`mode-btn-pomodoro ${mode === 'shortBreak' ? 'active' : ''}`}
+          onClick={() => handleModeChange('shortBreak')}
+          disabled={isRunning}
+        >
+          ☕ Break (5m)
+        </button>
+        <button 
+          className={`mode-btn-pomodoro ${mode === 'longBreak' ? 'active' : ''}`}
+          onClick={() => handleModeChange('longBreak')}
+          disabled={isRunning}
+        >
+          🌴 Long (30m)
+        </button>
+      </div>
+
+      {showSettings && !sessionId && mode === 'focus' && task ? (
         <div className="pomodoro-settings">
           <h4>Select Duration</h4>
           <div className="duration-options">

@@ -101,6 +101,11 @@ export const pomodoroAPI = {
     const response = await api.get(`/pomodoro/history/${taskId}`);
     return response.data;
   },
+  
+  resetTaskPomodoro: async (taskId) => {
+    const response = await api.delete(`/pomodoro/reset/${taskId}`);
+    return response.data;
+  },
 };
 
 // Tags API calls

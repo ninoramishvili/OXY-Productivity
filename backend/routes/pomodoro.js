@@ -176,5 +176,62 @@ router.get('/history/:taskId', verifyToken, async (req, res) => {
   }
 });
 
+// Reset pomodoro data for a task
+router.delete('/reset/:taskId', verifyToken, async (req, res) => {
+  const taskId = parseInt(req.params.taskId);
+
+  try {
+    await query('BEGIN');
+
+    // Delete all pomodoro sessions for the task
+    await query(
+      'DELETE FROM pomodoro_sessions WHERE task_id = $1 AND user_id = $2',
+      [taskId, req.userId]
+    );
+
+    // Reset time_spent and pomodoro_count
+    const result = await query(
+      `UPDATE tasks 
+       SET time_spent = 0, 
+           pomodoro_count = 0,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1 AND user_id = $2
+       RETURNING *`,
+      [taskId, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      await query('ROLLBACK');
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
+    }
+
+    // Fetch tags
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [taskId]
+    );
+
+    await query('COMMIT');
+
+    res.json({ 
+      success: true, 
+      task: { ...result.rows[0], tags: tagsResult.rows },
+      message: 'Pomodoro data reset successfully'
+    });
+  } catch (error) {
+    await query('ROLLBACK');
+    console.error('Reset pomodoro error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to reset pomodoro data' 
+    });
+  }
+});
+
 module.exports = router;
 

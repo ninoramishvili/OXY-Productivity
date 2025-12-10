@@ -246,6 +246,24 @@
   font-weight: 500;
 }
 
+.reset-pomodoro-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.reset-pomodoro-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
 .pomodoro-modal {
   max-width: 500px;
   padding: 0;

@@ -232,6 +232,40 @@
   stroke: #3b82f6;
 }
 
+.mode-switcher-pomodoro {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mode-btn-pomodoro {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-btn-pomodoro:hover:not(:disabled) {
+  background: var(--bg-primary);
+}
+
+.mode-btn-pomodoro.active {
+  background: var(--bg-primary);
+  border-color: var(--accent-primary);
+}
+
+.mode-btn-pomodoro:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .pomodoro-timer {
