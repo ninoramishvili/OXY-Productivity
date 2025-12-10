@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { query } = require('../config/database');
-const verifyToken = require('../middleware/auth');
+const { verifyToken } = require('./auth');
 
 // Start a pomodoro session
 router.post('/start', verifyToken, async (req, res) => {
