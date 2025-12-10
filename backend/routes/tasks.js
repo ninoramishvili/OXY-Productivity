@@ -348,4 +348,103 @@ router.delete('/:id/highlight', verifyToken, async (req, res) => {
   }
 });
 
+// Set task as frog (hardest task)
+router.put('/:id/frog', verifyToken, async (req, res) => {
+  const taskId = parseInt(req.params.id);
+
+  try {
+    await query('BEGIN');
+
+    // Remove existing frog for this user
+    await query(
+      `UPDATE tasks 
+       SET is_frog = FALSE 
+       WHERE user_id = $1 AND is_frog = TRUE`,
+      [req.userId]
+    );
+
+    // Set new frog
+    const result = await query(
+      `UPDATE tasks 
+       SET is_frog = TRUE, updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $1 AND user_id = $2 
+       RETURNING *`,
+      [taskId, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      await query('ROLLBACK');
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
+    }
+
+    // Fetch tags for the task
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [taskId]
+    );
+
+    await query('COMMIT');
+
+    res.json({ 
+      success: true, 
+      message: 'Task marked as frog',
+      task: { ...result.rows[0], tags: tagsResult.rows }
+    });
+  } catch (error) {
+    await query('ROLLBACK');
+    console.error('Set frog error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to mark task as frog' 
+    });
+  }
+});
+
+// Remove frog status
+router.delete('/:id/frog', verifyToken, async (req, res) => {
+  const taskId = parseInt(req.params.id);
+
+  try {
+    const result = await query(
+      `UPDATE tasks 
+       SET is_frog = FALSE, updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $1 AND user_id = $2 
+       RETURNING *`,
+      [taskId, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
+    }
+
+    // Fetch tags for the task
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [taskId]
+    );
+
+    res.json({ 
+      success: true, 
+      message: 'Frog status removed',
+      task: { ...result.rows[0], tags: tagsResult.rows }
+    });
+  } catch (error) {
+    console.error('Remove frog error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to remove frog status' 
+    });
+  }
+});
+
 module.exports = router;

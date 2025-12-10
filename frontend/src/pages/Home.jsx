@@ -176,6 +176,30 @@ function Home({ user }) {
     }
   };
 
+  const handleSetFrog = async (taskId) => {
+    try {
+      const response = await tasksAPI.setFrog(taskId);
+      if (response.success) {
+        showSuccess('🐸 Task marked as your Frog!');
+        await loadTasks();
+      }
+    } catch (err) {
+      alert('Failed to set frog: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleRemoveFrog = async (taskId) => {
+    try {
+      const response = await tasksAPI.removeFrog(taskId);
+      if (response.success) {
+        showSuccess('Frog status removed');
+        loadTasks();
+      }
+    } catch (err) {
+      alert('Failed to remove frog');
+    }
+  };
+
   const handleDeleteTask = (taskId) => {
     setDeleteConfirm({ isOpen: true, taskId });
   };
@@ -423,6 +447,7 @@ function Home({ user }) {
                             </button>
                             <h3 className="task-title">{task.title}</h3>
                             {isHighlight && <Star size={16} className="highlight-indicator" fill="currentColor" />}
+                            {task.is_frog && <span className="frog-indicator" title="Your Frog - Hardest Task">🐸</span>}
                           </div>
                           <span className={`priority-badge priority-${task.priority}`}>
                             {task.priority}
@@ -456,6 +481,25 @@ function Home({ user }) {
                             >
                               <Star size={16} />
                             </button>
+                          )}
+                          {!task.completed && (
+                            task.is_frog ? (
+                              <button 
+                                className="task-action-icon frog-btn active"
+                                onClick={() => handleRemoveFrog(task.id)}
+                                title="Remove Frog status"
+                              >
+                                🐸
+                              </button>
+                            ) : (
+                              <button 
+                                className="task-action-icon frog-btn"
+                                onClick={() => handleSetFrog(task.id)}
+                                title="Mark as Frog (Hardest Task)"
+                              >
+                                🐸
+                              </button>
+                            )
                           )}
                           <button 
                             className="task-action-icon"

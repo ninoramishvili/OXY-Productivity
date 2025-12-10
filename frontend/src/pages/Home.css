@@ -694,6 +694,37 @@
   color: var(--accent-coral);
 }
 
+.task-action-icon.frog-btn {
+  font-size: 16px;
+  padding: 6px;
+}
+
+.task-action-icon.frog-btn:hover {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: rgba(76, 175, 80, 0.4);
+  transform: scale(1.15);
+}
+
+.task-action-icon.frog-btn.active {
+  background: rgba(76, 175, 80, 0.15);
+  border-color: rgba(76, 175, 80, 0.5);
+}
+
+.frog-indicator {
+  font-size: 16px;
+  margin-left: 4px;
+  animation: frogBounce 2s ease-in-out infinite;
+}
+
+@keyframes frogBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 /* Stats Section - Compact */
 .stats-section {
   margin-top: 24px;

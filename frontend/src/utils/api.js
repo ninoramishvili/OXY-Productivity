@@ -63,6 +63,16 @@ export const tasksAPI = {
     const response = await api.delete(`/tasks/${taskId}/highlight`);
     return response.data;
   },
+  
+  setFrog: async (taskId) => {
+    const response = await api.put(`/tasks/${taskId}/frog`);
+    return response.data;
+  },
+  
+  removeFrog: async (taskId) => {
+    const response = await api.delete(`/tasks/${taskId}/frog`);
+    return response.data;
+  },
 };
 
 // Tags API calls
