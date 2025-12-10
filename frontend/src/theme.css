@@ -12,6 +12,7 @@
   --bg-card-hover: rgba(255, 255, 255, 0.05);
   --bg-input: rgba(255, 255, 255, 0.05);
   --bg-input-focus: rgba(255, 255, 255, 0.08);
+  --modal-bg: #1a1f3a;
   
   /* Text Colors */
   --text-primary: rgba(255, 255, 255, 0.95);
@@ -58,22 +59,23 @@
 :root[data-theme="light"] {
   /* Backgrounds */
   --bg-primary: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%);
-  --bg-secondary: rgba(255, 255, 255, 0.8);
-  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-secondary: rgba(255, 255, 255, 0.95);
+  --bg-card: rgba(255, 255, 255, 0.95);
   --bg-card-hover: rgba(255, 255, 255, 1);
-  --bg-input: rgba(255, 255, 255, 0.7);
-  --bg-input-focus: rgba(255, 255, 255, 0.95);
+  --bg-input: rgba(255, 255, 255, 0.9);
+  --bg-input-focus: rgba(255, 255, 255, 1);
+  --modal-bg: #ffffff;
   
   /* Text Colors */
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
-  --text-muted: #94a3b8;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #475569;
+  --text-muted: #64748b;
   
   /* Borders */
-  --border-primary: rgba(0, 0, 0, 0.08);
-  --border-secondary: rgba(0, 0, 0, 0.05);
-  --border-hover: rgba(255, 127, 80, 0.4);
+  --border-primary: rgba(0, 0, 0, 0.12);
+  --border-secondary: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(255, 127, 80, 0.5);
   
   /* Shadows */
   --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -104,22 +106,23 @@
 :root[data-theme="oxy"] {
   /* Backgrounds - Warm peachy tones, flat */
   --bg-primary: #fff5f0; /* Warm peach background - oxytocin warmth */
-  --bg-secondary: rgba(255, 250, 245, 0.98);
+  --bg-secondary: rgba(255, 250, 245, 1);
   --bg-card: #ffffff;
   --bg-card-hover: #fffbf7;
-  --bg-input: #fef8f5;
+  --bg-input: #ffffff;
   --bg-input-focus: #ffffff;
+  --modal-bg: #ffffff;
   
-  /* Text Colors - Warm, soft */
-  --text-primary: #3d2e28; /* Warm brown */
-  --text-secondary: #6b5b52; /* Soft brown */
-  --text-tertiary: #8a7a70; /* Light brown */
-  --text-muted: #b8a99f; /* Muted brown */
+  /* Text Colors - Warm, soft but more visible */
+  --text-primary: #2d1f1a; /* Darker warm brown */
+  --text-secondary: #5a4a42; /* Medium brown */
+  --text-tertiary: #786860; /* Light brown */
+  --text-muted: #a89891; /* Muted brown */
   
-  /* Borders - Coral/Teal themed but soft */
-  --border-primary: rgba(255, 127, 80, 0.15); /* Soft coral */
-  --border-secondary: rgba(0, 206, 209, 0.12); /* Soft teal */
-  --border-hover: rgba(255, 127, 80, 0.35); /* Coral hover */
+  /* Borders - Coral/Teal themed with more visibility */
+  --border-primary: rgba(255, 127, 80, 0.25); /* More visible coral */
+  --border-secondary: rgba(0, 206, 209, 0.2); /* More visible teal */
+  --border-hover: rgba(255, 127, 80, 0.5); /* Strong coral hover */
   
   /* Shadows - Warm, soft, colored */
   --shadow-sm: 0 3px 10px rgba(255, 127, 80, 0.08);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { tasksAPI, authAPI, tagsAPI } from '../utils/api';
 import ThemeSelector from '../components/ThemeSelector';
 import TaskModal from '../components/TaskModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { 
   Zap, 
   List, 
@@ -28,6 +29,7 @@ function Home({ user, onLogout }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
 
   // Load tasks and tags on mount
   useEffect(() => {
@@ -111,19 +113,21 @@ function Home({ user, onLogout }) {
     }
   };
 
-  const handleDeleteTask = async (taskId) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) {
-      return;
-    }
+  const handleDeleteTask = (taskId) => {
+    setDeleteConfirm({ isOpen: true, taskId });
+  };
 
+  const confirmDelete = async () => {
     try {
-      const response = await tasksAPI.deleteTask(taskId);
+      const response = await tasksAPI.deleteTask(deleteConfirm.taskId);
       if (response.success) {
         showSuccess('Task deleted successfully!');
         loadTasks();
       }
     } catch (err) {
       alert('Failed to delete task');
+    } finally {
+      setDeleteConfirm({ isOpen: false, taskId: null });
     }
   };
 
@@ -173,6 +177,16 @@ function Home({ user, onLogout }) {
         onSave={handleSaveTask}
         task={editingTask}
         tags={tags}
+        onTagsUpdate={loadTags}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, taskId: null })}
+        onConfirm={confirmDelete}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
       />
 
       {/* Sidebar */}

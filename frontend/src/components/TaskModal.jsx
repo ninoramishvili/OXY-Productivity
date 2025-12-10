@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Tag as TagIcon } from 'lucide-react';
+import { X, Tag as TagIcon, Plus } from 'lucide-react';
+import { tagsAPI } from '../utils/api';
 import './TaskModal.css';
 
-function TaskModal({ isOpen, onClose, onSave, task, tags }) {
+function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -10,6 +11,8 @@ function TaskModal({ isOpen, onClose, onSave, task, tags }) {
     tagIds: []
   });
   const [errors, setErrors] = useState({});
+  const [newTagName, setNewTagName] = useState('');
+  const [isCreatingTag, setIsCreatingTag] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -63,6 +66,34 @@ function TaskModal({ isOpen, onClose, onSave, task, tags }) {
     }
   };
 
+  const handleCreateTag = async () => {
+    if (!newTagName.trim()) return;
+    
+    setIsCreatingTag(true);
+    try {
+      // Generate a random color for the new tag
+      const colors = ['#FF7F50', '#00CED1', '#FFB84D', '#4ECB71', '#9b59b6', '#e74c3c', '#3498db'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      const response = await tagsAPI.createTag({
+        name: newTagName.trim(),
+        color: randomColor
+      });
+      
+      if (response.success) {
+        setNewTagName('');
+        // Notify parent to refresh tags
+        if (onTagsUpdate) {
+          onTagsUpdate();
+        }
+      }
+    } catch (err) {
+      alert('Failed to create tag: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setIsCreatingTag(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -110,19 +141,21 @@ function TaskModal({ isOpen, onClose, onSave, task, tags }) {
               name="priority"
               value={formData.priority}
               onChange={handleChange}
+              className="priority-select"
             >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="highest" className="priority-option-highest">🔴 Highest</option>
+              <option value="high" className="priority-option-high">🟠 High</option>
+              <option value="medium" className="priority-option-medium">🟡 Medium</option>
+              <option value="low" className="priority-option-low">🟢 Low</option>
             </select>
           </div>
 
-          {tags && tags.length > 0 && (
-            <div className="form-group">
-              <label>
-                <TagIcon size={16} />
-                Tags
-              </label>
+          <div className="form-group">
+            <label>
+              <TagIcon size={16} />
+              Tags
+            </label>
+            {tags && tags.length > 0 && (
               <div className="tags-selector">
                 {tags.map(tag => (
                   <button
@@ -139,8 +172,27 @@ function TaskModal({ isOpen, onClose, onSave, task, tags }) {
                   </button>
                 ))}
               </div>
+            )}
+            <div className="tag-input-row">
+              <input
+                type="text"
+                className="tag-input"
+                placeholder="Create new tag..."
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleCreateTag())}
+              />
+              <button
+                type="button"
+                className="btn-add-tag"
+                onClick={handleCreateTag}
+                disabled={!newTagName.trim() || isCreatingTag}
+              >
+                <Plus size={16} />
+                Add
+              </button>
             </div>
-          )}
+          </div>
 
           <div className="modal-actions">
             <button type="button" className="btn-cancel" onClick={onClose}>

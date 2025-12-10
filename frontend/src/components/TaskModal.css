@@ -22,7 +22,7 @@
 }
 
 .modal-content {
-  background: var(--bg-card);
+  background: var(--modal-bg);
   border: 1px solid var(--border-primary);
   border-radius: 20px;
   box-shadow: var(--shadow-lg);
@@ -31,6 +31,7 @@
   max-height: 90vh;
   overflow-y: auto;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: none;
 }
 
 @keyframes slideUp {
@@ -137,11 +138,95 @@
   font-weight: 500;
 }
 
+/* Priority Select Styling */
+.priority-select {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.priority-select option {
+  padding: 10px;
+  font-weight: 600;
+}
+
+/* Priority Colors */
+.priority-select option[value="highest"] {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.priority-select option[value="high"] {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+}
+
+.priority-select option[value="medium"] {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}
+
+.priority-select option[value="low"] {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
 /* Tags Selector */
 .tags-selector {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.tag-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tag-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  transition: all 0.3s ease;
+}
+
+.tag-input:focus {
+  outline: none;
+  border-color: var(--color-teal);
+  background: var(--bg-input-focus);
+  box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.15);
+}
+
+.btn-add-tag {
+  padding: 10px 16px;
+  background: rgba(0, 206, 209, 0.15);
+  border: 1px solid rgba(0, 206, 209, 0.3);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  color: var(--color-teal);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-add-tag:hover {
+  background: rgba(0, 206, 209, 0.25);
+  border-color: rgba(0, 206, 209, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 206, 209, 0.2);
+}
+
+.btn-add-tag:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .tag-chip {
