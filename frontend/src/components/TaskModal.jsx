@@ -45,12 +45,17 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
   };
 
   const toggleTag = (tagId) => {
-    setFormData(prev => ({
-      ...prev,
-      tagIds: prev.tagIds.includes(tagId)
+    console.log('Toggle tag:', tagId, 'Current tagIds:', formData.tagIds);
+    setFormData(prev => {
+      const newTagIds = prev.tagIds.includes(tagId)
         ? prev.tagIds.filter(id => id !== tagId)
-        : [...prev.tagIds, tagId]
-    }));
+        : [...prev.tagIds, tagId];
+      console.log('New tagIds:', newTagIds);
+      return {
+        ...prev,
+        tagIds: newTagIds
+      };
+    });
   };
 
   const validate = () => {
@@ -112,15 +117,27 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
     }
   };
 
-  const handleDeleteTagClick = (tag) => {
+  const handleDeleteTagClick = (e, tag) => {
+    e.stopPropagation(); // Prevent tag toggle
+    console.log('Delete tag clicked:', tag);
     setDeleteTagConfirm({ isOpen: true, tag });
   };
 
   const confirmDeleteTag = async () => {
-    const tagId = deleteTagConfirm.tag.id;
+    const tagId = deleteTagConfirm.tag?.id;
+    console.log('Confirming delete for tag ID:', tagId);
+    
+    if (!tagId) {
+      console.error('No tag ID found');
+      setDeleteTagConfirm({ isOpen: false, tag: null });
+      return;
+    }
     
     try {
+      console.log('Calling deleteTag API...');
       const response = await tagsAPI.deleteTag(tagId);
+      console.log('Delete response:', response);
+      
       if (response.success) {
         // Remove tag from current task if selected
         setFormData(prev => ({
@@ -139,6 +156,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
         }
       }
     } catch (err) {
+      console.error('Delete tag error:', err);
       alert('Failed to delete tag: ' + (err.response?.data?.message || err.message));
     } finally {
       setDeleteTagConfirm({ isOpen: false, tag: null });
@@ -233,7 +251,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
                     <button
                       type="button"
                       className="tag-delete-btn"
-                      onClick={() => handleDeleteTagClick(tag)}
+                      onClick={(e) => handleDeleteTagClick(e, tag)}
                       title="Delete tag"
                     >
                       <X size={12} />
