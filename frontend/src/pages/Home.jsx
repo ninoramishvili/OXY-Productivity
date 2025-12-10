@@ -554,28 +554,14 @@ function Home({ user }) {
                               className="task-action-icon highlight-btn"
                               onClick={() => handleSetHighlight(task.id)}
                               title="Set as Daily Highlight"
-                            >
-                              <Star size={16} />
-                            </button>
+                            ></button>
                           )}
-                          {!task.completed && (
-                            task.is_frog ? (
-                              <button 
-                                className="task-action-icon frog-btn active"
-                                onClick={() => handleRemoveFrog(task.id)}
-                                title="Remove Frog status"
-                              >
-                                🐸
-                              </button>
-                            ) : (
-                              <button 
-                                className="task-action-icon frog-btn"
-                                onClick={() => handleSetFrog(task.id)}
-                                title="Mark as Frog (Hardest Task)"
-                              >
-                                🐸
-                              </button>
-                            )
+                          {!task.is_frog && !task.completed && (
+                            <button 
+                              className="task-action-icon frog-btn"
+                              onClick={() => handleSetFrog(task.id)}
+                              title="Mark as Frog (Hardest Task)"
+                            ></button>
                           )}
                           <button 
                             className="task-action-icon"
