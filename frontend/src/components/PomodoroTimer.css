@@ -104,12 +104,12 @@
 
 .progress-ring-bg {
   stroke: var(--border-color);
-  opacity: 0.3;
+  opacity: 0.2;
 }
 
 .progress-ring-fill {
-  stroke: var(--accent-primary);
-  transition: stroke-dashoffset 0.3s ease;
+  transition: stroke-dashoffset 0.3s linear;
+  stroke-linecap: round;
 }
 
 .time-display {

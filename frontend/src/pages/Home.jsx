@@ -176,6 +176,7 @@ function Home({ user }) {
   const [editingTask, setEditingTask] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
+  const [resetPomodoroConfirm, setResetPomodoroConfirm] = useState({ isOpen: false, taskId: null });
   const [sortBy, setSortBy] = useState('manual');
   const [showCelebration, setShowCelebration] = useState(false);
   const [activePomodoroTask, setActivePomodoroTask] = useState(null);
@@ -286,11 +287,13 @@ function Home({ user }) {
     }
   };
 
-  const handleResetPomodoro = async (taskId) => {
-    if (!window.confirm('Are you sure you want to reset all Pomodoro data for this task? This will delete all time tracking and session history.')) {
-      return;
-    }
+  const handleResetPomodoro = (taskId) => {
+    setResetPomodoroConfirm({ isOpen: true, taskId });
+  };
 
+  const confirmResetPomodoro = async () => {
+    const taskId = resetPomodoroConfirm.taskId;
+    
     try {
       const response = await pomodoroAPI.resetTaskPomodoro(taskId);
       if (response.success && response.task) {
@@ -308,7 +311,9 @@ function Home({ user }) {
       }
     } catch (error) {
       console.error('Failed to reset pomodoro:', error);
-      alert('Failed to reset Pomodoro data');
+      showSuccess('Failed to reset Pomodoro data');
+    } finally {
+      setResetPomodoroConfirm({ isOpen: false, taskId: null });
     }
   };
 
@@ -561,6 +566,15 @@ function Home({ user }) {
         onConfirm={confirmDelete}
         title="Delete Task"
         message="Are you sure you want to delete this task? This action cannot be undone."
+      />
+
+      {/* Reset Pomodoro Confirmation Modal */}
+      <ConfirmModal
+        isOpen={resetPomodoroConfirm.isOpen}
+        onClose={() => setResetPomodoroConfirm({ isOpen: false, taskId: null })}
+        onConfirm={confirmResetPomodoro}
+        title="Reset Pomodoro Data"
+        message="Are you sure you want to reset all Pomodoro data for this task? This will delete all time tracking and session history."
       />
 
       {/* Main Content */}

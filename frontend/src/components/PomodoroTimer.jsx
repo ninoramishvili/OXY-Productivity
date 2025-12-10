@@ -323,10 +323,11 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
             r="85"
             fill="none"
             stroke={modeConfig.color}
-            strokeWidth="8"
+            strokeWidth="10"
             strokeDasharray={`${2 * Math.PI * 85}`}
-            strokeDashoffset={`${2 * Math.PI * 85 * (1 - progress / 100)}`}
+            strokeDashoffset={`${2 * Math.PI * 85 * (progress / 100)}`}
             transform="rotate(-90 100 100)"
+            strokeLinecap="round"
           />
         </svg>
         <div className="time-display">
