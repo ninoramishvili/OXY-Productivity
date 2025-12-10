@@ -4,6 +4,7 @@ const cors = require('cors');
 const { router: authRouter } = require('./routes/auth');
 const tasksRouter = require('./routes/tasks');
 const tagsRouter = require('./routes/tags');
+const pomodoroRouter = require('./routes/pomodoro');
 const { pool } = require('./config/database');
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json()); // Parse JSON request bodies
 app.use('/api/auth', authRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/tags', tagsRouter);
+app.use('/api/pomodoro', pomodoroRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -80,6 +80,29 @@ export const tasksAPI = {
   },
 };
 
+// Pomodoro API
+export const pomodoroAPI = {
+  startSession: async (taskId, duration) => {
+    const response = await api.post('/pomodoro/start', { taskId, duration });
+    return response.data;
+  },
+  
+  completeSession: async (sessionId, taskId, actualDuration) => {
+    const response = await api.post('/pomodoro/complete', { sessionId, taskId, actualDuration });
+    return response.data;
+  },
+  
+  cancelSession: async (sessionId, taskId, actualDuration) => {
+    const response = await api.post('/pomodoro/cancel', { sessionId, taskId, actualDuration });
+    return response.data;
+  },
+  
+  getHistory: async (taskId) => {
+    const response = await api.get(`/pomodoro/history/${taskId}`);
+    return response.data;
+  },
+};
+
 // Tags API calls
 export const tagsAPI = {
   getTags: async () => {

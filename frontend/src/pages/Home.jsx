@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { tasksAPI, tagsAPI } from '../utils/api';
 import TaskModal from '../components/TaskModal';
 import ConfirmModal from '../components/ConfirmModal';
+import PomodoroTimer from '../components/PomodoroTimer';
 import { 
   Target, 
   CheckSquare, 
@@ -13,7 +14,9 @@ import {
   Check,
   Star,
   X,
-  GripVertical
+  GripVertical,
+  Timer,
+  Clock
 } from 'lucide-react';
 import {
   DndContext,
@@ -32,7 +35,7 @@ import { CSS } from '@dnd-kit/utilities';
 import './Home.css';
 
 // Sortable Task Card Component
-function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onDeleteTask, onSetHighlight, onSetFrog }) {
+function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onDeleteTask, onSetHighlight, onSetFrog, onStartPomodoro }) {
   const {
     attributes,
     listeners,
@@ -93,7 +96,32 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
         </div>
       )}
       
+      {(task.time_spent > 0 || task.pomodoro_count > 0) && (
+        <div className="task-time-stats">
+          {task.time_spent > 0 && (
+            <span className="time-stat">
+              <Clock size={12} />
+              {Math.floor(task.time_spent / 60)}m
+            </span>
+          )}
+          {task.pomodoro_count > 0 && (
+            <span className="time-stat">
+              🍅 {task.pomodoro_count}
+            </span>
+          )}
+        </div>
+      )}
+      
       <div className="task-footer">
+        {!task.completed && (
+          <button 
+            className="task-action-icon pomodoro-btn"
+            onClick={() => onStartPomodoro(task)}
+            title="Start Pomodoro"
+          >
+            <Timer size={16} />
+          </button>
+        )}
         {!isHighlight && !task.completed && (
           <button 
             className="task-action-icon highlight-btn"
@@ -136,8 +164,10 @@ function Home({ user }) {
   const [editingTask, setEditingTask] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
-  const [sortBy, setSortBy] = useState('created_desc');
+  const [sortBy, setSortBy] = useState('manual');
   const [showCelebration, setShowCelebration] = useState(false);
+  const [activePomodoroTask, setActivePomodoroTask] = useState(null);
+  const [showPomodoroComplete, setShowPomodoroComplete] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -208,6 +238,34 @@ function Home({ user }) {
         // Revert on error
         loadTasks();
       }
+    }
+  };
+
+  const handleStartPomodoro = (task) => {
+    setActivePomodoroTask(task);
+  };
+
+  const handlePomodoroComplete = () => {
+    setShowPomodoroComplete(true);
+    setTimeout(() => {
+      setShowPomodoroComplete(false);
+      setActivePomodoroTask(null);
+    }, 3000);
+  };
+
+  const handlePomodoroCancel = () => {
+    setActivePomodoroTask(null);
+  };
+
+  const handleUpdateTaskFromPomodoro = (updatedTask) => {
+    setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t));
+    
+    // Update highlighted/frog task if it's the one being updated
+    if (highlightedTask && highlightedTask.id === updatedTask.id) {
+      setHighlightedTask(updatedTask);
+    }
+    if (frogTask && frogTask.id === updatedTask.id) {
+      setFrogTask(updatedTask);
     }
   };
 
@@ -405,6 +463,31 @@ function Home({ user }) {
 
   return (
     <div className="home-page">
+      {/* Pomodoro Timer Modal */}
+      {activePomodoroTask && (
+        <div className="modal-overlay" onClick={handlePomodoroCancel}>
+          <div className="modal-content pomodoro-modal" onClick={(e) => e.stopPropagation()}>
+            <PomodoroTimer
+              task={activePomodoroTask}
+              onComplete={handlePomodoroComplete}
+              onCancel={handlePomodoroCancel}
+              onUpdateTask={handleUpdateTaskFromPomodoro}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Pomodoro Completion Celebration */}
+      {showPomodoroComplete && (
+        <div className="celebration-overlay pomodoro-celebration">
+          <div className="celebration-content">
+            <span className="celebration-icon">🍅</span>
+            <h2>Pomodoro Complete! 🎉</h2>
+            <p>Great focus session!</p>
+          </div>
+        </div>
+      )}
+
       {/* Success Message */}
       {successMessage && (
         <div className="success-toast">
@@ -683,6 +766,7 @@ function Home({ user }) {
                             onDeleteTask={handleDeleteTask}
                             onSetHighlight={handleSetHighlight}
                             onSetFrog={handleSetFrog}
+                            onStartPomodoro={handleStartPomodoro}
                           />
                         );
                       })}
