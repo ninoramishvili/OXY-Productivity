@@ -369,6 +369,32 @@
   position: relative;
 }
 
+.backlog-task-card.dragging {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+  z-index: 999;
+  opacity: 0.5;
+}
+
+.backlog-task-card .drag-handle {
+  cursor: grab;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.backlog-task-card .drag-handle:hover {
+  color: var(--text-secondary);
+  background: rgba(var(--text-secondary-rgb), 0.1);
+}
+
+.backlog-task-card .drag-handle:active {
+  cursor: grabbing;
+}
+
 .backlog-task-card::before {
   content: '';
   position: absolute;
