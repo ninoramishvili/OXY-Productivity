@@ -19,13 +19,16 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
 
   useEffect(() => {
     if (task) {
+      const initialTagIds = task.tags?.map(t => Number(t.id)) || [];
+      console.log('Loading task for edit:', task.title, 'Tags:', task.tags, 'TagIds:', initialTagIds);
       setFormData({
         title: task.title || '',
         description: task.description || '',
         priority: task.priority || 'medium',
-        tagIds: task.tags?.map(t => t.id) || []
+        tagIds: initialTagIds
       });
     } else {
+      console.log('Creating new task');
       setFormData({
         title: '',
         description: '',
@@ -45,12 +48,18 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
   };
 
   const toggleTag = (tagId) => {
-    console.log('Toggle tag:', tagId, 'Current tagIds:', formData.tagIds);
+    // Ensure we're comparing numbers
+    const numericTagId = Number(tagId);
+    console.log('Toggle tag:', numericTagId, 'Current tagIds:', formData.tagIds, 'Type:', typeof formData.tagIds[0]);
+    
     setFormData(prev => {
-      const newTagIds = prev.tagIds.includes(tagId)
-        ? prev.tagIds.filter(id => id !== tagId)
-        : [...prev.tagIds, tagId];
-      console.log('New tagIds:', newTagIds);
+      const currentIds = prev.tagIds.map(id => Number(id));
+      const isSelected = currentIds.includes(numericTagId);
+      const newTagIds = isSelected
+        ? currentIds.filter(id => id !== numericTagId)
+        : [...currentIds, numericTagId];
+      
+      console.log('Is selected:', isSelected, 'New tagIds:', newTagIds);
       return {
         ...prev,
         tagIds: newTagIds
@@ -119,8 +128,11 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
 
   const handleDeleteTagClick = (e, tag) => {
     e.stopPropagation(); // Prevent tag toggle
+    e.preventDefault(); // Prevent any default behavior
     console.log('Delete tag clicked:', tag);
+    console.log('Setting deleteTagConfirm state to:', { isOpen: true, tag });
     setDeleteTagConfirm({ isOpen: true, tag });
+    console.log('After setState - should show modal');
   };
 
   const confirmDeleteTag = async () => {
@@ -165,12 +177,18 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
 
   if (!isOpen) return null;
 
+  console.log('TaskModal render - deleteTagConfirm:', deleteTagConfirm);
+
   return (
     <>
       {/* Delete Tag Confirmation Modal */}
+      {console.log('Rendering ConfirmModal with isOpen:', deleteTagConfirm.isOpen)}
       <ConfirmModal
         isOpen={deleteTagConfirm.isOpen}
-        onClose={() => setDeleteTagConfirm({ isOpen: false, tag: null })}
+        onClose={() => {
+          console.log('ConfirmModal close clicked');
+          setDeleteTagConfirm({ isOpen: false, tag: null });
+        }}
         onConfirm={confirmDeleteTag}
         title="Delete Tag"
         message={`Are you sure you want to delete "${deleteTagConfirm.tag?.name}"? This tag will be removed from all tasks using it.`}
@@ -235,29 +253,33 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
             </label>
             {tags && tags.length > 0 && (
               <div className="tags-selector">
-                {tags.map(tag => (
-                  <div key={tag.id} className="tag-chip-wrapper">
-                    <button
-                      type="button"
-                      className={`tag-chip ${formData.tagIds.includes(tag.id) ? 'selected' : ''}`}
-                      style={{ 
-                        '--tag-color': tag.color,
-                        borderColor: formData.tagIds.includes(tag.id) ? tag.color : 'transparent'
-                      }}
-                      onClick={() => toggleTag(tag.id)}
-                    >
-                      {tag.name}
-                    </button>
-                    <button
-                      type="button"
-                      className="tag-delete-btn"
-                      onClick={(e) => handleDeleteTagClick(e, tag)}
-                      title="Delete tag"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                ))}
+                {tags.map(tag => {
+                  const isSelected = formData.tagIds.map(id => Number(id)).includes(Number(tag.id));
+                  console.log('Rendering tag:', tag.name, 'ID:', tag.id, 'Selected:', isSelected, 'FormData tagIds:', formData.tagIds);
+                  return (
+                    <div key={tag.id} className="tag-chip-wrapper">
+                      <button
+                        type="button"
+                        className={`tag-chip ${isSelected ? 'selected' : ''}`}
+                        style={{ 
+                          '--tag-color': tag.color,
+                          borderColor: isSelected ? tag.color : 'transparent'
+                        }}
+                        onClick={() => toggleTag(tag.id)}
+                      >
+                        {tag.name}
+                      </button>
+                      <button
+                        type="button"
+                        className="tag-delete-btn"
+                        onClick={(e) => handleDeleteTagClick(e, tag)}
+                        title="Delete tag"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
             <div className="tag-input-row">
