@@ -80,8 +80,8 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
         </span>
       </div>
       
-      {/* Tags - always show space */}
-      {task.tags && task.tags.length > 0 ? (
+      {/* Tags */}
+      {task.tags && task.tags.length > 0 && (
         <div className="task-tags">
           {task.tags.map(tag => (
             <span 
@@ -97,12 +97,10 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
             </span>
           ))}
         </div>
-      ) : (
-        <div className="task-tags-placeholder"></div>
       )}
       
-      {/* Time stats - always show space */}
-      {task.time_spent > 0 || task.pomodoro_count > 0 ? (
+      {/* Time stats */}
+      {(task.time_spent > 0 || task.pomodoro_count > 0) && (
         <div className="task-time-stats">
           {task.time_spent > 0 && (
             <span className="time-stat">
@@ -126,34 +124,32 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
             <RotateCcw size={12} />
           </button>
         </div>
-      ) : (
-        <div className="task-time-stats-placeholder"></div>
       )}
       
       <div className="task-footer">
-        {!task.completed && (
-          <button 
-            className="task-action-icon pomodoro-btn"
-            onClick={() => onStartPomodoro(task)}
-            title="Start Pomodoro"
-          >
-            <Timer size={16} />
-          </button>
-        )}
-        {!isHighlight && !task.completed && (
-          <button 
-            className="task-action-icon highlight-btn"
-            onClick={() => onSetHighlight(task.id)}
-            title="Set as Daily Highlight"
-          ></button>
-        )}
-        {!task.is_frog && !task.completed && (
-          <button 
-            className="task-action-icon frog-btn"
-            onClick={() => onSetFrog(task.id)}
-            title="Mark as Frog (Hardest Task)"
-          ></button>
-        )}
+        <button 
+          className="task-action-icon pomodoro-btn"
+          onClick={() => onStartPomodoro(task)}
+          title="Start Pomodoro"
+          disabled={task.completed}
+          style={{ opacity: task.completed ? 0.3 : 1 }}
+        >
+          <Timer size={16} />
+        </button>
+        <button 
+          className="task-action-icon highlight-btn"
+          onClick={() => onSetHighlight(task.id)}
+          title="Set as Daily Highlight"
+          disabled={task.completed || isHighlight}
+          style={{ opacity: (task.completed || isHighlight) ? 0.3 : 1 }}
+        >✨</button>
+        <button 
+          className="task-action-icon frog-btn"
+          onClick={() => onSetFrog(task.id)}
+          title="Mark as Frog (Hardest Task)"
+          disabled={task.completed || task.is_frog}
+          style={{ opacity: (task.completed || task.is_frog) ? 0.3 : 1 }}
+        >🐸</button>
         <button 
           className="task-action-icon"
           onClick={() => onEditTask(task)}
