@@ -291,6 +291,10 @@ function Backlog() {
       if (editingTask) {
         const response = await tasksAPI.updateTask(editingTask.id, taskData);
         if (response.success) {
+          // Also update Eisenhower quadrant if changed
+          if (taskData.isUrgent !== undefined && taskData.isImportant !== undefined) {
+            await tasksAPI.updateEisenhower(editingTask.id, taskData.isUrgent, taskData.isImportant);
+          }
           showSuccess('Task updated successfully!');
           loadTasks();
         }
@@ -388,7 +392,7 @@ function Backlog() {
         <div className="header-title">
           <ListTodo size={32} className="header-icon" />
           <div>
-            <h1>Backlog</h1>
+            <h1>To Do</h1>
             <p className="header-subtitle">
               {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
               {getActiveFilterCount() > 0 && ` (filtered)`}

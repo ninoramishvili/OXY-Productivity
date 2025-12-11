@@ -45,7 +45,7 @@ function Layout({ user, onLogout, children }) {
             className={`nav-item ${isActive('/backlog') ? 'active' : ''}`}
           >
             <List className="nav-icon" size={20} />
-            <span>Backlog</span>
+            <span>To Do</span>
           </button>
           <button 
             onClick={() => navigate('/eisenhower')}

@@ -49,13 +49,14 @@
   bottom: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: var(--bg-card);
+  background: var(--modal-bg, var(--bg-card));
   border: 1px solid var(--border-primary);
   border-radius: 12px;
   padding: 8px;
   box-shadow: var(--shadow-md);
   z-index: 1000;
   animation: slideUpFade 0.2s ease-out;
+  backdrop-filter: none;
 }
 
 @keyframes slideUpFade {
@@ -143,6 +144,7 @@
 }
 
 :root[data-theme="oxy"] .theme-dropdown {
+  background: #fff8f5;
   box-shadow: 0 8px 24px rgba(255, 127, 80, 0.15);
 }
 
@@ -152,11 +154,19 @@
 }
 
 /* Dark mode specific */
+:root[data-theme="dark"] .theme-dropdown {
+  background: #1a1d23;
+}
+
 :root[data-theme="dark"] .theme-preview {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Light mode specific */
+:root[data-theme="light"] .theme-dropdown {
+  background: #ffffff;
+}
+
 :root[data-theme="light"] .theme-preview {
   border-color: rgba(0, 0, 0, 0.15);
 }

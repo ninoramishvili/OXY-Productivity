@@ -373,6 +373,10 @@ function Home({ user }) {
         // Update existing task
         const response = await tasksAPI.updateTask(editingTask.id, taskData);
         if (response.success) {
+          // Also update Eisenhower quadrant if changed
+          if (taskData.isUrgent !== undefined && taskData.isImportant !== undefined) {
+            await tasksAPI.updateEisenhower(editingTask.id, taskData.isUrgent, taskData.isImportant);
+          }
           showSuccess('Task updated successfully!');
           loadTasks();
         }

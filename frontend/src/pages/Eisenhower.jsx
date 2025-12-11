@@ -327,16 +327,22 @@ function Eisenhower() {
   const handleSaveTask = async (taskData) => {
     try {
       if (editingTask && editingTask.id) {
+        // Update task
         const response = await tasksAPI.updateTask(editingTask.id, taskData);
         if (response.success) {
+          // Also update Eisenhower quadrant if changed
+          if (taskData.isUrgent !== undefined && taskData.isImportant !== undefined) {
+            await tasksAPI.updateEisenhower(editingTask.id, taskData.isUrgent, taskData.isImportant);
+          }
           showSuccess('Task updated!');
           loadTasks();
         }
       } else {
+        // Create new task - use quadrant from taskData (selected in modal)
         const createData = {
           ...taskData,
-          isUrgent: editingTask?.is_urgent ?? true,
-          isImportant: editingTask?.is_important ?? true
+          isUrgent: taskData.isUrgent ?? true,
+          isImportant: taskData.isImportant ?? true
         };
         const response = await tasksAPI.createTask(createData);
         if (response.success) {
