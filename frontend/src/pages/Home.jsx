@@ -357,8 +357,12 @@ function Home({ user }) {
           loadTasks();
         }
       } else {
-        // Create new task
-        const response = await tasksAPI.createTask(taskData);
+        // Create new task - include scheduled_date from editingTask
+        const createData = {
+          ...taskData,
+          scheduledDate: editingTask?.scheduled_date || selectedDate.toISOString().split('T')[0]
+        };
+        const response = await tasksAPI.createTask(createData);
         if (response.success) {
           showSuccess('Task created successfully!');
           loadTasks();
@@ -637,58 +641,61 @@ function Home({ user }) {
       <div className="home-content">
         {/* Left Column - Tasks */}
         <div className="tasks-column">
-          {/* Daily Highlight Section */}
-          <div className="highlight-section compact">
-            <div className="section-header">
-              <h2><span className="section-icon">✨</span> Daily Highlight</h2>
-            </div>
-            {highlightedTask ? (
-              <div className="highlight-card compact">
-                <div className="highlight-info">
-                  <span className="highlight-title">{highlightedTask.title}</span>
-                  <span className={`priority-badge priority-${highlightedTask.priority}`}>
-                    {highlightedTask.priority}
-                  </span>
-                </div>
-                <button 
-                  className="btn-focus-complete"
-                  onClick={() => handleToggleComplete(highlightedTask)}
-                  disabled={highlightedTask.completed}
-                >
-                  <Check size={16} />
-                  {highlightedTask.completed ? 'Completed!' : 'Complete'}
-                </button>
+          {/* Focus Sections Row - Highlight & Frog Side by Side */}
+          <div className="focus-sections-row">
+            {/* Daily Highlight Section */}
+            <div className="highlight-section compact">
+              <div className="section-header">
+                <h2><span className="section-icon">✨</span> Daily Highlight</h2>
               </div>
-            ) : (
-              <p className="no-highlight">Click ✨ on a task to set your daily highlight</p>
-            )}
-          </div>
+              {highlightedTask ? (
+                <div className="highlight-card compact">
+                  <div className="highlight-info">
+                    <span className="highlight-title">{highlightedTask.title}</span>
+                    <span className={`priority-badge priority-${highlightedTask.priority}`}>
+                      {highlightedTask.priority}
+                    </span>
+                  </div>
+                  <button 
+                    className="btn-focus-complete"
+                    onClick={() => handleToggleComplete(highlightedTask)}
+                    disabled={highlightedTask.completed}
+                  >
+                    <Check size={16} />
+                    {highlightedTask.completed ? 'Completed!' : 'Complete'}
+                  </button>
+                </div>
+              ) : (
+                <p className="no-highlight">Click ✨ on a task to set it as highlight</p>
+              )}
+            </div>
 
-          {/* Eat That Frog Section */}
-          <div className="frog-section compact">
-            <div className="section-header">
-              <h2><span className="section-icon">🐸</span> Eat That Frog</h2>
-            </div>
-            {frogTask ? (
-              <div className="frog-card compact">
-                <div className="frog-info">
-                  <span className="frog-title">{frogTask.title}</span>
-                  <span className={`priority-badge priority-${frogTask.priority}`}>
-                    {frogTask.priority}
-                  </span>
-                </div>
-                <button 
-                  className="btn-focus-complete frog"
-                  onClick={() => handleToggleComplete(frogTask)}
-                  disabled={frogTask.completed}
-                >
-                  <Check size={16} />
-                  {frogTask.completed ? 'Eaten!' : 'Eat It!'}
-                </button>
+            {/* Eat That Frog Section */}
+            <div className="frog-section compact">
+              <div className="section-header">
+                <h2><span className="section-icon">🐸</span> Eat That Frog</h2>
               </div>
-            ) : (
-              <p className="no-frog">Click 🐸 on your hardest task to mark it as your frog</p>
-            )}
+              {frogTask ? (
+                <div className="frog-card compact">
+                  <div className="frog-info">
+                    <span className="frog-title">{frogTask.title}</span>
+                    <span className={`priority-badge priority-${frogTask.priority}`}>
+                      {frogTask.priority}
+                    </span>
+                  </div>
+                  <button 
+                    className="btn-focus-complete frog"
+                    onClick={() => handleToggleComplete(frogTask)}
+                    disabled={frogTask.completed}
+                  >
+                    <Check size={16} />
+                    {frogTask.completed ? 'Eaten!' : 'Eat It!'}
+                  </button>
+                </div>
+              ) : (
+                <p className="no-frog">Click 🐸 on your hardest task</p>
+              )}
+            </div>
           </div>
 
           {/* Tasks List */}
@@ -756,18 +763,18 @@ function Home({ user }) {
       </div>
 
       {/* Modals */}
-      {isModalOpen && (
-        <TaskModal
-          task={editingTask}
-          tags={tags}
-          onSave={handleSaveTask}
-          onClose={() => {
-            setIsModalOpen(false);
-            setEditingTask(null);
-          }}
-          onTagsChange={loadTags}
-        />
-      )}
+      <TaskModal
+        isOpen={isModalOpen}
+        task={editingTask}
+        tags={tags}
+        onSave={handleSaveTask}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingTask(null);
+        }}
+        onTagsUpdate={loadTags}
+        onTasksUpdate={loadTasks}
+      />
 
       <ConfirmModal
         isOpen={deleteConfirm.isOpen}
