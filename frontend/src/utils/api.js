@@ -78,6 +78,11 @@ export const tasksAPI = {
     const response = await api.post('/tasks/reorder', { taskOrders });
     return response.data;
   },
+  
+  updateEisenhower: async (taskId, isUrgent, isImportant) => {
+    const response = await api.put(`/tasks/${taskId}/eisenhower`, { isUrgent, isImportant });
+    return response.data;
+  },
 };
 
 // Pomodoro API

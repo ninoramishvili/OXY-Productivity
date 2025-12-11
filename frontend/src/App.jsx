@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Backlog from './pages/Backlog';
+import Eisenhower from './pages/Eisenhower';
 import Layout from './components/Layout';
 import './App.css';
 
@@ -62,6 +63,16 @@ function App() {
             isAuthenticated ? 
             <Layout user={user} onLogout={handleLogout}>
               <Backlog />
+            </Layout> : 
+            <Navigate to="/login" />
+          } 
+        />
+        <Route 
+          path="/eisenhower" 
+          element={
+            isAuthenticated ? 
+            <Layout user={user} onLogout={handleLogout}>
+              <Eisenhower />
             </Layout> : 
             <Navigate to="/login" />
           } 

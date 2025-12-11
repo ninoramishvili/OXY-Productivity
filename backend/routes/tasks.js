@@ -37,7 +37,7 @@ router.get('/', verifyToken, async (req, res) => {
 
 // Create new task
 router.post('/', verifyToken, async (req, res) => {
-  const { title, description, priority, scheduledDate, scheduledTime, tagIds } = req.body;
+  const { title, description, priority, scheduledDate, scheduledTime, tagIds, isUrgent, isImportant } = req.body;
 
   if (!title) {
     return res.status(400).json({ 
@@ -48,8 +48,8 @@ router.post('/', verifyToken, async (req, res) => {
 
   try {
     const result = await query(
-      `INSERT INTO tasks (user_id, title, description, priority, scheduled_date, scheduled_time) 
-       VALUES ($1, $2, $3, $4, $5, $6) 
+      `INSERT INTO tasks (user_id, title, description, priority, scheduled_date, scheduled_time, is_urgent, is_important) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
        RETURNING *`,
       [
         req.userId,
@@ -57,7 +57,9 @@ router.post('/', verifyToken, async (req, res) => {
         description || '',
         priority || 'medium',
         scheduledDate || null,
-        scheduledTime || null
+        scheduledTime || null,
+        isUrgent || false,
+        isImportant || false
       ]
     );
 
@@ -229,6 +231,49 @@ router.delete('/:id', verifyToken, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Failed to delete task' 
+    });
+  }
+});
+
+// Update Eisenhower Matrix quadrant for a task
+router.put('/:id/eisenhower', verifyToken, async (req, res) => {
+  const taskId = parseInt(req.params.id);
+  const { isUrgent, isImportant } = req.body;
+
+  try {
+    const result = await query(
+      `UPDATE tasks 
+       SET is_urgent = $1, is_important = $2, updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $3 AND user_id = $4 
+       RETURNING *`,
+      [isUrgent, isImportant, taskId, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
+    }
+
+    // Get tags for the task
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [taskId]
+    );
+
+    res.json({ 
+      success: true, 
+      message: 'Eisenhower quadrant updated',
+      task: { ...result.rows[0], tags: tagsResult.rows }
+    });
+  } catch (error) {
+    console.error('Update Eisenhower error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update Eisenhower quadrant' 
     });
   }
 });

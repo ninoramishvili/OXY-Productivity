@@ -5,7 +5,8 @@ import {
   List, 
   Timer, 
   BarChart3, 
-  LogOut
+  LogOut,
+  Grid3X3
 } from 'lucide-react';
 import './Layout.css';
 
@@ -45,6 +46,13 @@ function Layout({ user, onLogout, children }) {
           >
             <List className="nav-icon" size={20} />
             <span>Backlog</span>
+          </button>
+          <button 
+            onClick={() => navigate('/eisenhower')}
+            className={`nav-item ${isActive('/eisenhower') ? 'active' : ''}`}
+          >
+            <Grid3X3 className="nav-icon" size={20} />
+            <span>Eisenhower</span>
           </button>
           <button className="nav-item">
             <Timer className="nav-icon" size={20} />
