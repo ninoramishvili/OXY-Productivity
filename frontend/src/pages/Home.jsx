@@ -198,23 +198,10 @@ function Home({ user }) {
     loadTags();
   }, []);
 
-  // Sort tasks whenever sortBy changes
-  const getStats = () => {
-    const dayTasks = getFilteredTasks();
-    const completedToday = dayTasks.filter(t => t.completed).length;
-    const totalCompleted = tasks.filter(t => t.completed).length;
+  const getSortedTasks = () => {
+    const sorted = [...getFilteredTasks()];
     
-    return {
-      todayTasks: dayTasks.length,
-      completedToday,
-      totalCompleted
-    };
-  };
-
-  const stats = getStats();
-
-  return (
-    <div className="home-page">
+    if (sortBy === 'manual') {
       // Manual order - use display_order
       sorted.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
     } else {
@@ -238,6 +225,23 @@ function Home({ user }) {
     }
     return sorted;
   };
+
+  const getStats = () => {
+    const dayTasks = getFilteredTasks();
+    const completedToday = dayTasks.filter(t => t.completed).length;
+    const totalCompleted = tasks.filter(t => t.completed).length;
+    
+    return {
+      todayTasks: dayTasks.length,
+      completedToday,
+      totalCompleted
+    };
+  };
+
+  const stats = getStats();
+
+  return (
+    <div className="home-page">
 
   const handleDragEnd = async (event) => {
     const { active, over } = event;
