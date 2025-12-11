@@ -358,14 +358,14 @@
   background: var(--bg-card);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-primary);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 12px;
+  padding: 14px 16px;
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   position: relative;
 }
 
