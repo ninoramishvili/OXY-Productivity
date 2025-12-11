@@ -234,8 +234,9 @@
   align-items: center;
   padding: 4px 0;
   border-top: 1px solid var(--border-color);
-  margin-top: auto;
-  min-height: 28px;
+  margin-top: AUTO;
+  height: 45px;
+
 }
 
 .task-time-stats-placeholder {
@@ -799,11 +800,14 @@
 
 .task-footer {
   display: flex;
-  gap: 6px;
-  align-items: center;
-  justify-content: space-between;
+  gap: 10px;
   margin-top: 8px;
-  padding-top: 4px;
+  margin-left:48%;
+
+  width: 200px;
+
+
+  
 }
 
 .task-action {
@@ -820,6 +824,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+
 }
 
 .task-action:hover {
@@ -830,7 +835,7 @@
 }
 
 .task-action-icon {
-  padding: 6px;
+  padding: 0px;
   background: var(--bg-card);
   border: 1px solid var(--border-primary);
   border-radius: 6px;
@@ -840,7 +845,7 @@
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
-  width: 28px;
+  width : 28px;
   height: 28px;
 }
 

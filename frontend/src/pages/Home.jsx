@@ -83,7 +83,7 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
       {/* Tags - always show space */}
       {task.tags && task.tags.length > 0 ? (
         <div className="task-tags">
-          {task.tags.map(tag => (
+          {task.tags.slice(0, 3).map(tag => (
             <span 
               key={tag.id} 
               className="task-tag"
@@ -146,14 +146,14 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
           title={isHighlight ? "Already Daily Highlight" : "Set as Daily Highlight"}
           disabled={task.completed || isHighlight}
           style={{ opacity: (task.completed || isHighlight) ? 0.5 : 1, cursor: (task.completed || isHighlight) ? 'not-allowed' : 'pointer' }}
-        >✨</button>
+        ></button>
         <button 
           className={`task-action-icon frog-btn ${task.is_frog ? 'active' : ''}`}
           onClick={() => onSetFrog(task.id)}
           title={task.is_frog ? "Already Frog" : "Mark as Frog (Hardest Task)"}
           disabled={task.completed || task.is_frog}
           style={{ opacity: (task.completed || task.is_frog) ? 0.5 : 1, cursor: (task.completed || task.is_frog) ? 'not-allowed' : 'pointer' }}
-        >🐸</button>
+        ></button>
         <button 
           className="task-action-icon"
           onClick={() => onEditTask(task)}
