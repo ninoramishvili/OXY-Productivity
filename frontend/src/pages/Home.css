@@ -230,11 +230,18 @@
 
 .task-time-stats {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
-  padding: 6px 0;
+  padding: 8px 0;
   border-top: 1px solid var(--border-color);
   margin-top: auto;
+  min-height: 32px;
+}
+
+.task-time-stats-placeholder {
+  min-height: 32px;
+  border-top: 1px solid transparent;
+  padding: 8px 0;
 }
 
 .time-stat {
@@ -575,9 +582,10 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  height: 160px;
+  height: 180px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 .task-card.is-highlight {
