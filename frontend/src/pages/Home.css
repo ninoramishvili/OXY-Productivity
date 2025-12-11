@@ -232,11 +232,23 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  padding: 4px 0;
-  border-top: 1px solid var(--border-color);
-  margin-top: AUTO;
-  height: 45px;
+  justify-content: center;
+  padding: 4px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  background: rgba(var(--bg-primary-rgb), 0.4);
+  height: 32px;
+  margin-top: auto;
+  margin-bottom: auto;
+  flex-shrink: 0;
+  width: fit-content;
+  align-self: center;
+  transition: all 0.2s ease;
+}
 
+.task-time-stats:hover {
+  background: rgba(var(--bg-primary-rgb), 0.6);
+  border-color: var(--border-hover);
 }
 
 .task-time-stats-placeholder {
@@ -577,8 +589,8 @@
   background: var(--bg-card);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-primary);
-  border-radius: 12px;
-  padding: 12px 14px;
+  border-radius: 16px;
+  padding: 16px;
   box-shadow: var(--shadow-sm);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -640,7 +652,9 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  min-height: 40px;
+  flex-shrink: 0;
 }
 
 .task-title-row {
@@ -686,12 +700,13 @@
   font-weight: 600;
   color: var(--text-primary);
   flex: 1;
-  line-height: 1.3;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
 .highlight-indicator {
@@ -800,14 +815,13 @@
 
 .task-footer {
   display: flex;
-  gap: 10px;
-  margin-top: 8px;
-  margin-left:48%;
-
-  width: 200px;
-
-
-  
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  height: 32px;
+  margin-top: auto;
+  flex-shrink: 0;
+  padding-top: 4px;
 }
 
 .task-action {
@@ -835,25 +849,25 @@
 }
 
 .task-action-icon {
-  padding: 0px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-primary);
-  border-radius: 6px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
-  width : 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
 }
 
 .task-action-icon:hover {
-  background: rgba(0, 206, 209, 0.2);
-  border-color: rgba(0, 206, 209, 0.4);
-  color: var(--color-teal);
-  transform: scale(1.1);
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  border-color: var(--border-primary);
 }
 
 .task-action-icon.delete:hover {
