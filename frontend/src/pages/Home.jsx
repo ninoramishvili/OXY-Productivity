@@ -80,7 +80,8 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
         </span>
       </div>
       
-      {task.tags && task.tags.length > 0 && (
+      {/* Tags - always show space */}
+      {task.tags && task.tags.length > 0 ? (
         <div className="task-tags">
           {task.tags.map(tag => (
             <span 
@@ -96,9 +97,12 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
             </span>
           ))}
         </div>
+      ) : (
+        <div className="task-tags-placeholder"></div>
       )}
       
-      {(task.time_spent > 0 || task.pomodoro_count > 0) && (
+      {/* Time stats - always show space */}
+      {task.time_spent > 0 || task.pomodoro_count > 0 ? (
         <div className="task-time-stats">
           {task.time_spent > 0 && (
             <span className="time-stat">
@@ -122,6 +126,8 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
             <RotateCcw size={12} />
           </button>
         </div>
+      ) : (
+        <div className="task-time-stats-placeholder"></div>
       )}
       
       <div className="task-footer">
