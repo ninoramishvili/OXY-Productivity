@@ -7,6 +7,7 @@
 :root {
   /* Backgrounds */
   --bg-primary: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a2f4a 100%);
+  --bg-primary-rgb: 26, 31, 58;
   --bg-secondary: rgba(15, 23, 42, 0.6);
   --bg-card: rgba(255, 255, 255, 0.03);
   --bg-card-hover: rgba(255, 255, 255, 0.05);
@@ -59,6 +60,7 @@
 :root[data-theme="light"] {
   /* Backgrounds */
   --bg-primary: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%);
+  --bg-primary-rgb: 226, 232, 240;
   --bg-secondary: rgba(255, 255, 255, 0.95);
   --bg-card: rgba(255, 255, 255, 0.95);
   --bg-card-hover: rgba(255, 255, 255, 1);
@@ -106,6 +108,7 @@
 :root[data-theme="oxy"] {
   /* Backgrounds - Warm peachy tones, flat */
   --bg-primary: #fff5f0; /* Warm peach background - oxytocin warmth */
+  --bg-primary-rgb: 255, 245, 240;
   --bg-secondary: rgba(255, 250, 245, 1);
   --bg-card: #ffffff;
   --bg-card-hover: #fffbf7;

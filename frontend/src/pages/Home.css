@@ -16,7 +16,7 @@
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-primary);
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -56,7 +56,7 @@
   height: 36px;
   border-radius: 10px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -74,7 +74,7 @@
   gap: 8px;
   padding: 8px 16px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
@@ -118,7 +118,7 @@
   height: 40px;
   border-radius: 10px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
   color: var(--color-coral);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -133,7 +133,7 @@
   padding: 10px 16px;
   padding-right: 32px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
   color: var(--text-primary);
   font-size: 13px;
@@ -181,7 +181,7 @@
   background: var(--bg-card);
   border-radius: 16px;
   padding: 16px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
 }
 
 .highlight-section.compact,
@@ -223,7 +223,7 @@
   padding: 10px 12px;
   background: rgba(var(--bg-primary-rgb), 0.5);
   border-radius: 10px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
 }
 
 .highlight-card.compact,
@@ -293,7 +293,7 @@
   background: var(--bg-card);
   border-radius: 16px;
   padding: 20px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
 }
 
 .tasks-section .section-header {
@@ -348,7 +348,7 @@
   background: var(--bg-card);
   border-radius: 16px;
   padding: 20px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
 }
 
 .quick-stats.compact {
@@ -374,7 +374,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .stat-item:last-child {
@@ -542,7 +542,7 @@
   padding: 10px 16px;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
@@ -711,7 +711,7 @@
   align-items: center;
   justify-content: flex-start;
   padding: 4px 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
   border-radius: 20px;
   background: rgba(var(--bg-primary-rgb), 0.6);
   height: 32px;
@@ -766,7 +766,7 @@
   max-width: 500px;
   padding: 0;
   background: var(--card-bg);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-primary);
   box-shadow: var(--shadow-lg);
   border-radius: 16px;
   overflow: hidden;
