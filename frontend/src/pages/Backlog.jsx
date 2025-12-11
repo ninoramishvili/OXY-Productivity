@@ -193,6 +193,10 @@ function Backlog() {
   const filterAndSortTasks = () => {
     let filtered = [...tasks];
 
+    // Only show tasks WITHOUT scheduled_date (unscheduled tasks)
+    // Tasks with dates appear in Day View, not To Do
+    filtered = filtered.filter(task => !task.scheduled_date);
+
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();

@@ -230,6 +230,8 @@ function Eisenhower() {
   // Get tasks for each quadrant
   const getQuadrantTasks = (quadrant) => {
     return tasks.filter(task => 
+      // Only show unscheduled tasks (tasks with dates appear in Day View)
+      !task.scheduled_date &&
       task.is_urgent === quadrant.isUrgent && 
       task.is_important === quadrant.isImportant
     );

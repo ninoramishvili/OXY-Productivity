@@ -12,12 +12,13 @@ const QUADRANTS = [
   { id: 'eliminate', label: '🗑️ Eliminate', subtitle: 'Not Urgent & Not Important', isUrgent: false, isImportant: false, color: '#6b7280' },
 ];
 
-function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksUpdate }) {
+function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksUpdate, defaultDate }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     quadrant: 'doFirst',
-    tagIds: []
+    tagIds: [],
+    scheduledDate: ''
   });
   const [errors, setErrors] = useState({});
   const [newTagName, setNewTagName] = useState('');
@@ -37,22 +38,29 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
     if (task) {
       const initialTagIds = task.tags?.map(t => Number(t.id)) || [];
       const quadrant = getQuadrantFromFlags(task.is_urgent, task.is_important);
+      // Get scheduled_date in YYYY-MM-DD format for the input
+      let scheduledDate = '';
+      if (task.scheduled_date) {
+        scheduledDate = task.scheduled_date.split('T')[0];
+      }
       setFormData({
         title: task.title || '',
         description: task.description || '',
         quadrant: quadrant,
-        tagIds: initialTagIds
+        tagIds: initialTagIds,
+        scheduledDate: scheduledDate
       });
     } else {
       setFormData({
         title: '',
         description: '',
         quadrant: 'doFirst',
-        tagIds: []
+        tagIds: [],
+        scheduledDate: defaultDate || ''
       });
     }
     setErrors({});
-  }, [task, isOpen]);
+  }, [task, isOpen, defaultDate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -257,6 +265,23 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
               placeholder="Add details (optional)..."
               rows="3"
             />
+          </div>
+
+          <div className="form-group form-group-compact">
+            <label htmlFor="scheduledDate">
+              📅 Schedule Date (optional)
+            </label>
+            <input
+              type="date"
+              id="scheduledDate"
+              name="scheduledDate"
+              value={formData.scheduledDate}
+              onChange={handleChange}
+              className="date-input"
+            />
+            <span className="field-hint">
+              Leave empty for To Do & Eisenhower. Set date for Day View.
+            </span>
           </div>
 
           <div className="form-group form-group-compact">

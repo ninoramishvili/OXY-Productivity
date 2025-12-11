@@ -381,10 +381,10 @@ function Home({ user }) {
           loadTasks();
         }
       } else {
-        // Create new task - include scheduled_date using local date
+        // Create new task - use scheduledDate from form (can be empty for To Do/Eisenhower)
         const createData = {
           ...taskData,
-          scheduledDate: editingTask?.scheduled_date || getLocalDateString(selectedDate)
+          scheduledDate: taskData.scheduledDate || null
         };
         const response = await tasksAPI.createTask(createData);
         if (response.success) {
@@ -831,6 +831,7 @@ function Home({ user }) {
         isOpen={isModalOpen}
         task={editingTask}
         tags={tags}
+        defaultDate={getLocalDateString(selectedDate)}
         onSave={handleSaveTask}
         onClose={() => {
           setIsModalOpen(false);
