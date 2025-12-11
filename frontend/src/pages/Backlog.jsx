@@ -31,8 +31,23 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import './Backlog.css';
 
+// Helper to get Eisenhower quadrant info from task
+const getQuadrantInfo = (task) => {
+  if (task.is_urgent && task.is_important) {
+    return { label: 'Do First', icon: '🔥', className: 'doFirst' };
+  }
+  if (!task.is_urgent && task.is_important) {
+    return { label: 'Schedule', icon: '📅', className: 'schedule' };
+  }
+  if (task.is_urgent && !task.is_important) {
+    return { label: 'Delegate', icon: '👥', className: 'delegate' };
+  }
+  return { label: 'Eliminate', icon: '🗑️', className: 'eliminate' };
+};
+
 // Sortable Task Card Component for Backlog
 function SortableBacklogCard({ task, onToggleComplete, onEditTask, onDeleteTask }) {
+  const quadrant = getQuadrantInfo(task);
   const {
     attributes,
     listeners,
@@ -81,8 +96,8 @@ function SortableBacklogCard({ task, onToggleComplete, onEditTask, onDeleteTask 
               {task.tags[0].name}
             </span>
           )}
-          <span className={`priority-badge priority-${task.priority}`}>
-            {task.priority}
+          <span className={`priority-badge quadrant-${quadrant.className}`}>
+            {quadrant.icon} {quadrant.label}
           </span>
         </div>
       </div>

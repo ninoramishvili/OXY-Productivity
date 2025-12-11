@@ -156,6 +156,32 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+.quadrant.drag-over {
+  border-color: var(--quadrant-color);
+  background: rgba(var(--quadrant-color-rgb, 128, 128, 128), 0.05);
+  box-shadow: 0 0 0 3px rgba(var(--quadrant-color-rgb, 128, 128, 128), 0.2);
+}
+
+.quadrant-doFirst.drag-over {
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.quadrant-schedule.drag-over {
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.quadrant-delegate.drag-over {
+  background: rgba(245, 158, 11, 0.1);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.quadrant-eliminate.drag-over {
+  background: rgba(107, 114, 128, 0.1);
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
+}
+
 .quadrant-doFirst {
   --quadrant-color: #ef4444;
 }

@@ -159,6 +159,54 @@
   color: var(--text-primary);
 }
 
+/* Eisenhower Quadrant Selector */
+.quadrant-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.quadrant-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 2px solid var(--border-primary);
+  border-radius: 10px;
+  background: var(--bg-input);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.quadrant-option:hover {
+  border-color: var(--q-color, var(--border-hover));
+  background: rgba(var(--q-color-rgb, 128, 128, 128), 0.05);
+}
+
+.quadrant-option.selected {
+  border-color: var(--q-color, var(--color-coral));
+  background: rgba(var(--q-color-rgb, 128, 128, 128), 0.1);
+  box-shadow: 0 0 0 2px rgba(var(--q-color-rgb, 128, 128, 128), 0.15);
+}
+
+.quadrant-option .q-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.quadrant-option .q-subtitle {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.quadrant-option:nth-child(1) { --q-color-rgb: 239, 68, 68; }
+.quadrant-option:nth-child(2) { --q-color-rgb: 59, 130, 246; }
+.quadrant-option:nth-child(3) { --q-color-rgb: 245, 158, 11; }
+.quadrant-option:nth-child(4) { --q-color-rgb: 107, 114, 128; }
+
 /* Tags Selector */
 .tags-selector {
   display: flex;

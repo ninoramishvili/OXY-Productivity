@@ -18,15 +18,14 @@ import {
 import {
   DndContext,
   DragOverlay,
-  closestCorners,
+  closestCenter,
   PointerSensor,
   useSensor,
   useSensors,
+  useDroppable,
 } from '@dnd-kit/core';
 import {
-  SortableContext,
   useSortable,
-  rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import './Eisenhower.css';
@@ -80,7 +79,7 @@ function DraggableTask({ task, onToggleComplete, onEdit, onDelete }) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id });
+  } = useSortable({ id: `task-${task.id}` });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -103,6 +102,7 @@ function DraggableTask({ task, onToggleComplete, onEdit, onDelete }) {
             e.stopPropagation();
             onToggleComplete(task);
           }}
+          onPointerDown={(e) => e.stopPropagation()}
         >
           {task.completed ? <Check size={14} /> : <div className="check-empty" />}
         </button>
@@ -115,6 +115,7 @@ function DraggableTask({ task, onToggleComplete, onEdit, onDelete }) {
             e.stopPropagation();
             onEdit(task);
           }}
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <Edit2 size={12} />
         </button>
@@ -124,6 +125,7 @@ function DraggableTask({ task, onToggleComplete, onEdit, onDelete }) {
             e.stopPropagation();
             onDelete(task.id);
           }}
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <Trash2 size={12} />
         </button>
@@ -132,10 +134,18 @@ function DraggableTask({ task, onToggleComplete, onEdit, onDelete }) {
   );
 }
 
-// Quadrant Component
-function Quadrant({ quadrant, tasks, onToggleComplete, onEdit, onDelete }) {
+// Droppable Quadrant Component
+function DroppableQuadrant({ quadrant, tasks, onToggleComplete, onEdit, onDelete }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: quadrant.id,
+  });
+
   return (
-    <div className={`quadrant quadrant-${quadrant.id}`} style={{ '--quadrant-color': quadrant.color }}>
+    <div 
+      ref={setNodeRef}
+      className={`quadrant quadrant-${quadrant.id} ${isOver ? 'drag-over' : ''}`} 
+      style={{ '--quadrant-color': quadrant.color }}
+    >
       <div className="quadrant-header">
         <span className="quadrant-icon">{quadrant.icon}</span>
         <div className="quadrant-titles">
@@ -144,25 +154,23 @@ function Quadrant({ quadrant, tasks, onToggleComplete, onEdit, onDelete }) {
         </div>
         <span className="quadrant-count">{tasks.length}</span>
       </div>
-      <SortableContext items={tasks.map(t => t.id)} strategy={rectSortingStrategy}>
-        <div className="quadrant-tasks">
-          {tasks.length === 0 ? (
-            <div className="quadrant-empty">
-              <span>Drop tasks here</span>
-            </div>
-          ) : (
-            tasks.map(task => (
-              <DraggableTask
-                key={task.id}
-                task={task}
-                onToggleComplete={onToggleComplete}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            ))
-          )}
-        </div>
-      </SortableContext>
+      <div className="quadrant-tasks">
+        {tasks.length === 0 ? (
+          <div className="quadrant-empty">
+            <span>Drop tasks here</span>
+          </div>
+        ) : (
+          tasks.map(task => (
+            <DraggableTask
+              key={task.id}
+              task={task}
+              onToggleComplete={onToggleComplete}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }
@@ -175,7 +183,7 @@ function Eisenhower() {
   const [editingTask, setEditingTask] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
   const [successMessage, setSuccessMessage] = useState('');
-  const [activeId, setActiveId] = useState(null);
+  const [activeTask, setActiveTask] = useState(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -227,46 +235,41 @@ function Eisenhower() {
     );
   };
 
-  // Get unassigned tasks (not in any quadrant)
-  const getUnassignedTasks = () => {
-    return tasks.filter(task => 
-      !task.is_urgent && !task.is_important && 
-      task.is_urgent !== true && task.is_important !== true
-    );
-  };
-
   const handleDragStart = (event) => {
-    setActiveId(event.active.id);
+    const taskId = parseInt(event.active.id.replace('task-', ''));
+    const task = tasks.find(t => t.id === taskId);
+    setActiveTask(task);
   };
 
   const handleDragEnd = async (event) => {
     const { active, over } = event;
-    setActiveId(null);
+    setActiveTask(null);
 
     if (!over) return;
 
-    const taskId = active.id;
+    // Extract task ID from the draggable ID
+    const taskId = parseInt(active.id.replace('task-', ''));
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    // Determine which quadrant the task was dropped into
+    // Determine target quadrant
     let targetQuadrant = null;
-    
-    // Check if dropped over another task
-    const overTask = tasks.find(t => t.id === over.id);
-    if (overTask) {
-      // Find which quadrant this task belongs to
-      for (const q of Object.values(QUADRANTS)) {
-        if (overTask.is_urgent === q.isUrgent && overTask.is_important === q.isImportant) {
-          targetQuadrant = q;
-          break;
+    const overId = over.id;
+
+    // Check if dropped on a quadrant directly
+    if (QUADRANTS[overId]) {
+      targetQuadrant = QUADRANTS[overId];
+    } else if (overId.startsWith('task-')) {
+      // Dropped on another task - find which quadrant that task is in
+      const overTaskId = parseInt(overId.replace('task-', ''));
+      const overTask = tasks.find(t => t.id === overTaskId);
+      if (overTask) {
+        for (const q of Object.values(QUADRANTS)) {
+          if (overTask.is_urgent === q.isUrgent && overTask.is_important === q.isImportant) {
+            targetQuadrant = q;
+            break;
+          }
         }
-      }
-    } else {
-      // Dropped on quadrant container
-      const overId = over.id;
-      if (QUADRANTS[overId]) {
-        targetQuadrant = QUADRANTS[overId];
       }
     }
 
@@ -312,10 +315,11 @@ function Eisenhower() {
     setIsModalOpen(true);
   };
 
-  const handleCreateTask = (quadrant) => {
+  const handleCreateTask = () => {
+    // Default to "Do First" quadrant
     setEditingTask({
-      is_urgent: quadrant.isUrgent,
-      is_important: quadrant.isImportant
+      is_urgent: true,
+      is_important: true
     });
     setIsModalOpen(true);
   };
@@ -331,8 +335,8 @@ function Eisenhower() {
       } else {
         const createData = {
           ...taskData,
-          isUrgent: editingTask?.is_urgent || false,
-          isImportant: editingTask?.is_important || false
+          isUrgent: editingTask?.is_urgent ?? true,
+          isImportant: editingTask?.is_important ?? true
         };
         const response = await tasksAPI.createTask(createData);
         if (response.success) {
@@ -365,8 +369,6 @@ function Eisenhower() {
     }
   };
 
-  const activeTask = activeId ? tasks.find(t => t.id === activeId) : null;
-
   if (loading) {
     return (
       <div className="eisenhower-page">
@@ -390,7 +392,7 @@ function Eisenhower() {
           <p className="header-subtitle">Prioritize tasks by urgency and importance</p>
         </div>
         <div className="header-actions">
-          <button className="btn-primary" onClick={() => handleCreateTask(QUADRANTS.doFirst)}>
+          <button className="btn-primary" onClick={handleCreateTask}>
             <Plus size={18} />
             Add Task
           </button>
@@ -399,7 +401,7 @@ function Eisenhower() {
 
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCorners}
+        collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
@@ -429,28 +431,28 @@ function Eisenhower() {
             </div>
 
             <div className="matrix-grid">
-              <Quadrant
+              <DroppableQuadrant
                 quadrant={QUADRANTS.doFirst}
                 tasks={getQuadrantTasks(QUADRANTS.doFirst)}
                 onToggleComplete={handleToggleComplete}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
               />
-              <Quadrant
+              <DroppableQuadrant
                 quadrant={QUADRANTS.schedule}
                 tasks={getQuadrantTasks(QUADRANTS.schedule)}
                 onToggleComplete={handleToggleComplete}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
               />
-              <Quadrant
+              <DroppableQuadrant
                 quadrant={QUADRANTS.delegate}
                 tasks={getQuadrantTasks(QUADRANTS.delegate)}
                 onToggleComplete={handleToggleComplete}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
               />
-              <Quadrant
+              <DroppableQuadrant
                 quadrant={QUADRANTS.eliminate}
                 tasks={getQuadrantTasks(QUADRANTS.eliminate)}
                 onToggleComplete={handleToggleComplete}
@@ -497,4 +499,3 @@ function Eisenhower() {
 }
 
 export default Eisenhower;
-

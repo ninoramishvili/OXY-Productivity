@@ -4,11 +4,19 @@ import { tagsAPI } from '../utils/api';
 import ConfirmModal from './ConfirmModal';
 import './TaskModal.css';
 
+// Eisenhower Quadrant definitions
+const QUADRANTS = [
+  { id: 'doFirst', label: '🔥 Do First', subtitle: 'Urgent & Important', isUrgent: true, isImportant: true, color: '#ef4444' },
+  { id: 'schedule', label: '📅 Schedule', subtitle: 'Not Urgent & Important', isUrgent: false, isImportant: true, color: '#3b82f6' },
+  { id: 'delegate', label: '👥 Delegate', subtitle: 'Urgent & Not Important', isUrgent: true, isImportant: false, color: '#f59e0b' },
+  { id: 'eliminate', label: '🗑️ Eliminate', subtitle: 'Not Urgent & Not Important', isUrgent: false, isImportant: false, color: '#6b7280' },
+];
+
 function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksUpdate }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    priority: 'medium',
+    quadrant: 'doFirst',
     tagIds: []
   });
   const [errors, setErrors] = useState({});
@@ -17,22 +25,29 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
   const [isSaving, setIsSaving] = useState(false);
   const [deleteTagConfirm, setDeleteTagConfirm] = useState({ isOpen: false, tag: null });
 
+  // Helper to get quadrant from urgent/important flags
+  const getQuadrantFromFlags = (isUrgent, isImportant) => {
+    if (isUrgent && isImportant) return 'doFirst';
+    if (!isUrgent && isImportant) return 'schedule';
+    if (isUrgent && !isImportant) return 'delegate';
+    return 'eliminate';
+  };
+
   useEffect(() => {
     if (task) {
       const initialTagIds = task.tags?.map(t => Number(t.id)) || [];
-      console.log('Loading task for edit:', task.title, 'Tags:', task.tags, 'TagIds:', initialTagIds);
+      const quadrant = getQuadrantFromFlags(task.is_urgent, task.is_important);
       setFormData({
         title: task.title || '',
         description: task.description || '',
-        priority: task.priority || 'medium',
+        quadrant: quadrant,
         tagIds: initialTagIds
       });
     } else {
-      console.log('Creating new task');
       setFormData({
         title: '',
         description: '',
-        priority: 'medium',
+        quadrant: 'doFirst',
         tagIds: []
       });
     }
@@ -85,7 +100,18 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
     if (validate()) {
       setIsSaving(true);
       try {
-        await onSave(formData);
+        // Convert quadrant to isUrgent/isImportant flags
+        const quadrantData = QUADRANTS.find(q => q.id === formData.quadrant);
+        const submitData = {
+          ...formData,
+          isUrgent: quadrantData?.isUrgent ?? true,
+          isImportant: quadrantData?.isImportant ?? true,
+          // Map quadrant to old priority for backward compatibility
+          priority: formData.quadrant === 'doFirst' ? 'high' : 
+                   formData.quadrant === 'schedule' ? 'medium' : 
+                   formData.quadrant === 'delegate' ? 'medium' : 'low'
+        };
+        await onSave(submitData);
       } finally {
         setIsSaving(false);
       }
@@ -234,18 +260,21 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
           </div>
 
           <div className="form-group form-group-compact">
-            <label htmlFor="priority">Priority</label>
-            <select
-              id="priority"
-              name="priority"
-              value={formData.priority}
-              onChange={handleChange}
-              className="priority-select"
-            >
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
+            <label>Priority (Eisenhower)</label>
+            <div className="quadrant-selector">
+              {QUADRANTS.map(q => (
+                <button
+                  key={q.id}
+                  type="button"
+                  className={`quadrant-option ${formData.quadrant === q.id ? 'selected' : ''}`}
+                  onClick={() => setFormData(prev => ({ ...prev, quadrant: q.id }))}
+                  style={{ '--q-color': q.color }}
+                >
+                  <span className="q-label">{q.label}</span>
+                  <span className="q-subtitle">{q.subtitle}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="form-group form-group-compact">

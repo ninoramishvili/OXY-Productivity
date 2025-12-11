@@ -39,8 +39,23 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import './Home.css';
 
+// Helper to get Eisenhower quadrant info from task
+const getQuadrantInfo = (task) => {
+  if (task.is_urgent && task.is_important) {
+    return { label: 'Do First', icon: '🔥', className: 'doFirst' };
+  }
+  if (!task.is_urgent && task.is_important) {
+    return { label: 'Schedule', icon: '📅', className: 'schedule' };
+  }
+  if (task.is_urgent && !task.is_important) {
+    return { label: 'Delegate', icon: '👥', className: 'delegate' };
+  }
+  return { label: 'Eliminate', icon: '🗑️', className: 'eliminate' };
+};
+
 // Sortable Task Card Component
 function SortableTaskCard({ task, isHighlight, isFrog, onToggleComplete, onEditTask, onDeleteTask, onToggleHighlight, onToggleFrog, onStartPomodoro, onResetPomodoro }) {
+  const quadrant = getQuadrantInfo(task);
   const {
     attributes,
     listeners,
@@ -91,8 +106,8 @@ function SortableTaskCard({ task, isHighlight, isFrog, onToggleComplete, onEditT
               {task.tags[0].name}
             </span>
           )}
-          <span className={`priority-badge priority-${task.priority}`}>
-            {task.priority}
+          <span className={`priority-badge quadrant-${quadrant.className}`}>
+            {quadrant.icon} {quadrant.label}
           </span>
         </div>
       </div>
@@ -678,8 +693,8 @@ function Home({ user }) {
                     <span className={`highlight-title ${highlightedTask.completed ? 'completed' : ''}`}>
                       {highlightedTask.completed && '✓ '}{highlightedTask.title}
                     </span>
-                    <span className={`priority-badge priority-${highlightedTask.priority}`}>
-                      {highlightedTask.priority}
+                    <span className={`priority-badge quadrant-${getQuadrantInfo(highlightedTask).className}`}>
+                      {getQuadrantInfo(highlightedTask).icon}
                     </span>
                   </div>
                   <div className="highlight-actions">
@@ -715,8 +730,8 @@ function Home({ user }) {
                     <span className={`frog-title ${frogTask.completed ? 'completed' : ''}`}>
                       {frogTask.completed && '✓ '}{frogTask.title}
                     </span>
-                    <span className={`priority-badge priority-${frogTask.priority}`}>
-                      {frogTask.priority}
+                    <span className={`priority-badge quadrant-${getQuadrantInfo(frogTask).className}`}>
+                      {getQuadrantInfo(frogTask).icon}
                     </span>
                   </div>
                   <div className="frog-actions">
