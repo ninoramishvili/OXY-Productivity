@@ -18,7 +18,10 @@ import {
   GripVertical,
   Timer,
   Clock,
-  RotateCcw
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  Calendar
 } from 'lucide-react';
 import {
   DndContext,
@@ -179,6 +182,7 @@ function Home({ user }) {
   const [frogTask, setFrogTask] = useState(null);
   const [showHighlightCelebration, setShowHighlightCelebration] = useState(false);
   const [showFrogCelebration, setShowFrogCelebration] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -195,10 +199,22 @@ function Home({ user }) {
   }, []);
 
   // Sort tasks whenever sortBy changes
-  const getSortedTasks = () => {
-    const sorted = [...tasks];
+  const getStats = () => {
+    const dayTasks = getFilteredTasks();
+    const completedToday = dayTasks.filter(t => t.completed).length;
+    const totalCompleted = tasks.filter(t => t.completed).length;
     
-    if (sortBy === 'manual') {
+    return {
+      todayTasks: dayTasks.length,
+      completedToday,
+      totalCompleted
+    };
+  };
+
+  const stats = getStats();
+
+  return (
+    <div className="home-page">
       // Manual order - use display_order
       sorted.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
     } else {
@@ -342,7 +358,9 @@ function Home({ user }) {
   };
 
   const handleCreateTask = () => {
-    setEditingTask(null);
+    setEditingTask({
+      scheduled_date: selectedDate.toISOString().split('T')[0]
+    });
     setIsModalOpen(true);
   };
 
@@ -484,26 +502,56 @@ function Home({ user }) {
 
   const getCurrentDate = () => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date().toLocaleDateString('en-US', options);
+    return selectedDate.toLocaleDateString('en-US', options);
   };
 
-  const getStats = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const todayTasks = tasks.filter(t => t.scheduled_date === today);
-    const completedToday = todayTasks.filter(t => t.completed).length;
-    const totalCompleted = tasks.filter(t => t.completed).length;
+  const isToday = (date) => {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+  };
+
+  const handlePrevDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const handleNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() + 1);
+    setSelectedDate(newDate);
+  };
+
+  const handleGoToToday = () => {
+    setSelectedDate(new Date());
+  };
+
+  const getFilteredTasks = () => {
+    // Convert selected date to YYYY-MM-DD string in local time
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const selectedDateString = `${year}-${month}-${day}`;
+
+    // Filter tasks for the selected date
+    const dayTasks = tasks.filter(task => {
+      // If task has no date, it shouldn't appear in calendar view (it's backlog)
+      if (!task.scheduled_date) return false;
+      
+      // Get task date string (handle both ISO string and YYYY-MM-DD format)
+      const taskDate = task.scheduled_date.split('T')[0];
+      return taskDate === selectedDateString;
+    });
+
+    return dayTasks;
+  };
+
+  const getSortedTasks = () => {
+    const sorted = [...getFilteredTasks()];
     
-    return {
-      todayTasks: todayTasks.length,
-      completedToday,
-      totalCompleted
-    };
-  };
-
-  const stats = getStats();
-
-  return (
-    <div className="home-page">
+    if (sortBy === 'manual') {
       {/* Floating Timer */}
       {showFloatingTimer && (
         <FloatingTimer onClose={() => setShowFloatingTimer(false)} />
@@ -573,9 +621,32 @@ function Home({ user }) {
       {/* Main Content */}
       <div className="home-main">
         <header className="content-header">
-          <div>
-            <h1 className="page-title">Good Day, {user?.name?.split(' ')[0] || 'there'}!</h1>
-            <p className="page-subtitle">{getCurrentDate()}</p>
+          <div className="header-content">
+            <div>
+              <h1 className="page-title">Good Day, {user?.name?.split(' ')[0] || 'there'}!</h1>
+              <p className="page-subtitle">Here's your schedule for today</p>
+            </div>
+            
+            <div className="date-navigation">
+              <button className="nav-btn" onClick={handlePrevDay} title="Previous Day">
+                <ChevronLeft size={20} />
+              </button>
+              
+              <div className="current-date-display">
+                <Calendar size={18} className="calendar-icon" />
+                <span>{getCurrentDate()}</span>
+              </div>
+
+              <button className="nav-btn" onClick={handleNextDay} title="Next Day">
+                <ChevronRight size={20} />
+              </button>
+
+              {!isToday(selectedDate) && (
+                <button className="today-btn" onClick={handleGoToToday}>
+                  Today
+                </button>
+              )}
+            </div>
           </div>
         </header>
 
@@ -795,10 +866,14 @@ function Home({ user }) {
                 </div>
               </div>
               
-              {tasks.length === 0 ? (
+              {getFilteredTasks().length === 0 ? (
                 <div className="empty-state-card">
                   <CheckSquare size={48} className="empty-icon" />
-                  <p>No tasks yet. Create your first task to get started!</p>
+                  <p>No tasks scheduled for {isToday(selectedDate) ? 'today' : 'this day'}.</p>
+                  <button className="btn-primary" onClick={handleCreateTask}>
+                    <Plus size={18} />
+                    Add Task for {isToday(selectedDate) ? 'Today' : 'This Day'}
+                  </button>
                 </div>
               ) : (
                 <DndContext
@@ -812,10 +887,14 @@ function Home({ user }) {
                   >
                     <div className="tasks-grid">
                       {getSortedTasks().map((task) => {
-                        const now = new Date();
-                        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                        // Use local date for comparison
+                        const year = selectedDate.getFullYear();
+                        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(selectedDate.getDate()).padStart(2, '0');
+                        const selectedDateString = `${year}-${month}-${day}`;
+                        
                         const taskDate = task.highlight_date ? new Date(task.highlight_date).toISOString().split('T')[0] : null;
-                        const isHighlight = task.is_daily_highlight && taskDate === today;
+                        const isHighlight = task.is_daily_highlight && taskDate === selectedDateString;
                         
                         return (
                           <SortableTaskCard
@@ -848,15 +927,15 @@ function Home({ user }) {
               </div>
               <div className="stats-grid">
                 <div className="stat-card">
-                  <div className="stat-value">{tasks.length}</div>
-                  <div className="stat-label">Total Tasks</div>
+                  <div className="stat-value">{getFilteredTasks().length}</div>
+                  <div className="stat-label">Tasks for Day</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-value">{stats.totalCompleted}</div>
+                  <div className="stat-value">{stats.completedToday}</div>
                   <div className="stat-label">Completed</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-value">{tasks.length - stats.totalCompleted}</div>
+                  <div className="stat-value">{getFilteredTasks().length - stats.completedToday}</div>
                   <div className="stat-label">Active</div>
                 </div>
               </div>
