@@ -326,6 +326,46 @@
   color: #ef4444;
 }
 
+/* Completed Highlight State */
+.highlight-card.completed {
+  background: rgba(255, 127, 80, 0.1);
+  border-color: rgba(255, 127, 80, 0.3);
+}
+
+.highlight-title.completed {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.btn-focus-complete.done {
+  background: var(--color-coral);
+  cursor: default;
+}
+
+.btn-focus-complete.done:hover {
+  transform: none;
+}
+
+/* Completed Frog State */
+.frog-card.completed {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.frog-title.completed {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.btn-focus-complete.frog.eaten {
+  background: #4CAF50;
+  cursor: default;
+}
+
+.btn-focus-complete.frog.eaten:hover {
+  transform: none;
+}
+
 /* ============================================
    TASKS SECTION
    ============================================ */

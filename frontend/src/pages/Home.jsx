@@ -327,8 +327,8 @@ function Home({ user }) {
   };
 
   const getFrogTask = () => {
-    // Find task that is: frog AND scheduled for this day AND not completed
-    return getFilteredTasks().find(task => task.is_frog && !task.completed);
+    // Find task that is: frog AND scheduled for this day (keep showing even when completed)
+    return getFilteredTasks().find(task => task.is_frog);
   };
 
   // Helper to get local date string (YYYY-MM-DD) without timezone shift
@@ -673,21 +673,22 @@ function Home({ user }) {
                 <h2><span className="section-icon">✨</span> Daily Highlight</h2>
               </div>
               {highlightedTask ? (
-                <div className="highlight-card compact">
+                <div className={`highlight-card compact ${highlightedTask.completed ? 'completed' : ''}`}>
                   <div className="highlight-info">
-                    <span className="highlight-title">{highlightedTask.title}</span>
+                    <span className={`highlight-title ${highlightedTask.completed ? 'completed' : ''}`}>
+                      {highlightedTask.completed && '✓ '}{highlightedTask.title}
+                    </span>
                     <span className={`priority-badge priority-${highlightedTask.priority}`}>
                       {highlightedTask.priority}
                     </span>
                   </div>
                   <div className="highlight-actions">
                     <button 
-                      className="btn-focus-complete"
+                      className={`btn-focus-complete ${highlightedTask.completed ? 'done' : ''}`}
                       onClick={() => handleToggleComplete(highlightedTask)}
-                      disabled={highlightedTask.completed}
                     >
                       <Check size={16} />
-                      {highlightedTask.completed ? 'Done!' : 'Complete'}
+                      {highlightedTask.completed ? '🎉 Done!' : 'Complete'}
                     </button>
                     <button 
                       className="btn-focus-remove"
@@ -709,21 +710,22 @@ function Home({ user }) {
                 <h2><span className="section-icon">🐸</span> Eat That Frog</h2>
               </div>
               {frogTask ? (
-                <div className="frog-card compact">
+                <div className={`frog-card compact ${frogTask.completed ? 'completed' : ''}`}>
                   <div className="frog-info">
-                    <span className="frog-title">{frogTask.title}</span>
+                    <span className={`frog-title ${frogTask.completed ? 'completed' : ''}`}>
+                      {frogTask.completed && '✓ '}{frogTask.title}
+                    </span>
                     <span className={`priority-badge priority-${frogTask.priority}`}>
                       {frogTask.priority}
                     </span>
                   </div>
                   <div className="frog-actions">
                     <button 
-                      className="btn-focus-complete frog"
+                      className={`btn-focus-complete frog ${frogTask.completed ? 'eaten' : ''}`}
                       onClick={() => handleToggleComplete(frogTask)}
-                      disabled={frogTask.completed}
                     >
                       <Check size={16} />
-                      {frogTask.completed ? 'Eaten!' : 'Eat It!'}
+                      {frogTask.completed ? '🎉 Eaten!' : 'Eat It!'}
                     </button>
                     <button 
                       className="btn-focus-remove"
