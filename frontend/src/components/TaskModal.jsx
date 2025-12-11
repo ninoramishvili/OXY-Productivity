@@ -56,11 +56,12 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
       const currentIds = prev.tagIds.map(id => Number(id));
       const isSelected = currentIds.includes(numericTagId);
       
-      // If already selected, deselect it (empty array)
-      // If not selected, select it (array with just this ID)
-      const newTagIds = isSelected ? [] : [numericTagId];
+      // Single selection mode:
+      // If already selected, do nothing (or could deselect if you want toggling off)
+      // If not selected, replace current selection with new one
+      const newTagIds = [numericTagId];
       
-      console.log('Is selected:', isSelected, 'New tagIds:', newTagIds);
+      console.log('Is selected:', isSelected, 'New tagIds (Single Mode):', newTagIds);
       return {
         ...prev,
         tagIds: newTagIds
