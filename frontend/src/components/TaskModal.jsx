@@ -55,9 +55,10 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
     setFormData(prev => {
       const currentIds = prev.tagIds.map(id => Number(id));
       const isSelected = currentIds.includes(numericTagId);
-      const newTagIds = isSelected
-        ? currentIds.filter(id => id !== numericTagId)
-        : [...currentIds, numericTagId];
+      
+      // If already selected, deselect it (empty array)
+      // If not selected, select it (array with just this ID)
+      const newTagIds = isSelected ? [] : [numericTagId];
       
       console.log('Is selected:', isSelected, 'New tagIds:', newTagIds);
       return {

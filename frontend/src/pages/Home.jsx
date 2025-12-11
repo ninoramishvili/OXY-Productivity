@@ -75,46 +75,35 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
           {isHighlight && <span className="task-emoji-indicator" title="Daily Highlight">✨</span>}
           {task.is_frog && <span className="task-emoji-indicator" title="Your Frog - Hardest Task">🐸</span>}
         </div>
-        <span className={`priority-badge priority-${task.priority}`}>
-          {task.priority}
-        </span>
-      </div>
-      
-      {/* Tags - always show space */}
-      {task.tags && task.tags.length > 0 ? (
-        <div className="task-tags">
-          {task.tags.slice(0, 3).map(tag => (
+        <div className="task-header-right">
+          {task.tags && task.tags.length > 0 && (
             <span 
-              key={tag.id} 
               className="task-tag"
               style={{ 
-                backgroundColor: `${tag.color}20`,
-                color: tag.color,
-                borderColor: `${tag.color}40`
+                backgroundColor: `${task.tags[0].color}20`,
+                color: task.tags[0].color,
+                borderColor: `${task.tags[0].color}40`
               }}
             >
-              {tag.name}
+              {task.tags[0].name}
             </span>
-          ))}
+          )}
+          <span className={`priority-badge priority-${task.priority}`}>
+            {task.priority}
+          </span>
         </div>
-      ) : (
-        <div className="task-tags-placeholder"></div>
-      )}
+      </div>
       
       {/* Time stats - always show space */}
-      {task.time_spent > 0 || task.pomodoro_count > 0 ? (
-        <div className="task-time-stats">
-          {task.time_spent > 0 && (
-            <span className="time-stat">
-              <Clock size={12} />
-              {Math.floor(task.time_spent / 60)}m
-            </span>
-          )}
-          {task.pomodoro_count > 0 && (
-            <span className="time-stat">
-              🍅 {task.pomodoro_count}
-            </span>
-          )}
+      <div className="task-time-stats">
+        <span className="time-stat">
+          <Clock size={12} />
+          {task.time_spent > 0 ? Math.floor(task.time_spent / 60) : 0}m
+        </span>
+        <span className="time-stat">
+          🍅 {task.pomodoro_count || 0}
+        </span>
+        {(task.time_spent > 0 || task.pomodoro_count > 0) && (
           <button 
             className="reset-pomodoro-btn"
             onClick={(e) => {
@@ -125,10 +114,8 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
           >
             <RotateCcw size={12} />
           </button>
-        </div>
-      ) : (
-        <div className="task-time-stats-placeholder"></div>
-      )}
+        )}
+      </div>
       
       <div className="task-footer">
         <button 
