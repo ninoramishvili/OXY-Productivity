@@ -131,29 +131,29 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
       )}
       
       <div className="task-footer">
-        {!task.completed && (
-          <button 
-            className="task-action-icon pomodoro-btn"
-            onClick={() => onStartPomodoro(task)}
-            title="Start Pomodoro"
-          >
-            <Timer size={16} />
-          </button>
-        )}
-        {!isHighlight && !task.completed && (
-          <button 
-            className="task-action-icon highlight-btn"
-            onClick={() => onSetHighlight(task.id)}
-            title="Set as Daily Highlight"
-          ></button>
-        )}
-        {!task.is_frog && !task.completed && (
-          <button 
-            className="task-action-icon frog-btn"
-            onClick={() => onSetFrog(task.id)}
-            title="Mark as Frog (Hardest Task)"
-          ></button>
-        )}
+        <button 
+          className="task-action-icon pomodoro-btn"
+          onClick={() => onStartPomodoro(task)}
+          title="Start Pomodoro"
+          disabled={task.completed}
+          style={{ opacity: task.completed ? 0.5 : 1, cursor: task.completed ? 'not-allowed' : 'pointer' }}
+        >
+          <Timer size={16} />
+        </button>
+        <button 
+          className={`task-action-icon highlight-btn ${isHighlight ? 'active' : ''}`}
+          onClick={() => onSetHighlight(task.id)}
+          title={isHighlight ? "Already Daily Highlight" : "Set as Daily Highlight"}
+          disabled={task.completed || isHighlight}
+          style={{ opacity: (task.completed || isHighlight) ? 0.5 : 1, cursor: (task.completed || isHighlight) ? 'not-allowed' : 'pointer' }}
+        >✨</button>
+        <button 
+          className={`task-action-icon frog-btn ${task.is_frog ? 'active' : ''}`}
+          onClick={() => onSetFrog(task.id)}
+          title={task.is_frog ? "Already Frog" : "Mark as Frog (Hardest Task)"}
+          disabled={task.completed || task.is_frog}
+          style={{ opacity: (task.completed || task.is_frog) ? 0.5 : 1, cursor: (task.completed || task.is_frog) ? 'not-allowed' : 'pointer' }}
+        >🐸</button>
         <button 
           className="task-action-icon"
           onClick={() => onEditTask(task)}
