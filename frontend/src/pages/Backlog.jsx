@@ -12,7 +12,8 @@ import {
   X,
   ListTodo,
   AlertCircle,
-  GripVertical
+  GripVertical,
+  Clock
 } from 'lucide-react';
 import {
   DndContext,
@@ -67,28 +68,35 @@ function SortableBacklogCard({ task, onToggleComplete, onEditTask, onDeleteTask 
           </button>
           <h3 className="task-title">{task.title}</h3>
         </div>
-        <span className={`priority-badge priority-${task.priority}`}>
-          {task.priority}
-        </span>
-      </div>
-      
-      {task.tags && task.tags.length > 0 && (
-        <div className="task-tags">
-          {task.tags.map(tag => (
+        <div className="task-header-right">
+          {task.tags && task.tags.length > 0 && (
             <span 
-              key={tag.id} 
               className="task-tag"
               style={{ 
-                backgroundColor: `${tag.color}20`,
-                color: tag.color,
-                borderColor: `${tag.color}40`
+                backgroundColor: `${task.tags[0].color}20`,
+                color: task.tags[0].color,
+                borderColor: `${task.tags[0].color}40`
               }}
             >
-              {tag.name}
+              {task.tags[0].name}
             </span>
-          ))}
+          )}
+          <span className={`priority-badge priority-${task.priority}`}>
+            {task.priority}
+          </span>
         </div>
-      )}
+      </div>
+      
+      {/* Time stats - always show space */}
+      <div className="task-time-stats">
+        <span className="time-stat">
+          <Clock size={12} />
+          {task.time_spent > 0 ? Math.floor(task.time_spent / 60) : 0}m
+        </span>
+        <span className="time-stat">
+          🍅 {task.pomodoro_count || 0}
+        </span>
+      </div>
       
       <div className="task-footer">
         <button 
