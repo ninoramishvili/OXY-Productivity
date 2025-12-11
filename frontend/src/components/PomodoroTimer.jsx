@@ -3,7 +3,7 @@ import { Play, Pause, X, Check, Clock } from 'lucide-react';
 import { pomodoroAPI } from '../utils/api';
 import './PomodoroTimer.css';
 
-function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
+function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask, onClose }) {
   const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes in seconds
   const [isRunning, setIsRunning] = useState(false);
   const [sessionId, setSessionId] = useState(null);
@@ -221,8 +221,12 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
   const modeConfig = getModeConfig();
 
   return (
-    <div className="pomodoro-timer" data-mode={mode}>
-      <div className="pomodoro-header">
+    <div className="pomodoro-overlay" onClick={onClose}>
+      <div className="pomodoro-timer" data-mode={mode} onClick={(e) => e.stopPropagation()}>
+        <button className="pomodoro-close" onClick={onClose} title="Close">
+          <X size={20} />
+        </button>
+        <div className="pomodoro-header">
         <div className="pomodoro-icon">{modeConfig.icon}</div>
         <div className="pomodoro-task-info">
           <h3>{modeConfig.title}</h3>
@@ -363,6 +367,7 @@ function PomodoroTimer({ task, onComplete, onCancel, onUpdateTask }) {
           <X size={20} />
           {mode === 'focus' ? 'Cancel' : 'Skip Break'}
         </button>
+      </div>
       </div>
     </div>
   );

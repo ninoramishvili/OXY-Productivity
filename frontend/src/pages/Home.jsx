@@ -40,7 +40,7 @@ import { CSS } from '@dnd-kit/utilities';
 import './Home.css';
 
 // Sortable Task Card Component
-function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onDeleteTask, onSetHighlight, onSetFrog, onStartPomodoro, onResetPomodoro }) {
+function SortableTaskCard({ task, isHighlight, isFrog, onToggleComplete, onEditTask, onDeleteTask, onToggleHighlight, onToggleFrog, onStartPomodoro, onResetPomodoro }) {
   const {
     attributes,
     listeners,
@@ -132,17 +132,17 @@ function SortableTaskCard({ task, isHighlight, onToggleComplete, onEditTask, onD
         </button>
         <button 
           className={`task-action-icon highlight-btn ${isHighlight ? 'active' : ''}`}
-          onClick={() => onSetHighlight(task.id)}
-          title={isHighlight ? "Already Daily Highlight" : "Set as Daily Highlight"}
-          disabled={task.completed || isHighlight}
-          style={{ opacity: (task.completed || isHighlight) ? 0.5 : 1, cursor: (task.completed || isHighlight) ? 'not-allowed' : 'pointer' }}
+          onClick={() => onToggleHighlight(task.id)}
+          title={isHighlight ? "Remove Highlight" : "Set as Daily Highlight"}
+          disabled={task.completed}
+          style={{ opacity: task.completed ? 0.5 : 1, cursor: task.completed ? 'not-allowed' : 'pointer' }}
         ></button>
         <button 
-          className={`task-action-icon frog-btn ${task.is_frog ? 'active' : ''}`}
-          onClick={() => onSetFrog(task.id)}
-          title={task.is_frog ? "Already Frog" : "Mark as Frog (Hardest Task)"}
-          disabled={task.completed || task.is_frog}
-          style={{ opacity: (task.completed || task.is_frog) ? 0.5 : 1, cursor: (task.completed || task.is_frog) ? 'not-allowed' : 'pointer' }}
+          className={`task-action-icon frog-btn ${isFrog ? 'active' : ''}`}
+          onClick={() => onToggleFrog(task.id)}
+          title={isFrog ? "Remove Frog" : "Mark as Frog (Hardest Task)"}
+          disabled={task.completed}
+          style={{ opacity: task.completed ? 0.5 : 1, cursor: task.completed ? 'not-allowed' : 'pointer' }}
         ></button>
         <button 
           className="task-action-icon"
@@ -315,29 +315,34 @@ function Home({ user }) {
     };
   };
 
-  // Highlight and Frog logic
+  // Highlight and Frog logic - filter by selected date
   const getHighlightedTask = () => {
-    // Get local date string for comparison
-    const year = selectedDate.getFullYear();
-    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(selectedDate.getDate()).padStart(2, '0');
-    const selectedDateString = `${year}-${month}-${day}`;
-
-    return tasks.find(task => {
-      if (!task.is_daily_highlight || !task.highlight_date) return false;
-      const highlightDate = task.highlight_date.split('T')[0];
-      return highlightDate === selectedDateString;
+    const selectedDateString = getLocalDateString(selectedDate);
+    
+    // Find task that is: highlighted AND scheduled for this day
+    return getFilteredTasks().find(task => {
+      if (!task.is_daily_highlight) return false;
+      return true; // Task is already filtered by date via getFilteredTasks
     });
   };
 
   const getFrogTask = () => {
-    return tasks.find(task => task.is_frog && !task.completed);
+    // Find task that is: frog AND scheduled for this day AND not completed
+    return getFilteredTasks().find(task => task.is_frog && !task.completed);
+  };
+
+  // Helper to get local date string (YYYY-MM-DD) without timezone shift
+  const getLocalDateString = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // Task CRUD handlers
   const handleCreateTask = () => {
     setEditingTask({
-      scheduled_date: selectedDate.toISOString().split('T')[0]
+      scheduled_date: getLocalDateString(selectedDate)
     });
     setIsModalOpen(true);
   };
@@ -357,10 +362,10 @@ function Home({ user }) {
           loadTasks();
         }
       } else {
-        // Create new task - include scheduled_date from editingTask
+        // Create new task - include scheduled_date using local date
         const createData = {
           ...taskData,
-          scheduledDate: editingTask?.scheduled_date || selectedDate.toISOString().split('T')[0]
+          scheduledDate: editingTask?.scheduled_date || getLocalDateString(selectedDate)
         };
         const response = await tasksAPI.createTask(createData);
         if (response.success) {
@@ -418,23 +423,30 @@ function Home({ user }) {
     }
   };
 
-  // Highlight handlers
-  const handleSetHighlight = async (taskId) => {
+  // Highlight handlers - toggle functionality
+  const handleToggleHighlight = async (taskId) => {
     try {
-      // Get user's local date (in their timezone)
-      const year = selectedDate.getFullYear();
-      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getDate()).padStart(2, '0');
-      const localDate = `${year}-${month}-${day}`;
-      
-      const response = await tasksAPI.setHighlight(taskId, localDate);
-      if (response.success) {
-        showSuccess('✨ Task set as Daily Highlight!');
-        await loadTasks();
+      // Check if task is already highlighted
+      const task = tasks.find(t => t.id === taskId);
+      if (task?.is_daily_highlight) {
+        // Remove highlight
+        const response = await tasksAPI.removeHighlight(taskId);
+        if (response.success) {
+          showSuccess('Highlight removed');
+          await loadTasks();
+        }
+      } else {
+        // Set as highlight with selected date
+        const localDate = getLocalDateString(selectedDate);
+        const response = await tasksAPI.setHighlight(taskId, localDate);
+        if (response.success) {
+          showSuccess('✨ Task set as Daily Highlight!');
+          await loadTasks();
+        }
       }
     } catch (err) {
-      console.error('Set highlight error:', err);
-      alert('Failed to set highlight: ' + (err.response?.data?.message || err.message));
+      console.error('Highlight error:', err);
+      alert('Failed to update highlight: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -450,16 +462,28 @@ function Home({ user }) {
     }
   };
 
-  // Frog handlers
-  const handleSetFrog = async (taskId) => {
+  // Frog handlers - toggle functionality
+  const handleToggleFrog = async (taskId) => {
     try {
-      const response = await tasksAPI.setFrog(taskId);
-      if (response.success) {
-        showSuccess('🐸 Task marked as your Frog!');
-        await loadTasks();
+      // Check if task is already a frog
+      const task = tasks.find(t => t.id === taskId);
+      if (task?.is_frog) {
+        // Remove frog status
+        const response = await tasksAPI.removeFrog(taskId);
+        if (response.success) {
+          showSuccess('Frog status removed');
+          await loadTasks();
+        }
+      } else {
+        // Set as frog
+        const response = await tasksAPI.setFrog(taskId);
+        if (response.success) {
+          showSuccess('🐸 Task marked as your Frog!');
+          await loadTasks();
+        }
       }
     } catch (err) {
-      alert('Failed to set frog: ' + (err.response?.data?.message || err.message));
+      alert('Failed to update frog: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -656,14 +680,23 @@ function Home({ user }) {
                       {highlightedTask.priority}
                     </span>
                   </div>
-                  <button 
-                    className="btn-focus-complete"
-                    onClick={() => handleToggleComplete(highlightedTask)}
-                    disabled={highlightedTask.completed}
-                  >
-                    <Check size={16} />
-                    {highlightedTask.completed ? 'Completed!' : 'Complete'}
-                  </button>
+                  <div className="highlight-actions">
+                    <button 
+                      className="btn-focus-complete"
+                      onClick={() => handleToggleComplete(highlightedTask)}
+                      disabled={highlightedTask.completed}
+                    >
+                      <Check size={16} />
+                      {highlightedTask.completed ? 'Done!' : 'Complete'}
+                    </button>
+                    <button 
+                      className="btn-focus-remove"
+                      onClick={() => handleRemoveHighlight(highlightedTask.id)}
+                      title="Remove from highlight"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <p className="no-highlight">Click ✨ on a task to set it as highlight</p>
@@ -683,14 +716,23 @@ function Home({ user }) {
                       {frogTask.priority}
                     </span>
                   </div>
-                  <button 
-                    className="btn-focus-complete frog"
-                    onClick={() => handleToggleComplete(frogTask)}
-                    disabled={frogTask.completed}
-                  >
-                    <Check size={16} />
-                    {frogTask.completed ? 'Eaten!' : 'Eat It!'}
-                  </button>
+                  <div className="frog-actions">
+                    <button 
+                      className="btn-focus-complete frog"
+                      onClick={() => handleToggleComplete(frogTask)}
+                      disabled={frogTask.completed}
+                    >
+                      <Check size={16} />
+                      {frogTask.completed ? 'Eaten!' : 'Eat It!'}
+                    </button>
+                    <button 
+                      className="btn-focus-remove"
+                      onClick={() => handleRemoveFrog(frogTask.id)}
+                      title="Remove from frog"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <p className="no-frog">Click 🐸 on your hardest task</p>
@@ -726,11 +768,12 @@ function Home({ user }) {
                         key={task.id}
                         task={task}
                         isHighlight={highlightedTask?.id === task.id}
+                        isFrog={frogTask?.id === task.id}
                         onToggleComplete={handleToggleComplete}
                         onEditTask={handleEditTask}
                         onDeleteTask={handleDeleteTask}
-                        onSetHighlight={handleSetHighlight}
-                        onSetFrog={handleSetFrog}
+                        onToggleHighlight={handleToggleHighlight}
+                        onToggleFrog={handleToggleFrog}
                         onStartPomodoro={handleStartPomodoro}
                         onResetPomodoro={handleResetPomodoro}
                       />
