@@ -783,7 +783,8 @@
   gap: 8px;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 16px;
+  margin-top: auto;
+  padding-top: 8px;
 }
 
 .task-action {
