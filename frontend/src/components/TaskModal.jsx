@@ -233,7 +233,10 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
-            <h2>{task ? 'Edit Task' : 'Create New Task'}</h2>
+            <div className="modal-title-group">
+              <h2>{task ? 'Edit Task' : 'Create New Task'}</h2>
+              {!task && <span className="hotkey-hint">💡 Tip: Press Ctrl+Alt+N to open this quickly</span>}
+            </div>
             <button className="modal-close" onClick={onClose}>
               <X size={24} />
             </button>

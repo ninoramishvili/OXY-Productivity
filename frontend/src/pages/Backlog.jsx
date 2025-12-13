@@ -260,8 +260,14 @@ function Backlog() {
           case 'name_desc':
             return b.title.localeCompare(a.title);
           case 'priority':
-            const priorityOrder = { high: 0, medium: 1, low: 2 };
-            return priorityOrder[a.priority] - priorityOrder[b.priority];
+            // Eisenhower quadrant order: Do First > Schedule > Delegate > Eliminate
+            const getQuadrantOrder = (task) => {
+              if (task.is_urgent && task.is_important) return 0; // Do First
+              if (!task.is_urgent && task.is_important) return 1; // Schedule
+              if (task.is_urgent && !task.is_important) return 2; // Delegate
+              return 3; // Eliminate
+            };
+            return getQuadrantOrder(a) - getQuadrantOrder(b);
           default:
             return 0;
         }

@@ -51,11 +51,23 @@
   border-bottom: 1px solid var(--border-secondary);
 }
 
+.modal-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .modal-header h2 {
   font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+}
+
+.hotkey-hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
 }
 
 .modal-close {

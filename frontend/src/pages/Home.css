@@ -1119,7 +1119,7 @@
 /* Success Toast */
 .success-toast {
   position: fixed;
-  top: 24px;
+  bottom: 24px;
   right: 24px;
   background: var(--bg-card);
   border: 1px solid rgba(78, 203, 113, 0.3);
@@ -1132,7 +1132,7 @@
   align-items: center;
   gap: 12px;
   z-index: 1001;
-  animation: slideInRight 0.3s ease-out;
+  animation: slideInUp 0.3s ease-out;
   backdrop-filter: var(--glass-blur);
 }
 

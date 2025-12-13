@@ -147,8 +147,16 @@ router.put('/:id', verifyToken, async (req, res) => {
     if (scheduledDate !== undefined) {
       updates.push(`scheduled_date = $${paramCount}`);
       // Convert empty string to null for database
-      values.push(scheduledDate === '' ? null : scheduledDate);
+      const dateValue = scheduledDate === '' ? null : scheduledDate;
+      values.push(dateValue);
       paramCount++;
+      
+      // If removing date (setting to null), also unprioritize - send back to To Do
+      if (dateValue === null) {
+        updates.push(`is_prioritized = $${paramCount}`);
+        values.push(false);
+        paramCount++;
+      }
     }
     if (scheduledTime !== undefined) {
       updates.push(`scheduled_time = $${paramCount}`);
@@ -288,9 +296,18 @@ router.post('/schedule-all-today', verifyToken, async (req, res) => {
 
   try {
     // Update all prioritized, unscheduled tasks to today
+    // Set display_order based on Eisenhower priority:
+    // Do First (urgent+important) = 0, Schedule = 1, Delegate = 2, Eliminate = 3
     const result = await query(
       `UPDATE tasks 
-       SET scheduled_date = $1, updated_at = CURRENT_TIMESTAMP 
+       SET scheduled_date = $1, 
+           display_order = CASE 
+             WHEN is_urgent AND is_important THEN 0
+             WHEN NOT is_urgent AND is_important THEN 1
+             WHEN is_urgent AND NOT is_important THEN 2
+             ELSE 3
+           END,
+           updated_at = CURRENT_TIMESTAMP 
        WHERE user_id = $2 AND is_prioritized = TRUE AND scheduled_date IS NULL
        RETURNING id`,
       [targetDate, req.userId]
