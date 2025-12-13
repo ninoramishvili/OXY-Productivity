@@ -265,8 +265,14 @@ function Backlog() {
 
     // Quick Tasks filter (2-minute rule)
     if (quickFilter) {
+      // Show ONLY quick tasks when filter is active
       filtered = filtered.filter(task => 
         task.estimated_minutes && task.estimated_minutes <= 2
+      );
+    } else {
+      // Exclude quick tasks from regular list - they appear in Quick Wins section
+      filtered = filtered.filter(task => 
+        !(task.estimated_minutes && task.estimated_minutes <= 2 && !task.completed)
       );
     }
 
@@ -423,6 +429,19 @@ function Backlog() {
     setQuickFilter(false);
   };
 
+  // Get quick tasks (2-minute rule: estimated_minutes <= 2, not scheduled)
+  const getQuickTasks = () => {
+    return tasks.filter(task => 
+      !task.scheduled_date && 
+      !task.is_prioritized &&
+      task.estimated_minutes && 
+      task.estimated_minutes <= 2 && 
+      !task.completed
+    );
+  };
+
+  const quickTasks = getQuickTasks();
+
   const getActiveFilterCount = () => {
     let count = 0;
     if (searchQuery) count++;
@@ -490,6 +509,38 @@ function Backlog() {
           </div>
         </div>
       </div>
+
+      {/* Quick Wins Section - 2-Minute Rule */}
+      {quickTasks.length > 0 && (
+        <div className="quick-wins-section">
+          <div className="section-header">
+            <h2><span className="section-icon">⚡</span> Quick Wins ({quickTasks.length})</h2>
+            <span className="section-hint">Tasks ≤2 min — do them now!</span>
+          </div>
+          <div className="quick-wins-list">
+            {quickTasks.map(task => (
+              <div key={task.id} className="quick-task-card">
+                <button 
+                  className="quick-complete-btn"
+                  onClick={() => handleToggleComplete(task)}
+                  title="Complete task"
+                >
+                  <Check size={16} />
+                </button>
+                <span className="quick-task-title">{task.title}</span>
+                <span className="quick-task-time">⏱️ {task.estimated_minutes}m</span>
+                <button 
+                  className="quick-edit-btn"
+                  onClick={() => handleEditTask(task)}
+                  title="Edit task"
+                >
+                  <Edit2 size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Search, Sort and Filters */}
       <div className="backlog-controls">

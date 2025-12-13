@@ -259,8 +259,10 @@ function Eisenhower() {
       // - is_prioritized = true → Eisenhower
       // - is_prioritized = false → To Do (Brain Dump)
       // - scheduled_date set → Day View
+      // - Quick tasks (≤2 min) skip Eisenhower entirely
       task.is_prioritized &&
       !task.scheduled_date &&
+      !(task.estimated_minutes && task.estimated_minutes <= 2) && // Exclude quick tasks
       task.is_urgent === quadrant.isUrgent && 
       task.is_important === quadrant.isImportant
     );

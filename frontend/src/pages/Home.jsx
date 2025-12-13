@@ -343,7 +343,10 @@ function Home({ user }) {
   };
 
   const getSortedTasks = () => {
-    const sorted = [...getFilteredTasks()];
+    // Exclude quick tasks (≤2 min) - they appear in Quick Wins section instead
+    const sorted = [...getFilteredTasks()].filter(task => 
+      !(task.estimated_minutes && task.estimated_minutes <= 2 && !task.is_completed)
+    );
     
     if (sortBy === 'manual') {
       // Manual order - use display_order
