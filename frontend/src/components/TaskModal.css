@@ -279,16 +279,65 @@
   color: white;
 }
 
-.date-input:focus {
+.date-input:focus,
+.time-input:focus {
   outline: none;
   border-color: var(--color-coral);
   background: var(--bg-input-focus);
   box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.15);
 }
 
-.date-input::-webkit-calendar-picker-indicator {
+/* Style the date/time picker dropdown triggers */
+.date-input::-webkit-calendar-picker-indicator,
+.time-input::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  filter: var(--calendar-icon-filter, none);
+  padding: 4px;
+  border-radius: 4px;
+  background-color: rgba(255, 127, 80, 0.1);
+  transition: all 0.2s ease;
+}
+
+.date-input::-webkit-calendar-picker-indicator:hover,
+.time-input::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(255, 127, 80, 0.2);
+}
+
+/* Style the datetime-local inner components */
+.date-input::-webkit-datetime-edit,
+.time-input::-webkit-datetime-edit {
+  padding: 0;
+}
+
+.date-input::-webkit-datetime-edit-fields-wrapper,
+.time-input::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.date-input::-webkit-datetime-edit-text,
+.time-input::-webkit-datetime-edit-text {
+  color: var(--text-tertiary);
+  padding: 0 2px;
+}
+
+.date-input::-webkit-datetime-edit-month-field,
+.date-input::-webkit-datetime-edit-day-field,
+.date-input::-webkit-datetime-edit-year-field,
+.time-input::-webkit-datetime-edit-hour-field,
+.time-input::-webkit-datetime-edit-minute-field,
+.time-input::-webkit-datetime-edit-ampm-field {
+  color: var(--text-primary);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.date-input::-webkit-datetime-edit-month-field:focus,
+.date-input::-webkit-datetime-edit-day-field:focus,
+.date-input::-webkit-datetime-edit-year-field:focus,
+.time-input::-webkit-datetime-edit-hour-field:focus,
+.time-input::-webkit-datetime-edit-minute-field:focus,
+.time-input::-webkit-datetime-edit-ampm-field:focus {
+  background: rgba(255, 127, 80, 0.15);
+  color: var(--color-coral);
 }
 
 :root[data-theme="dark"] .date-input::-webkit-calendar-picker-indicator {

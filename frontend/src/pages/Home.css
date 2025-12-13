@@ -661,26 +661,55 @@
 .time-slots {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  max-height: 500px;
+  max-height: 450px;
   overflow-y: auto;
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+.time-slots::-webkit-scrollbar {
+  width: 6px;
+}
+
+.time-slots::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.time-slots::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+}
+
+.time-slots::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
 }
 
 .time-slot {
   display: flex;
-  min-height: 50px;
-  border-radius: 8px;
+  min-height: 36px;
   background: var(--bg-secondary);
   transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.time-slot.hour-start {
+  border-top: 1px solid var(--border-primary);
+}
+
+.time-slot.half-hour {
+  min-height: 32px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px dashed rgba(128, 128, 128, 0.2);
 }
 
 .time-slot:hover {
-  background: var(--bg-tertiary);
+  background: rgba(255, 127, 80, 0.03);
 }
 
-.time-slot.current-hour {
-  background: rgba(255, 127, 80, 0.08);
-  border: 1px solid rgba(255, 127, 80, 0.3);
+.time-slot.current-slot {
+  background: rgba(255, 127, 80, 0.1);
+  border-left: 3px solid var(--color-coral);
 }
 
 .time-slot.has-tasks {
@@ -688,25 +717,29 @@
 }
 
 .slot-time {
-  width: 70px;
-  padding: 8px 12px;
-  font-size: 12px;
+  width: 65px;
+  padding: 6px 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-tertiary);
-  border-right: 2px solid var(--border-primary);
+  border-right: 1px solid var(--border-primary);
   flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
 }
 
-.time-slot.current-hour .slot-time {
+.time-slot.current-slot .slot-time {
   color: var(--color-coral);
+  font-weight: 700;
 }
 
 .slot-content {
   flex: 1;
-  padding: 6px;
+  padding: 4px 6px;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
+  align-items: center;
 }
 
 /* Time block task */
@@ -801,17 +834,24 @@
 .empty-slot {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  justify-content: center;
+  font-size: 11px;
   color: var(--text-tertiary);
   cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
   transition: all 0.2s ease;
+  opacity: 0.4;
+  width: 100%;
+  height: 100%;
+}
+
+.time-slot:hover .empty-slot {
+  opacity: 1;
 }
 
 .empty-slot:hover {
-  background: var(--bg-card);
+  background: rgba(255, 127, 80, 0.1);
   color: var(--color-coral);
 }
 

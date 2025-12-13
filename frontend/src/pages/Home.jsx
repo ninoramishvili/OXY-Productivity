@@ -449,25 +449,35 @@ function Home({ user }) {
       .reduce((sum, task) => sum + (task.estimated_minutes || 0), 0);
   };
 
-  // Generate hourly time slots for the calendar view (6 AM to 10 PM)
+  // Generate time slots for the calendar view (24 hours, 30-min intervals)
   const generateTimeSlots = () => {
     const slots = [];
-    for (let hour = 6; hour <= 22; hour++) {
-      slots.push({
-        hour,
-        label: `${hour.toString().padStart(2, '0')}:00`,
-        displayLabel: hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`
-      });
+    for (let hour = 0; hour < 24; hour++) {
+      for (let min = 0; min < 60; min += 30) {
+        const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+        const ampm = hour < 12 ? 'AM' : 'PM';
+        const displayLabel = `${displayHour}:${min.toString().padStart(2, '0')} ${ampm}`;
+        
+        slots.push({
+          hour,
+          minute: min,
+          timeKey: `${hour}-${min}`,
+          label: timeStr,
+          displayLabel
+        });
+      }
     }
     return slots;
   };
 
-  // Get tasks scheduled for a specific hour
-  const getTasksForHour = (hour) => {
+  // Get tasks scheduled for a specific time slot (hour and minute)
+  const getTasksForSlot = (hour, minute) => {
     return getFilteredTasks().filter(task => {
       if (!task.scheduled_time) return false;
-      const taskHour = parseInt(task.scheduled_time.split(':')[0], 10);
-      return taskHour === hour;
+      const [taskHour, taskMin] = task.scheduled_time.split(':').map(Number);
+      // Match tasks that start in this 30-min slot
+      return taskHour === hour && taskMin >= minute && taskMin < minute + 30;
     });
   };
 
@@ -1043,19 +1053,23 @@ function Home({ user }) {
                   </div>
                 )}
 
-                {/* Hourly time slots */}
+                {/* 30-minute time slots */}
                 <div className="time-slots">
                   {generateTimeSlots().map(slot => {
-                    const slotTasks = getTasksForHour(slot.hour);
-                    const isCurrentHour = new Date().getHours() === slot.hour && isToday(selectedDate);
+                    const slotTasks = getTasksForSlot(slot.hour, slot.minute);
+                    const now = new Date();
+                    const isCurrentSlot = now.getHours() === slot.hour && 
+                      now.getMinutes() >= slot.minute && 
+                      now.getMinutes() < slot.minute + 30 && 
+                      isToday(selectedDate);
                     
                     return (
                       <div 
-                        key={slot.hour} 
-                        className={`time-slot ${isCurrentHour ? 'current-hour' : ''} ${slotTasks.length > 0 ? 'has-tasks' : ''}`}
+                        key={slot.timeKey} 
+                        className={`time-slot ${isCurrentSlot ? 'current-slot' : ''} ${slotTasks.length > 0 ? 'has-tasks' : ''} ${slot.minute === 0 ? 'hour-start' : 'half-hour'}`}
                       >
                         <div className="slot-time">
-                          {slot.displayLabel}
+                          {slot.minute === 0 ? slot.displayLabel : ''}
                         </div>
                         <div className="slot-content">
                           {slotTasks.length > 0 ? (
@@ -1064,7 +1078,7 @@ function Home({ user }) {
                                 key={task.id}
                                 className={`time-block-task ${task.completed ? 'completed' : ''}`}
                                 style={{
-                                  height: task.estimated_minutes ? `${Math.max(40, task.estimated_minutes * 1.5)}px` : '40px'
+                                  height: task.estimated_minutes ? `${Math.max(32, task.estimated_minutes)}px` : '32px'
                                 }}
                                 onClick={() => handleEditTask(task)}
                               >
@@ -1086,10 +1100,14 @@ function Home({ user }) {
                             ))
                           ) : (
                             <div className="empty-slot" onClick={() => {
-                              setEditingTask({ scheduled_time: `${slot.label}:00` });
+                              // Pre-fill both date AND time for the slot
+                              setEditingTask({ 
+                                scheduled_date: getLocalDateString(selectedDate),
+                                scheduled_time: slot.label 
+                              });
                               setIsModalOpen(true);
                             }}>
-                              <Plus size={14} /> Add task
+                              <Plus size={14} />
                             </div>
                           )}
                         </div>
