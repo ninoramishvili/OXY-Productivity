@@ -626,6 +626,46 @@
   line-height: 1.4;
 }
 
+/* Quick Navigation Bar */
+.time-nav-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+
+.time-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-nav-btn:hover {
+  border-color: var(--color-coral);
+  color: var(--color-coral);
+  background: rgba(255, 127, 80, 0.05);
+}
+
+.time-nav-btn.now {
+  background: var(--gradient-primary);
+  border-color: transparent;
+  color: white;
+}
+
+.time-nav-btn.now:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
+}
+
 .parkinson-tip .tip-text strong {
   color: var(--text-primary);
 }
@@ -682,11 +722,11 @@
   border-radius: 4px;
 }
 
-/* Individual time slot row */
+/* Individual time slot row - Compact height */
 .time-slot {
   display: flex;
-  min-height: 44px;
-  height: 44px;
+  min-height: 32px;
+  height: 32px;
   border-bottom: 1px solid var(--border-primary);
   transition: background 0.15s ease;
   position: relative;
@@ -708,12 +748,12 @@
   background: transparent;
 }
 
-/* Time label column */
+/* Time label column - Compact */
 .slot-time {
-  width: 60px;
-  min-width: 60px;
-  padding: 10px 8px;
-  font-size: 12px;
+  width: 50px;
+  min-width: 50px;
+  padding: 6px 6px;
+  font-size: 11px;
   font-weight: 600;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   color: var(--text-tertiary);
@@ -732,10 +772,10 @@
 /* Slot content area (tasks) */
 .slot-content {
   flex: 1;
-  padding: 4px 8px;
+  padding: 2px 6px;
   display: flex;
   flex-wrap: nowrap;
-  gap: 6px;
+  gap: 4px;
   align-items: flex-start;
   overflow: visible;
   position: relative;
@@ -755,10 +795,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-width: 180px;
-  padding: 8px 12px;
+  min-width: 150px;
+  padding: 4px 8px;
   background: var(--bg-card);
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid var(--border-primary);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -795,15 +835,15 @@
 
 .calendar-task-header {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
 }
 
 .calendar-task-card .task-checkbox {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  border-radius: 6px;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 4px;
   border: 2px solid var(--border-primary);
   background: transparent;
   display: flex;
@@ -826,15 +866,13 @@
 }
 
 .calendar-task-card .task-title {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-primary);
-  line-height: 1.3;
+  line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
 }
 
 .calendar-task-card .task-title.completed {
@@ -846,25 +884,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 6px;
+  margin-top: 2px;
 }
 
 .task-duration-badge {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 1px 5px;
   background: rgba(78, 203, 113, 0.15);
   color: #4ECB71;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .task-delete-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
   border: none;
   background: transparent;
   color: var(--text-tertiary);

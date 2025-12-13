@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { tasksAPI, tagsAPI, pomodoroAPI } from '../utils/api';
 import TaskModal from '../components/TaskModal';
@@ -253,6 +253,27 @@ function Home({ user }) {
   const [showHighlightCelebration, setShowHighlightCelebration] = useState(false);
   const [showFrogCelebration, setShowFrogCelebration] = useState(false);
   const [selectedDate, setSelectedDate] = useState(getInitialDate);
+  const timeSlotsRef = useRef(null);
+
+  // Quick navigation - scroll to specific time range
+  const scrollToTime = (hour) => {
+    if (timeSlotsRef.current) {
+      const slotHeight = 33; // 32px slot + 1px border
+      const scrollPosition = hour * 2 * slotHeight; // 2 slots per hour (30 min each)
+      timeSlotsRef.current.scrollTo({
+        top: scrollPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Scroll to current time on calendar view load
+  useEffect(() => {
+    if (viewMode === 'calendar' && timeSlotsRef.current) {
+      const currentHour = new Date().getHours();
+      setTimeout(() => scrollToTime(Math.max(0, currentHour - 1)), 100);
+    }
+  }, [viewMode]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -1026,6 +1047,45 @@ function Home({ user }) {
                     Set specific time slots to create natural deadlines!
                   </span>
                 </div>
+
+                {/* Quick Navigation Bar */}
+                <div className="time-nav-bar">
+                  <button 
+                    className="time-nav-btn" 
+                    onClick={() => scrollToTime(6)}
+                    title="Jump to 6:00"
+                  >
+                    🌅 Morning
+                  </button>
+                  <button 
+                    className="time-nav-btn" 
+                    onClick={() => scrollToTime(12)}
+                    title="Jump to 12:00"
+                  >
+                    ☀️ Noon
+                  </button>
+                  <button 
+                    className="time-nav-btn" 
+                    onClick={() => scrollToTime(17)}
+                    title="Jump to 17:00"
+                  >
+                    🌆 Evening
+                  </button>
+                  <button 
+                    className="time-nav-btn" 
+                    onClick={() => scrollToTime(21)}
+                    title="Jump to 21:00"
+                  >
+                    🌙 Night
+                  </button>
+                  <button 
+                    className="time-nav-btn now" 
+                    onClick={() => scrollToTime(new Date().getHours())}
+                    title="Jump to current time"
+                  >
+                    ⏰ Now
+                  </button>
+                </div>
                 
                 {/* Untimed tasks section */}
                 {getUntimedTasks().length > 0 && (
@@ -1051,7 +1111,7 @@ function Home({ user }) {
                 )}
 
                 {/* 30-minute time slots */}
-                <div className="time-slots">
+                <div className="time-slots" ref={timeSlotsRef}>
                   {generateTimeSlots().map(slot => {
                     const slotTasks = getTasksForSlot(slot.hour, slot.minute);
                     const now = new Date();
@@ -1073,7 +1133,7 @@ function Home({ user }) {
                             // Calculate height based on duration (44px per 30 min slot)
                             const duration = task.estimated_minutes || 30;
                             const slotsSpan = Math.ceil(duration / 30);
-                            const taskHeight = slotsSpan * 44 - 8; // 44px per slot minus padding
+                            const taskHeight = slotsSpan * 32 - 4; // 32px per slot minus padding
                             
                             return (
                               <div 
