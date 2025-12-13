@@ -186,15 +186,23 @@
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   margin-bottom: 12px;
-  padding: 6px 8px;
-  background: rgba(var(--bg-primary-rgb), 0.5);
-  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  min-height: 32px;
+  align-items: center;
+}
+
+.task-count {
+  font-weight: 500;
 }
 
 .completed-count {
   color: var(--color-teal);
+  font-weight: 600;
   font-weight: 600;
 }
 

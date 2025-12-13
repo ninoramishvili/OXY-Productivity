@@ -190,10 +190,11 @@ function Weekly() {
     })
   );
 
+  // Load tasks and tags when component mounts or week changes
   useEffect(() => {
     loadTasks();
     loadTags();
-  }, []);
+  }, [weekStart]);
 
   // Keyboard shortcut for adding task
   useEffect(() => {
@@ -222,7 +223,7 @@ function Weekly() {
 
   const loadTags = async () => {
     try {
-      const response = await tasksAPI.getAllTags();
+      const response = await tasksAPI.getTags();
       if (response.success) {
         setTags(response.data);
       }
@@ -239,11 +240,12 @@ function Weekly() {
   // Get tasks for a specific day
   const getTasksForDay = (date) => {
     const dateString = getLocalDateString(date);
-    return tasks.filter(task => {
+    const dayTasks = tasks.filter(task => {
       if (!task.scheduled_date) return false;
       const taskDate = task.scheduled_date.split('T')[0];
       return taskDate === dateString;
     });
+    return dayTasks;
   };
 
   // Navigation handlers
