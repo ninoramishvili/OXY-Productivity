@@ -116,26 +116,49 @@ function SortableTaskCard({ task, isHighlight, isFrog, onToggleComplete, onEditT
       {/* Time stats - always show space */}
       <div className="task-time-stats">
         {task.estimated_minutes && (
-          <span className={`time-stat estimate ${task.estimated_minutes <= 2 ? 'quick-task' : ''}`} title="Estimated time">
+          <span className={`time-stat estimate ${task.estimated_minutes <= 2 ? 'quick-task' : ''}`} title="Your estimate">
             ⏱️ {task.estimated_minutes}m
           </span>
         )}
-        <span className="time-stat" title="Time spent">
+        <span className="time-stat" title="Actual time spent">
           <Clock size={12} />
           {task.time_spent > 0 ? Math.floor(task.time_spent / 60) : 0}m
         </span>
-        {/* Planning Fallacy: Show accuracy when both estimate and actual exist */}
-        {task.estimated_minutes && task.time_spent > 0 && (
-          <span 
-            className={`time-stat accuracy ${
-              Math.floor(task.time_spent / 60) <= task.estimated_minutes ? 'on-track' : 'over'
-            }`}
-            title={`Estimated: ${task.estimated_minutes}m, Actual: ${Math.floor(task.time_spent / 60)}m`}
-          >
-            {Math.floor(task.time_spent / 60) <= task.estimated_minutes ? '✓' : '⚠️'}
-            {Math.round((Math.floor(task.time_spent / 60) / task.estimated_minutes) * 100)}%
-          </span>
-        )}
+        {/* Planning Fallacy: Show user-friendly accuracy message */}
+        {task.estimated_minutes && task.time_spent > 0 && (() => {
+          const actual = Math.floor(task.time_spent / 60);
+          const estimate = task.estimated_minutes;
+          const ratio = actual / estimate;
+          const diff = actual - estimate;
+          
+          let message, className, icon;
+          if (ratio <= 0.8) {
+            message = `${Math.abs(diff)}m faster!`;
+            className = 'accurate';
+            icon = '🎯';
+          } else if (ratio <= 1.1) {
+            message = 'Spot on!';
+            className = 'accurate';
+            icon = '✅';
+          } else if (ratio <= 1.5) {
+            message = `+${diff}m over`;
+            className = 'slightly-over';
+            icon = '📊';
+          } else {
+            message = `+${diff}m under-estimated`;
+            className = 'over';
+            icon = '💡';
+          }
+          
+          return (
+            <span 
+              className={`time-stat planning-fallacy ${className}`}
+              title={`Planning Fallacy Check: You estimated ${estimate}m, took ${actual}m`}
+            >
+              {icon} {message}
+            </span>
+          );
+        })()}
         <span className="time-stat" title="Pomodoro sessions">
           🍅 {task.pomodoro_count || 0}
         </span>
@@ -950,6 +973,23 @@ function Home({ user }) {
             <div className="stat-item">
               <span className="stat-label">Total Completed</span>
               <span className="stat-value">{stats.totalCompleted}</span>
+            </div>
+          </div>
+
+          {/* Planning Fallacy Educational Tip */}
+          <div className="technique-tip planning-fallacy-tip">
+            <div className="tip-header">
+              <span className="tip-icon">📊</span>
+              <span className="tip-title">Planning Fallacy</span>
+            </div>
+            <p className="tip-description">
+              We tend to underestimate task time. Set estimates, track actual time with Pomodoro, and learn from the results!
+            </p>
+            <div className="tip-legend">
+              <span className="legend-item accurate">🎯 Faster</span>
+              <span className="legend-item accurate">✅ On time</span>
+              <span className="legend-item slightly-over">📊 Slightly over</span>
+              <span className="legend-item over">💡 Under-estimated</span>
             </div>
           </div>
         </div>

@@ -644,6 +644,73 @@
 }
 
 /* ============================================
+   TECHNIQUE TIPS (Educational Sections)
+   ============================================ */
+.technique-tip {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-primary);
+  margin-top: 12px;
+}
+
+.technique-tip .tip-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.technique-tip .tip-icon {
+  font-size: 16px;
+}
+
+.technique-tip .tip-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.technique-tip .tip-description {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0 0 10px 0;
+}
+
+.technique-tip .tip-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.technique-tip .legend-item {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.technique-tip .legend-item.accurate {
+  background: rgba(78, 203, 113, 0.1);
+  color: #4ECB71;
+}
+
+.technique-tip .legend-item.slightly-over {
+  background: rgba(251, 191, 36, 0.1);
+  color: #f59e0b;
+}
+
+.technique-tip .legend-item.over {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.planning-fallacy-tip {
+  border-left: 3px solid #3b82f6;
+}
+
+/* ============================================
    SUCCESS MESSAGE
    ============================================ */
 
@@ -1026,20 +1093,32 @@
 }
 
 /* Planning Fallacy - Accuracy Indicator */
-.time-stat.accuracy {
+/* Planning Fallacy Indicator Styles */
+.time-stat.planning-fallacy {
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 6px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  cursor: help;
 }
 
-.time-stat.accuracy.on-track {
+.time-stat.planning-fallacy.accurate {
   background: rgba(78, 203, 113, 0.15);
   color: #4ECB71;
+  border: 1px solid rgba(78, 203, 113, 0.3);
 }
 
-.time-stat.accuracy.over {
-  background: rgba(239, 68, 68, 0.15);
+.time-stat.planning-fallacy.slightly-over {
+  background: rgba(251, 191, 36, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.time-stat.planning-fallacy.over {
+  background: rgba(239, 68, 68, 0.12);
   color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 .reset-pomodoro-btn {

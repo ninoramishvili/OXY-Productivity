@@ -716,20 +716,32 @@
 }
 
 /* Planning Fallacy - Accuracy Indicator */
-.time-stat.accuracy {
+/* Planning Fallacy Indicator Styles */
+.time-stat.planning-fallacy {
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 6px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  cursor: help;
 }
 
-.time-stat.accuracy.on-track {
+.time-stat.planning-fallacy.accurate {
   background: rgba(78, 203, 113, 0.15);
   color: #4ECB71;
+  border: 1px solid rgba(78, 203, 113, 0.3);
 }
 
-.time-stat.accuracy.over {
-  background: rgba(239, 68, 68, 0.15);
+.time-stat.planning-fallacy.slightly-over {
+  background: rgba(251, 191, 36, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.time-stat.planning-fallacy.over {
+  background: rgba(239, 68, 68, 0.12);
   color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 .task-footer {
