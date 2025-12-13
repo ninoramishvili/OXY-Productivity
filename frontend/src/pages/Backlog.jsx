@@ -326,8 +326,8 @@ function Backlog() {
       if (editingTask) {
         const response = await tasksAPI.updateTask(editingTask.id, taskData);
         if (response.success) {
-          // Also update Eisenhower quadrant if changed
-          if (taskData.isUrgent !== undefined && taskData.isImportant !== undefined) {
+          // Only update Eisenhower quadrant if task has a date (not being sent to To Do)
+          if (taskData.scheduledDate && taskData.isUrgent !== undefined && taskData.isImportant !== undefined) {
             await tasksAPI.updateEisenhower(editingTask.id, taskData.isUrgent, taskData.isImportant);
           }
           showSuccess('Task updated successfully!');

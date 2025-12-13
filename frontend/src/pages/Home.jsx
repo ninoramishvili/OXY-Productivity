@@ -391,8 +391,9 @@ function Home({ user }) {
         // Update existing task
         const response = await tasksAPI.updateTask(editingTask.id, taskData);
         if (response.success) {
-          // Also update Eisenhower quadrant if changed
-          if (taskData.isUrgent !== undefined && taskData.isImportant !== undefined) {
+          // Only update Eisenhower quadrant if task still has a date (not being unprioritized)
+          // If date is being cleared, the backend already sets is_prioritized = false
+          if (taskData.scheduledDate && taskData.isUrgent !== undefined && taskData.isImportant !== undefined) {
             await tasksAPI.updateEisenhower(editingTask.id, taskData.isUrgent, taskData.isImportant);
           }
           showSuccess('Task updated successfully!');

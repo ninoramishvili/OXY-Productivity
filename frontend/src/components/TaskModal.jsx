@@ -235,7 +235,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
           <div className="modal-header">
             <div className="modal-title-group">
               <h2>{task ? 'Edit Task' : 'Create New Task'}</h2>
-              {!task && <span className="hotkey-hint">💡 Tip: Press Ctrl+Alt+N to open this quickly</span>}
+              <span className="hotkey-hint">💡 Tip: Press Ctrl+Alt+N to add tasks quickly</span>
             </div>
             <button className="modal-close" onClick={onClose}>
               <X size={24} />
@@ -262,14 +262,26 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
             <label htmlFor="scheduledDate">
               📅 Schedule Date (optional)
             </label>
-            <input
-              type="date"
-              id="scheduledDate"
-              name="scheduledDate"
-              value={formData.scheduledDate}
-              onChange={handleChange}
-              className="date-input"
-            />
+            <div className="date-input-row">
+              <input
+                type="date"
+                id="scheduledDate"
+                name="scheduledDate"
+                value={formData.scheduledDate}
+                onChange={handleChange}
+                className="date-input"
+              />
+              {formData.scheduledDate && (
+                <button
+                  type="button"
+                  className="btn-clear-date"
+                  onClick={() => setFormData(prev => ({ ...prev, scheduledDate: '' }))}
+                  title="Clear date (moves task to To Do)"
+                >
+                  ✕ Clear
+                </button>
+              )}
+            </div>
             <span className="field-hint">
               Leave empty for To Do & Eisenhower. Set date for Day View.
             </span>

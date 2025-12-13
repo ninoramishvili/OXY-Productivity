@@ -148,8 +148,14 @@
 }
 
 /* Date Input */
+.date-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .date-input {
-  width: 100%;
+  flex: 1;
   padding: 10px 14px;
   border: 1px solid var(--border-primary);
   border-radius: 10px;
@@ -159,6 +165,24 @@
   background: var(--bg-input);
   transition: all 0.3s ease;
   cursor: pointer;
+}
+
+.btn-clear-date {
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-clear-date:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
 }
 
 .date-input:focus {
