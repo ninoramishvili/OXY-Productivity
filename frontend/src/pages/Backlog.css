@@ -353,6 +353,25 @@
   color: var(--text-secondary);
 }
 
+/* Quick Filter Button */
+.filter-buttons .quick-filter-btn {
+  background: rgba(78, 203, 113, 0.1);
+  border-color: rgba(78, 203, 113, 0.3);
+  color: #4ECB71;
+  padding: 8px 20px;
+}
+
+.filter-buttons .quick-filter-btn:hover {
+  background: rgba(78, 203, 113, 0.2);
+  border-color: rgba(78, 203, 113, 0.5);
+}
+
+.filter-buttons .quick-filter-btn.active {
+  background: #4ECB71;
+  border-color: #4ECB71;
+  color: white;
+}
+
 .btn-clear-filters {
   margin-top: 12px;
   padding: 8px 14px;
@@ -508,6 +527,23 @@
 @keyframes pulseQuick {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
+}
+
+/* Planning Fallacy - Accuracy Indicator */
+.time-stat.accuracy {
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.time-stat.accuracy.on-track {
+  background: rgba(78, 203, 113, 0.15);
+  color: #4ECB71;
+}
+
+.time-stat.accuracy.over {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
 .task-footer {

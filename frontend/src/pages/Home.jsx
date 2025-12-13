@@ -124,6 +124,18 @@ function SortableTaskCard({ task, isHighlight, isFrog, onToggleComplete, onEditT
           <Clock size={12} />
           {task.time_spent > 0 ? Math.floor(task.time_spent / 60) : 0}m
         </span>
+        {/* Planning Fallacy: Show accuracy when both estimate and actual exist */}
+        {task.estimated_minutes && task.time_spent > 0 && (
+          <span 
+            className={`time-stat accuracy ${
+              Math.floor(task.time_spent / 60) <= task.estimated_minutes ? 'on-track' : 'over'
+            }`}
+            title={`Estimated: ${task.estimated_minutes}m, Actual: ${Math.floor(task.time_spent / 60)}m`}
+          >
+            {Math.floor(task.time_spent / 60) <= task.estimated_minutes ? '✓' : '⚠️'}
+            {Math.round((Math.floor(task.time_spent / 60) / task.estimated_minutes) * 100)}%
+          </span>
+        )}
         <span className="time-stat" title="Pomodoro sessions">
           🍅 {task.pomodoro_count || 0}
         </span>
@@ -392,6 +404,15 @@ function Home({ user }) {
     return getFilteredTasks().find(task => task.is_frog);
   };
 
+  // Get quick tasks (2-minute rule: estimated_minutes <= 2)
+  const getQuickTasks = () => {
+    return getFilteredTasks().filter(task => 
+      task.estimated_minutes && 
+      task.estimated_minutes <= 2 && 
+      !task.is_completed
+    );
+  };
+
   // Helper to get local date string (YYYY-MM-DD) without timezone shift
   const getLocalDateString = (date) => {
     const year = date.getFullYear();
@@ -646,6 +667,7 @@ function Home({ user }) {
   const stats = getStats();
   const highlightedTask = getHighlightedTask();
   const frogTask = getFrogTask();
+  const quickTasks = getQuickTasks();
   const sortedTasks = getSortedTasks();
 
   if (loading) {
@@ -807,6 +829,38 @@ function Home({ user }) {
               )}
             </div>
           </div>
+
+          {/* Quick Wins Section - 2-Minute Rule */}
+          {quickTasks.length > 0 && (
+            <div className="quick-wins-section">
+              <div className="section-header">
+                <h2><span className="section-icon">⚡</span> Quick Wins ({quickTasks.length})</h2>
+                <span className="section-hint">Tasks ≤2 min — do them now!</span>
+              </div>
+              <div className="quick-wins-list">
+                {quickTasks.map(task => (
+                  <div key={task.id} className="quick-task-card">
+                    <button 
+                      className="quick-complete-btn"
+                      onClick={() => handleToggleComplete(task)}
+                      title="Complete task"
+                    >
+                      <Check size={16} />
+                    </button>
+                    <span className="quick-task-title">{task.title}</span>
+                    <span className="quick-task-time">⏱️ {task.estimated_minutes}m</span>
+                    <button 
+                      className="quick-edit-btn"
+                      onClick={() => handleEditTask(task)}
+                      title="Edit task"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Tasks List */}
           <div className="tasks-section">

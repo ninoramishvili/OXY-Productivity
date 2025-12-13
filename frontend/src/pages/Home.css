@@ -370,6 +370,124 @@
    TASKS SECTION
    ============================================ */
 
+/* ============================================
+   QUICK WINS SECTION - 2-Minute Rule
+   ============================================ */
+.quick-wins-section {
+  background: linear-gradient(135deg, rgba(78, 203, 113, 0.08), rgba(0, 206, 209, 0.05));
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(78, 203, 113, 0.2);
+}
+
+.quick-wins-section .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.quick-wins-section .section-header h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.quick-wins-section .section-hint {
+  font-size: 12px;
+  color: #4ECB71;
+  font-weight: 600;
+  background: rgba(78, 203, 113, 0.15);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.quick-wins-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quick-task-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+  transition: all 0.2s ease;
+}
+
+.quick-task-card:hover {
+  border-color: #4ECB71;
+  box-shadow: 0 2px 8px rgba(78, 203, 113, 0.15);
+}
+
+.quick-complete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #4ECB71;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.quick-complete-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(78, 203, 113, 0.4);
+}
+
+.quick-task-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.quick-task-time {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4ECB71;
+  background: rgba(78, 203, 113, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.quick-edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-edit-btn:hover {
+  border-color: var(--color-coral);
+  color: var(--color-coral);
+  background: rgba(255, 127, 80, 0.05);
+}
+
+/* ============================================
+   TASKS SECTION
+   ============================================ */
 .tasks-section {
   background: var(--bg-card);
   border-radius: 16px;
@@ -856,6 +974,23 @@
 @keyframes pulseQuick {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
+}
+
+/* Planning Fallacy - Accuracy Indicator */
+.time-stat.accuracy {
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.time-stat.accuracy.on-track {
+  background: rgba(78, 203, 113, 0.15);
+  color: #4ECB71;
+}
+
+.time-stat.accuracy.over {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 
 .reset-pomodoro-btn {

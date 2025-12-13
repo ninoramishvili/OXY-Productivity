@@ -114,6 +114,18 @@ function SortableBacklogCard({ task, onToggleComplete, onEditTask, onDeleteTask,
           <Clock size={12} />
           {task.time_spent > 0 ? Math.floor(task.time_spent / 60) : 0}m
         </span>
+        {/* Planning Fallacy: Show accuracy when both estimate and actual exist */}
+        {task.estimated_minutes && task.time_spent > 0 && (
+          <span 
+            className={`time-stat accuracy ${
+              Math.floor(task.time_spent / 60) <= task.estimated_minutes ? 'on-track' : 'over'
+            }`}
+            title={`Estimated: ${task.estimated_minutes}m, Actual: ${Math.floor(task.time_spent / 60)}m`}
+          >
+            {Math.floor(task.time_spent / 60) <= task.estimated_minutes ? '✓' : '⚠️'}
+            {Math.round((Math.floor(task.time_spent / 60) / task.estimated_minutes) * 100)}%
+          </span>
+        )}
         <span className="time-stat" title="Pomodoro sessions">
           🍅 {task.pomodoro_count || 0}
         </span>
@@ -158,6 +170,7 @@ function Backlog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [quickFilter, setQuickFilter] = useState(false); // 2-minute rule filter
   const [sortBy, setSortBy] = useState('manual'); // manual, created_asc, created_desc, name_asc, name_desc, priority
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -180,7 +193,7 @@ function Backlog() {
 
   useEffect(() => {
     filterAndSortTasks();
-  }, [tasks, searchQuery, priorityFilter, statusFilter, sortBy]);
+  }, [tasks, searchQuery, priorityFilter, statusFilter, quickFilter, sortBy]);
 
   // Hotkey: Ctrl+N to add task
   useEffect(() => {
@@ -248,6 +261,13 @@ function Backlog() {
       } else if (statusFilter === 'active') {
         filtered = filtered.filter(task => !task.completed);
       }
+    }
+
+    // Quick Tasks filter (2-minute rule)
+    if (quickFilter) {
+      filtered = filtered.filter(task => 
+        task.estimated_minutes && task.estimated_minutes <= 2
+      );
     }
 
     // Sorting
@@ -400,6 +420,7 @@ function Backlog() {
     setSearchQuery('');
     setPriorityFilter('all');
     setStatusFilter('all');
+    setQuickFilter(false);
   };
 
   const getActiveFilterCount = () => {
@@ -407,6 +428,7 @@ function Backlog() {
     if (searchQuery) count++;
     if (priorityFilter !== 'all') count++;
     if (statusFilter !== 'all') count++;
+    if (quickFilter) count++;
     return count;
   };
 
@@ -565,6 +587,18 @@ function Backlog() {
                 onClick={() => setStatusFilter('completed')}
               >
                 Completed
+              </button>
+            </div>
+          </div>
+
+          <div className="filter-group">
+            <label>⚡ Quick Tasks (≤2 min)</label>
+            <div className="filter-buttons">
+              <button 
+                className={`quick-filter-btn ${quickFilter ? 'active' : ''}`}
+                onClick={() => setQuickFilter(!quickFilter)}
+              >
+                {quickFilter ? '✓ Showing Quick Tasks' : 'Show Quick Tasks'}
               </button>
             </div>
           </div>
