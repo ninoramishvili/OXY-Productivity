@@ -146,7 +146,8 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
     if (scheduledDate !== undefined) {
       updates.push(`scheduled_date = $${paramCount}`);
-      values.push(scheduledDate);
+      // Convert empty string to null for database
+      values.push(scheduledDate === '' ? null : scheduledDate);
       paramCount++;
     }
     if (scheduledTime !== undefined) {
@@ -276,6 +277,35 @@ router.put('/:id/eisenhower', verifyToken, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Failed to update Eisenhower quadrant' 
+    });
+  }
+});
+
+// Schedule all prioritized tasks for today
+router.post('/schedule-all-today', verifyToken, async (req, res) => {
+  const { date } = req.body;
+  const targetDate = date || new Date().toISOString().split('T')[0];
+
+  try {
+    // Update all prioritized, unscheduled tasks to today
+    const result = await query(
+      `UPDATE tasks 
+       SET scheduled_date = $1, updated_at = CURRENT_TIMESTAMP 
+       WHERE user_id = $2 AND is_prioritized = TRUE AND scheduled_date IS NULL
+       RETURNING id`,
+      [targetDate, req.userId]
+    );
+
+    res.json({ 
+      success: true, 
+      message: `${result.rows.length} tasks scheduled for today`,
+      count: result.rows.length
+    });
+  } catch (error) {
+    console.error('Schedule all today error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to schedule tasks' 
     });
   }
 });

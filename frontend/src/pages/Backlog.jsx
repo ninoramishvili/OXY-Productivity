@@ -177,6 +177,18 @@ function Backlog() {
     filterAndSortTasks();
   }, [tasks, searchQuery, priorityFilter, statusFilter, sortBy]);
 
+  // Hotkey: Ctrl+N to add task
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        handleCreateTask();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const loadTasks = async () => {
     try {
       const response = await tasksAPI.getTasks();

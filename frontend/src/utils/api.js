@@ -88,6 +88,11 @@ export const tasksAPI = {
     const response = await api.put(`/tasks/${taskId}/unprioritize`);
     return response.data;
   },
+  
+  scheduleAllToday: async (date) => {
+    const response = await api.post('/tasks/schedule-all-today', { date });
+    return response.data;
+  },
 };
 
 // Pomodoro API

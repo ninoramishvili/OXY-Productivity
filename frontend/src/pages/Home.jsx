@@ -211,6 +211,18 @@ function Home({ user }) {
     loadTags();
   }, []);
 
+  // Hotkey: Ctrl+N to add task
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        handleCreateTask();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedDate]);
+
   const loadTasks = async () => {
     try {
       const response = await tasksAPI.getTasks();

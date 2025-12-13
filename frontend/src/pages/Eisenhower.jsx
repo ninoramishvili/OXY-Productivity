@@ -211,6 +211,18 @@ function Eisenhower() {
     loadTags();
   }, []);
 
+  // Hotkey: Ctrl+N to add task
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        handleCreateTask();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const loadTasks = async () => {
     try {
       const response = await tasksAPI.getTasks();
@@ -392,6 +404,21 @@ function Eisenhower() {
     }
   };
 
+  const handleScheduleAllToday = async () => {
+    const today = new Date();
+    const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+    try {
+      const response = await tasksAPI.scheduleAllToday(dateString);
+      if (response.success) {
+        showSuccess(`${response.count} tasks moved to Today! 📅`);
+        loadTasks();
+      }
+    } catch (err) {
+      alert('Failed to schedule tasks');
+    }
+  };
+
   const confirmDelete = async () => {
     try {
       const response = await tasksAPI.deleteTask(deleteConfirm.taskId);
@@ -429,6 +456,10 @@ function Eisenhower() {
           <p className="header-subtitle">Prioritize tasks by urgency and importance</p>
         </div>
         <div className="header-actions">
+          <button className="btn-schedule-today" onClick={handleScheduleAllToday}>
+            <Calendar size={16} />
+            Move All to Today
+          </button>
           <button className="btn-primary" onClick={handleCreateTask}>
             <Plus size={18} />
             Add Task

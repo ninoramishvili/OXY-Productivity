@@ -255,18 +255,6 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
             {errors.title && <span className="error-text">{errors.title}</span>}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Add details (optional)..."
-              rows="3"
-            />
-          </div>
-
           <div className="form-group form-group-compact">
             <label htmlFor="scheduledDate">
               📅 Schedule Date (optional)

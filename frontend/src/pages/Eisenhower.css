@@ -40,10 +40,31 @@
   gap: 12px;
 }
 
+.btn-schedule-today {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(0, 206, 209, 0.15) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-schedule-today:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(0, 206, 209, 0.25) 100%);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-1px);
+}
+
 /* Success Message */
 .eisenhower-page .success-message {
   position: fixed;
-  top: 24px;
+  bottom: 24px;
   right: 24px;
   padding: 12px 20px;
   background: var(--color-teal);
@@ -52,8 +73,19 @@
   font-size: 14px;
   font-weight: 600;
   z-index: 10000;
-  animation: slideIn 0.3s ease-out;
+  animation: slideInUp 0.3s ease-out;
   box-shadow: 0 4px 12px rgba(0, 206, 209, 0.3);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Matrix Container */
