@@ -116,7 +116,7 @@ function DraggableTask({ task, onToggleComplete, onClick }) {
 }
 
 // Droppable Day Column Component
-function DayColumn({ date, tasks, isToday, onTaskClick, onToggleComplete, onAddTask }) {
+function DayColumn({ date, tasks, isToday, onTaskClick, onToggleComplete, onAddTask, onGoToDay }) {
   const dateString = getLocalDateString(date);
   const { setNodeRef, isOver } = useDroppable({
     id: `day-${dateString}`,
@@ -131,7 +131,7 @@ function DayColumn({ date, tasks, isToday, onTaskClick, onToggleComplete, onAddT
       ref={setNodeRef}
       className={`day-column ${isToday ? 'today' : ''} ${isOver ? 'drag-over' : ''}`}
     >
-      <div className="day-header">
+      <div className="day-header" onClick={() => onGoToDay(dateString)} style={{ cursor: 'pointer' }}>
         <div className="day-name">{dayInfo.dayName}</div>
         <div className={`day-number ${isToday ? 'today-badge' : ''}`}>
           {dayInfo.dayNum}
@@ -160,9 +160,14 @@ function DayColumn({ date, tasks, isToday, onTaskClick, onToggleComplete, onAddT
         )}
       </div>
 
-      <button className="add-task-day-btn" onClick={() => onAddTask(dateString)}>
-        <Plus size={14} /> Add
-      </button>
+      <div className="day-actions">
+        <button className="go-to-day-btn" onClick={() => onGoToDay(dateString)}>
+          View Day →
+        </button>
+        <button className="add-task-day-btn" onClick={() => onAddTask(dateString)}>
+          <Plus size={14} /> Add
+        </button>
+      </div>
     </div>
   );
 }
@@ -431,6 +436,7 @@ function Weekly() {
               onTaskClick={handleTaskClick}
               onToggleComplete={handleToggleComplete}
               onAddTask={handleAddTask}
+              onGoToDay={(dateString) => navigate(`/home?date=${dateString}`)}
             />
           ))}
         </div>

@@ -344,8 +344,36 @@
   background: var(--text-tertiary);
 }
 
+/* Day Actions */
+.day-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+/* View Day Button */
+.go-to-day-btn {
+  flex: 1;
+  padding: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.go-to-day-btn:hover {
+  border-color: var(--color-teal);
+  color: var(--color-teal);
+  background: rgba(0, 206, 209, 0.05);
+}
+
 /* Add Task Button in Day */
 .add-task-day-btn {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -365,6 +393,11 @@
   border-color: var(--color-coral);
   color: var(--color-coral);
   background: rgba(255, 127, 80, 0.05);
+}
+
+/* Clickable day header */
+.day-header:hover {
+  opacity: 0.8;
 }
 
 /* Success Message */
