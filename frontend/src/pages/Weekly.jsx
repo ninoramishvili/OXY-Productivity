@@ -195,7 +195,7 @@ function Weekly() {
     try {
       const response = await tasksAPI.getTasks();
       if (response.success) {
-        setTasks(response.data);
+        setTasks(response.tasks || []);
       }
     } catch (err) {
       console.error('Failed to load tasks:', err);
@@ -208,7 +208,7 @@ function Weekly() {
     try {
       const response = await tasksAPI.getTags();
       if (response.success) {
-        setTags(response.data);
+        setTags(response.tags || []);
       }
     } catch (err) {
       console.error('Failed to load tags:', err);
@@ -247,6 +247,7 @@ function Weekly() {
 
   // Get tasks for a specific day
   const getTasksForDay = (date) => {
+    if (!tasks || !Array.isArray(tasks)) return [];
     const dateString = getLocalDateString(date);
     const dayTasks = tasks.filter(task => {
       if (!task.scheduled_date) return false;
