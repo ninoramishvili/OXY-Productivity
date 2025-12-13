@@ -37,7 +37,7 @@ router.get('/', verifyToken, async (req, res) => {
 
 // Create new task
 router.post('/', verifyToken, async (req, res) => {
-  const { title, description, priority, scheduledDate, scheduledTime, tagIds, isUrgent, isImportant, isPrioritized } = req.body;
+  const { title, description, priority, scheduledDate, scheduledTime, tagIds, isUrgent, isImportant, isPrioritized, estimatedMinutes } = req.body;
 
   if (!title) {
     return res.status(400).json({ 
@@ -48,8 +48,8 @@ router.post('/', verifyToken, async (req, res) => {
 
   try {
     const result = await query(
-      `INSERT INTO tasks (user_id, title, description, priority, scheduled_date, scheduled_time, is_urgent, is_important, is_prioritized) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+      `INSERT INTO tasks (user_id, title, description, priority, scheduled_date, scheduled_time, is_urgent, is_important, is_prioritized, estimated_minutes) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
        RETURNING *`,
       [
         req.userId,
@@ -60,7 +60,8 @@ router.post('/', verifyToken, async (req, res) => {
         scheduledTime || null,
         isUrgent || false,
         isImportant || false,
-        isPrioritized || false
+        isPrioritized || false,
+        estimatedMinutes || null
       ]
     );
 
@@ -101,7 +102,7 @@ router.post('/', verifyToken, async (req, res) => {
 // Update task
 router.put('/:id', verifyToken, async (req, res) => {
   const taskId = parseInt(req.params.id);
-  const { title, description, completed, priority, scheduledDate, scheduledTime, tagIds } = req.body;
+  const { title, description, completed, priority, scheduledDate, scheduledTime, tagIds, estimatedMinutes } = req.body;
 
   console.log('Update task request:', { taskId, tagIds });
 
@@ -161,6 +162,13 @@ router.put('/:id', verifyToken, async (req, res) => {
     if (scheduledTime !== undefined) {
       updates.push(`scheduled_time = $${paramCount}`);
       values.push(scheduledTime);
+      paramCount++;
+    }
+    if (estimatedMinutes !== undefined) {
+      updates.push(`estimated_minutes = $${paramCount}`);
+      // Convert empty string or 0 to null
+      const estimateValue = (estimatedMinutes === '' || estimatedMinutes === 0) ? null : estimatedMinutes;
+      values.push(estimateValue);
       paramCount++;
     }
 

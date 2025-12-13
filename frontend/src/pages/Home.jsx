@@ -115,11 +115,16 @@ function SortableTaskCard({ task, isHighlight, isFrog, onToggleComplete, onEditT
       
       {/* Time stats - always show space */}
       <div className="task-time-stats">
-        <span className="time-stat">
+        {task.estimated_minutes && (
+          <span className={`time-stat estimate ${task.estimated_minutes <= 2 ? 'quick-task' : ''}`} title="Estimated time">
+            ⏱️ {task.estimated_minutes}m
+          </span>
+        )}
+        <span className="time-stat" title="Time spent">
           <Clock size={12} />
           {task.time_spent > 0 ? Math.floor(task.time_spent / 60) : 0}m
         </span>
-        <span className="time-stat">
+        <span className="time-stat" title="Pomodoro sessions">
           🍅 {task.pomodoro_count || 0}
         </span>
         {(task.time_spent > 0 || task.pomodoro_count > 0) && (

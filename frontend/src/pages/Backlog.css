@@ -491,6 +491,25 @@
   font-weight: 500;
 }
 
+.time-stat.estimate {
+  background: rgba(0, 206, 209, 0.1);
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--color-teal);
+}
+
+.time-stat.estimate.quick-task {
+  background: rgba(78, 203, 113, 0.15);
+  color: #4ECB71;
+  font-weight: 600;
+  animation: pulseQuick 2s ease-in-out infinite;
+}
+
+@keyframes pulseQuick {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
 .task-footer {
   display: flex;
   gap: 8px;

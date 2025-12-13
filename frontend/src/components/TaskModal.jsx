@@ -18,7 +18,8 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
     description: '',
     quadrant: 'doFirst',
     tagIds: [],
-    scheduledDate: ''
+    scheduledDate: '',
+    estimatedMinutes: ''
   });
   const [errors, setErrors] = useState({});
   const [newTagName, setNewTagName] = useState('');
@@ -48,7 +49,8 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
         description: task.description || '',
         quadrant: quadrant,
         tagIds: initialTagIds,
-        scheduledDate: scheduledDate
+        scheduledDate: scheduledDate,
+        estimatedMinutes: task.estimated_minutes || ''
       });
     } else {
       setFormData({
@@ -56,7 +58,8 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
         description: '',
         quadrant: 'doFirst',
         tagIds: [],
-        scheduledDate: defaultDate || ''
+        scheduledDate: defaultDate || '',
+        estimatedMinutes: ''
       });
     }
     setErrors({});
@@ -284,6 +287,35 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
             </div>
             <span className="field-hint">
               Leave empty for To Do & Eisenhower. Set date for Day View.
+            </span>
+          </div>
+
+          <div className="form-group form-group-compact">
+            <label htmlFor="estimatedMinutes">
+              ⏱️ Time Estimate (minutes)
+            </label>
+            <div className="estimate-input-row">
+              <input
+                type="number"
+                id="estimatedMinutes"
+                name="estimatedMinutes"
+                value={formData.estimatedMinutes}
+                onChange={handleChange}
+                placeholder="e.g. 15, 30, 60..."
+                className="estimate-input"
+                min="1"
+                max="480"
+              />
+              <div className="quick-estimates">
+                <button type="button" className={`quick-btn ${formData.estimatedMinutes === 2 ? 'active' : ''}`} onClick={() => setFormData(prev => ({ ...prev, estimatedMinutes: 2 }))}>2m</button>
+                <button type="button" className={`quick-btn ${formData.estimatedMinutes === 5 ? 'active' : ''}`} onClick={() => setFormData(prev => ({ ...prev, estimatedMinutes: 5 }))}>5m</button>
+                <button type="button" className={`quick-btn ${formData.estimatedMinutes === 15 ? 'active' : ''}`} onClick={() => setFormData(prev => ({ ...prev, estimatedMinutes: 15 }))}>15m</button>
+                <button type="button" className={`quick-btn ${formData.estimatedMinutes === 30 ? 'active' : ''}`} onClick={() => setFormData(prev => ({ ...prev, estimatedMinutes: 30 }))}>30m</button>
+                <button type="button" className={`quick-btn ${formData.estimatedMinutes === 60 ? 'active' : ''}`} onClick={() => setFormData(prev => ({ ...prev, estimatedMinutes: 60 }))}>1h</button>
+              </div>
+            </div>
+            <span className="field-hint">
+              💡 Tasks ≤2 min = Quick Task (do it now!)
             </span>
           </div>
 

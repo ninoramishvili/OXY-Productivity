@@ -110,6 +110,11 @@ function DraggableTask({ task, onToggleComplete, onClick }) {
       <span className={`task-title ${task.is_completed ? 'completed' : ''}`}>
         {task.title}
       </span>
+      {task.estimated_minutes && (
+        <span className={`task-estimate ${task.estimated_minutes <= 2 ? 'quick' : ''}`} title={`Est: ${task.estimated_minutes}m`}>
+          {task.estimated_minutes}m
+        </span>
+      )}
       <span className={`task-priority-dot ${quadrant.class}`} title={quadrant.label} />
     </div>
   );

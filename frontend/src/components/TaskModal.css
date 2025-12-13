@@ -185,6 +185,76 @@
   border-color: rgba(239, 68, 68, 0.5);
 }
 
+/* Time Estimate Input */
+.estimate-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.estimate-input {
+  width: 120px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  transition: all 0.3s ease;
+}
+
+.estimate-input:focus {
+  outline: none;
+  border-color: var(--color-teal);
+  background: var(--bg-input-focus);
+  box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.15);
+}
+
+.estimate-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Hide spinner buttons for number input */
+.estimate-input::-webkit-outer-spin-button,
+.estimate-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.estimate-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.quick-estimates {
+  display: flex;
+  gap: 6px;
+}
+
+.quick-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-btn:hover {
+  border-color: var(--color-teal);
+  color: var(--color-teal);
+  background: rgba(0, 206, 209, 0.1);
+}
+
+.quick-btn.active {
+  border-color: var(--color-teal);
+  background: var(--color-teal);
+  color: white;
+}
+
 .date-input:focus {
   outline: none;
   border-color: var(--color-coral);
