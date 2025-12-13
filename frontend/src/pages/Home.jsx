@@ -345,7 +345,7 @@ function Home({ user }) {
   const getSortedTasks = () => {
     // Exclude quick tasks (≤2 min) - they appear in Quick Wins section instead
     const sorted = [...getFilteredTasks()].filter(task => 
-      !(task.estimated_minutes && task.estimated_minutes <= 2 && !task.is_completed)
+      !(task.estimated_minutes && task.estimated_minutes <= 2)
     );
     
     if (sortBy === 'manual') {
@@ -416,10 +416,10 @@ function Home({ user }) {
     );
   };
 
-  // Calculate total minutes for quick tasks
+  // Calculate total minutes for quick tasks (only incomplete ones)
   const getQuickTasksTotalMinutes = () => {
     return getQuickTasks()
-      .filter(t => !t.is_completed)
+      .filter(t => !t.completed)
       .reduce((sum, task) => sum + (task.estimated_minutes || 0), 0);
   };
 
@@ -856,15 +856,15 @@ function Home({ user }) {
             {quickTasks.length > 0 ? (
               <div className="quick-wins-list">
                 {quickTasks.map(task => (
-                  <div key={task.id} className={`quick-task-card ${task.is_completed ? 'completed' : ''}`}>
+                  <div key={task.id} className={`quick-task-card ${task.completed ? 'completed' : ''}`}>
                     <button 
-                      className={`quick-checkbox ${task.is_completed ? 'checked' : ''}`}
+                      className={`quick-checkbox ${task.completed ? 'checked' : ''}`}
                       onClick={() => handleToggleComplete(task)}
-                      title={task.is_completed ? 'Mark incomplete' : 'Mark complete'}
+                      title={task.completed ? 'Mark incomplete' : 'Mark complete'}
                     >
-                      {task.is_completed ? <Check size={14} /> : null}
+                      {task.completed ? <Check size={14} /> : null}
                     </button>
-                    <span className={`quick-task-title ${task.is_completed ? 'completed' : ''}`}>
+                    <span className={`quick-task-title ${task.completed ? 'completed' : ''}`}>
                       {task.title}
                     </span>
                     <span className="quick-task-time">⏱️ {task.estimated_minutes}m</span>

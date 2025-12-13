@@ -270,9 +270,9 @@ function Backlog() {
         task.estimated_minutes && task.estimated_minutes <= 2
       );
     } else {
-      // Exclude quick tasks from regular list - they appear in Quick Wins section
+      // Exclude ALL quick tasks from regular list - they appear in Quick Wins section
       filtered = filtered.filter(task => 
-        !(task.estimated_minutes && task.estimated_minutes <= 2 && !task.completed)
+        !(task.estimated_minutes && task.estimated_minutes <= 2)
       );
     }
 
