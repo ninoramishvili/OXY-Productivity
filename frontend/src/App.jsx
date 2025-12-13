@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Backlog from './pages/Backlog';
 import Eisenhower from './pages/Eisenhower';
+import Weekly from './pages/Weekly';
 import Layout from './components/Layout';
 import './App.css';
 
@@ -73,6 +74,16 @@ function App() {
             isAuthenticated ? 
             <Layout user={user} onLogout={handleLogout}>
               <Eisenhower />
+            </Layout> : 
+            <Navigate to="/login" />
+          } 
+        />
+        <Route 
+          path="/weekly" 
+          element={
+            isAuthenticated ? 
+            <Layout user={user} onLogout={handleLogout}>
+              <Weekly />
             </Layout> : 
             <Navigate to="/login" />
           } 

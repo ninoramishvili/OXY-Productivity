@@ -6,7 +6,8 @@ import {
   Timer, 
   BarChart3, 
   LogOut,
-  Grid3X3
+  Grid3X3,
+  Calendar
 } from 'lucide-react';
 import './Layout.css';
 
@@ -39,6 +40,13 @@ function Layout({ user, onLogout, children }) {
           >
             <Zap className="nav-icon" size={20} />
             <span>Today</span>
+          </button>
+          <button 
+            onClick={() => navigate('/weekly')}
+            className={`nav-item ${isActive('/weekly') ? 'active' : ''}`}
+          >
+            <Calendar className="nav-icon" size={20} />
+            <span>Weekly</span>
           </button>
           <button 
             onClick={() => navigate('/backlog')}
