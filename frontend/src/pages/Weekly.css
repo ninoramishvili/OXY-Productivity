@@ -1,7 +1,7 @@
-/* Weekly View Styles */
+/* Weekly View Styles - Consistent with Home Page */
 .weekly-page {
   min-height: 100vh;
-  padding: 24px;
+  padding: 24px 32px;
   background: var(--bg-primary);
 }
 
@@ -13,14 +13,18 @@
   color: var(--text-secondary);
 }
 
-/* Header */
+/* ============================================
+   HEADER - Consistent with Home Header
+   ============================================ */
 .weekly-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  padding-bottom: 20px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--border-primary);
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .header-left {
@@ -35,7 +39,7 @@
 
 .weekly-header h1 {
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
   margin: 0;
 }
@@ -49,76 +53,84 @@
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-/* Week Navigation */
+/* Week Navigation - Styled like Home nav */
 .week-navigation {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--bg-card);
-  border-radius: 12px;
-  padding: 4px;
-  border: 1px solid var(--border-primary);
 }
 
-.nav-btn {
+.weekly-page .nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  border-radius: 8px;
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.nav-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+.weekly-page .nav-btn:hover {
+  background: var(--bg-primary);
+  border-color: var(--color-coral);
+  color: var(--color-coral);
 }
 
-.nav-btn.today-btn {
+.weekly-page .nav-btn.today-btn {
   width: auto;
-  padding: 0 16px;
+  padding: 8px 16px;
   font-size: 13px;
   font-weight: 600;
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
 }
 
-/* Add Task Button */
-.btn-add-task {
+.weekly-page .nav-btn.today-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
+}
+
+/* Add Task Button - Consistent with Home */
+.weekly-page .btn-add-task {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: linear-gradient(135deg, var(--color-coral), var(--color-coral-dark, #e06550));
+  background: var(--gradient-primary);
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   color: white;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(255, 127, 80, 0.2);
 }
 
-.btn-add-task:hover {
+.weekly-page .btn-add-task:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
+  box-shadow: 0 6px 16px rgba(255, 127, 80, 0.3);
 }
 
-/* Week Grid */
+/* ============================================
+   WEEK GRID
+   ============================================ */
 .week-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 12px;
+  gap: 16px;
   min-height: calc(100vh - 180px);
 }
 
-/* Day Column */
+/* Day Column - Card Style */
 .day-column {
   background: var(--bg-card);
   border: 1px solid var(--border-primary);
@@ -128,38 +140,49 @@
   flex-direction: column;
   transition: all 0.2s ease;
   min-height: 400px;
+  box-shadow: var(--shadow-sm);
+}
+
+.day-column:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .day-column.today {
   border-color: var(--color-coral);
-  box-shadow: 0 0 0 1px var(--color-coral);
+  box-shadow: 0 0 0 2px rgba(255, 127, 80, 0.2), var(--shadow-md);
 }
 
 .day-column.drag-over {
-  background: rgba(var(--color-teal-rgb, 0, 206, 209), 0.1);
+  background: rgba(0, 206, 209, 0.05);
   border-color: var(--color-teal);
-  box-shadow: 0 0 0 2px var(--color-teal);
+  box-shadow: 0 0 0 2px rgba(0, 206, 209, 0.3);
 }
 
-/* Day Header */
+/* Day Header - Clickable */
 .day-header {
   text-align: center;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-primary);
   margin-bottom: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.day-header:hover {
+  background: rgba(255, 127, 80, 0.05);
 }
 
 .day-name {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   color: var(--text-tertiary);
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .day-number {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 32px;
+  font-weight: 800;
   color: var(--text-primary);
   line-height: 1.2;
 }
@@ -168,17 +191,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: var(--color-coral);
+  width: 44px;
+  height: 44px;
+  background: var(--gradient-primary);
   color: white;
   border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
 }
 
 .day-month {
   font-size: 11px;
   color: var(--text-tertiary);
-  margin-top: 2px;
+  margin-top: 4px;
+  font-weight: 500;
 }
 
 /* Day Stats */
@@ -188,25 +213,24 @@
   font-size: 11px;
   color: var(--text-secondary);
   margin-bottom: 12px;
-  padding: 8px 10px;
-  background: var(--bg-primary);
+  padding: 8px 12px;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
-  border-radius: 8px;
+  border-radius: 10px;
   min-height: 32px;
   align-items: center;
 }
 
 .task-count {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .completed-count {
   color: var(--color-teal);
-  font-weight: 600;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-/* Day Tasks */
+/* Day Tasks List */
 .day-tasks {
   flex: 1;
   display: flex;
@@ -214,6 +238,7 @@
   gap: 8px;
   overflow-y: auto;
   margin-bottom: 12px;
+  padding-right: 4px;
 }
 
 .day-tasks::-webkit-scrollbar {
@@ -222,7 +247,11 @@
 
 .day-tasks::-webkit-scrollbar-thumb {
   background: var(--border-primary);
-  border-radius: 2px;
+  border-radius: 4px;
+}
+
+.day-tasks::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
 }
 
 .empty-day {
@@ -230,32 +259,41 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-tertiary);
   font-style: italic;
+  opacity: 0.6;
 }
 
-/* Task Card */
+/* ============================================
+   TASK CARD - Mini Version
+   ============================================ */
 .weekly-task-card {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .weekly-task-card:hover {
   border-color: var(--color-coral);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
 .weekly-task-card.completed {
-  opacity: 0.6;
-  background: rgba(var(--bg-primary-rgb), 0.5);
+  opacity: 0.5;
+  background: var(--bg-primary);
+}
+
+.weekly-task-card.completed:hover {
+  opacity: 0.7;
 }
 
 .weekly-task-card.dragging {
@@ -266,17 +304,23 @@
 .weekly-task-card.dragging-overlay {
   background: var(--bg-card);
   border: 2px solid var(--color-coral);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .task-drag-handle {
-  font-size: 12px;
+  font-size: 10px;
   color: var(--text-tertiary);
   cursor: grab;
   padding: 2px;
   user-select: none;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.weekly-task-card:hover .task-drag-handle {
+  opacity: 1;
 }
 
 .task-drag-handle:active {
@@ -291,6 +335,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.task-complete-btn:hover {
+  transform: scale(1.1);
 }
 
 .check-icon {
@@ -321,30 +370,37 @@
   color: var(--text-tertiary);
 }
 
+/* Priority Dot */
 .task-priority-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .task-priority-dot.do-first {
   background: var(--color-coral);
+  box-shadow: 0 0 6px rgba(255, 127, 80, 0.4);
 }
 
 .task-priority-dot.schedule {
   background: var(--color-teal);
+  box-shadow: 0 0 6px rgba(0, 206, 209, 0.4);
 }
 
 .task-priority-dot.delegate {
   background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
 }
 
 .task-priority-dot.eliminate {
   background: var(--text-tertiary);
 }
 
-/* Day Actions */
+/* ============================================
+   DAY ACTIONS - Buttons at Bottom
+   ============================================ */
 .day-actions {
   display: flex;
   gap: 8px;
@@ -354,13 +410,13 @@
 /* View Day Button */
 .go-to-day-btn {
   flex: 1;
-  padding: 8px;
-  background: var(--bg-primary);
+  padding: 10px 12px;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--text-secondary);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -368,7 +424,7 @@
 .go-to-day-btn:hover {
   border-color: var(--color-teal);
   color: var(--color-teal);
-  background: rgba(0, 206, 209, 0.05);
+  background: rgba(0, 206, 209, 0.08);
 }
 
 /* Add Task Button in Day */
@@ -378,42 +434,40 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px;
+  padding: 10px 12px;
   background: transparent;
   border: 1px dashed var(--border-primary);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--text-tertiary);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .add-task-day-btn:hover {
   border-color: var(--color-coral);
+  border-style: solid;
   color: var(--color-coral);
-  background: rgba(255, 127, 80, 0.05);
+  background: rgba(255, 127, 80, 0.08);
 }
 
-/* Clickable day header */
-.day-header:hover {
-  opacity: 0.8;
-}
-
-/* Success Message */
-.success-message {
+/* ============================================
+   SUCCESS MESSAGE
+   ============================================ */
+.weekly-page .success-message {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  padding: 12px 20px;
+  padding: 14px 24px;
   background: var(--color-teal);
   color: white;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
   z-index: 10000;
   animation: slideInUp 0.3s ease-out;
-  box-shadow: 0 4px 12px rgba(0, 206, 209, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 206, 209, 0.35);
 }
 
 @keyframes slideInUp {
@@ -427,14 +481,26 @@
   }
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1400px) {
   .week-grid {
     grid-template-columns: repeat(4, 1fr);
   }
+  
+  .day-column {
+    min-height: 350px;
+  }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
+  .week-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
   .week-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -444,11 +510,19 @@
     gap: 16px;
     align-items: flex-start;
   }
-}
-
-@media (max-width: 600px) {
-  .week-grid {
-    grid-template-columns: 1fr;
+  
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
+@media (max-width: 500px) {
+  .week-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .weekly-page {
+    padding: 16px;
+  }
+}
