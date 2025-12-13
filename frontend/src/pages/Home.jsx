@@ -449,22 +449,19 @@ function Home({ user }) {
       .reduce((sum, task) => sum + (task.estimated_minutes || 0), 0);
   };
 
-  // Generate time slots for the calendar view (24 hours, 30-min intervals)
+  // Generate time slots for the calendar view (24 hours, 30-min intervals, 24h format)
   const generateTimeSlots = () => {
     const slots = [];
     for (let hour = 0; hour < 24; hour++) {
       for (let min = 0; min < 60; min += 30) {
         const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
-        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-        const ampm = hour < 12 ? 'AM' : 'PM';
-        const displayLabel = `${displayHour}:${min.toString().padStart(2, '0')} ${ampm}`;
         
         slots.push({
           hour,
           minute: min,
           timeKey: `${hour}-${min}`,
           label: timeStr,
-          displayLabel
+          displayLabel: timeStr // 24h format: "09:00", "14:30", etc.
         });
       }
     }
@@ -1066,50 +1063,45 @@ function Home({ user }) {
                     return (
                       <div 
                         key={slot.timeKey} 
-                        className={`time-slot ${isCurrentSlot ? 'current-slot' : ''} ${slotTasks.length > 0 ? 'has-tasks' : ''} ${slot.minute === 0 ? 'hour-start' : 'half-hour'}`}
+                        className={`time-slot ${isCurrentSlot ? 'current-slot' : ''} ${slotTasks.length > 0 ? 'has-tasks' : ''}`}
                       >
                         <div className="slot-time">
-                          {slot.minute === 0 ? slot.displayLabel : ''}
+                          {slot.displayLabel}
                         </div>
                         <div className="slot-content">
-                          {slotTasks.length > 0 ? (
-                            slotTasks.map(task => (
-                              <div 
-                                key={task.id}
-                                className={`time-block-task ${task.completed ? 'completed' : ''}`}
-                                style={{
-                                  height: task.estimated_minutes ? `${Math.max(32, task.estimated_minutes)}px` : '32px'
-                                }}
-                                onClick={() => handleEditTask(task)}
+                          {slotTasks.map(task => (
+                            <div 
+                              key={task.id}
+                              className={`time-block-task ${task.completed ? 'completed' : ''}`}
+                              onClick={() => handleEditTask(task)}
+                            >
+                              <button 
+                                className={`mini-checkbox ${task.completed ? 'checked' : ''}`}
+                                onClick={(e) => { e.stopPropagation(); handleToggleComplete(task); }}
                               >
-                                <div className="task-block-header">
-                                  <button 
-                                    className={`mini-checkbox ${task.completed ? 'checked' : ''}`}
-                                    onClick={(e) => { e.stopPropagation(); handleToggleComplete(task); }}
-                                  >
-                                    {task.completed && <Check size={12} />}
-                                  </button>
-                                  <span className={`task-name ${task.completed ? 'completed' : ''}`}>
-                                    {task.title}
-                                  </span>
-                                </div>
-                                {task.estimated_minutes && (
-                                  <span className="task-duration">{task.estimated_minutes}m</span>
-                                )}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="empty-slot" onClick={() => {
-                              // Pre-fill both date AND time for the slot
+                                {task.completed && <Check size={12} />}
+                              </button>
+                              <span className={`task-name ${task.completed ? 'completed' : ''}`}>
+                                {task.title}
+                              </span>
+                              {task.estimated_minutes && (
+                                <span className="task-duration">{task.estimated_minutes}m</span>
+                              )}
+                            </div>
+                          ))}
+                          <button 
+                            className="add-to-slot-btn"
+                            onClick={() => {
                               setEditingTask({ 
                                 scheduled_date: getLocalDateString(selectedDate),
                                 scheduled_time: slot.label 
                               });
                               setIsModalOpen(true);
-                            }}>
-                              <Plus size={14} />
-                            </div>
-                          )}
+                            }}
+                            title={`Add task at ${slot.displayLabel}`}
+                          >
+                            <Plus size={12} />
+                          </button>
                         </div>
                       </div>
                     );
