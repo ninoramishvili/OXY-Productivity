@@ -210,7 +210,7 @@ function Weekly() {
 
   const loadTasks = async () => {
     try {
-      const response = await tasksAPI.getAllTasks();
+      const response = await tasksAPI.getTasks();
       if (response.success) {
         setTasks(response.data);
       }
