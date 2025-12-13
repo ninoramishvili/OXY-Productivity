@@ -13,7 +13,8 @@ import {
   ListTodo,
   AlertCircle,
   GripVertical,
-  Clock
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 import {
   DndContext,
@@ -46,7 +47,7 @@ const getQuadrantInfo = (task) => {
 };
 
 // Sortable Task Card Component for Backlog
-function SortableBacklogCard({ task, onToggleComplete, onEditTask, onDeleteTask }) {
+function SortableBacklogCard({ task, onToggleComplete, onEditTask, onDeleteTask, onPrioritize }) {
   const quadrant = getQuadrantInfo(task);
   const {
     attributes,
@@ -115,19 +116,29 @@ function SortableBacklogCard({ task, onToggleComplete, onEditTask, onDeleteTask 
       
       <div className="task-footer">
         <button 
-          className="task-action-icon"
-          onClick={() => onEditTask(task)}
-          title="Edit task"
+          className="btn-prioritize"
+          onClick={() => onPrioritize(task.id)}
+          title="Move to Eisenhower Matrix"
         >
-          <Edit2 size={16} />
+          <ArrowRight size={14} />
+          Prioritize
         </button>
-        <button 
-          className="task-action-icon delete"
-          onClick={() => onDeleteTask(task.id)}
-          title="Delete task"
-        >
-          <Trash2 size={16} />
-        </button>
+        <div className="task-actions-group">
+          <button 
+            className="task-action-icon"
+            onClick={() => onEditTask(task)}
+            title="Edit task"
+          >
+            <Edit2 size={16} />
+          </button>
+          <button 
+            className="task-action-icon delete"
+            onClick={() => onDeleteTask(task.id)}
+            title="Delete task"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -193,9 +204,11 @@ function Backlog() {
   const filterAndSortTasks = () => {
     let filtered = [...tasks];
 
-    // Only show tasks WITHOUT scheduled_date (unscheduled tasks)
-    // Tasks with dates appear in Day View, not To Do
-    filtered = filtered.filter(task => !task.scheduled_date);
+    // Only show UNPRIORITIZED tasks (Brain Dump inbox)
+    // - is_prioritized = false → To Do
+    // - is_prioritized = true → Eisenhower
+    // - scheduled_date set → Day View
+    filtered = filtered.filter(task => !task.scheduled_date && !task.is_prioritized);
 
     // Search filter
     if (searchQuery) {
@@ -329,6 +342,19 @@ function Backlog() {
     }
   };
 
+  const handlePrioritize = async (taskId) => {
+    try {
+      // Move to Eisenhower Matrix - default to "Do First" quadrant
+      const response = await tasksAPI.updateEisenhower(taskId, true, true);
+      if (response.success) {
+        showSuccess('Task moved to Eisenhower Matrix! 📊');
+        loadTasks();
+      }
+    } catch (err) {
+      alert('Failed to prioritize task');
+    }
+  };
+
   const handleDeleteTask = (taskId) => {
     setDeleteConfirm({ isOpen: true, taskId });
   };
@@ -396,7 +422,7 @@ function Backlog() {
         <div className="header-title">
           <ListTodo size={32} className="header-icon" />
           <div>
-            <h1>To Do</h1>
+            <h1>🧠 Brain Dump</h1>
             <p className="header-subtitle">
               {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
               {getActiveFilterCount() > 0 && ` (filtered)`}
@@ -407,6 +433,17 @@ function Backlog() {
           <Plus size={18} />
           Add Task
         </button>
+      </div>
+
+      {/* Brain Dump Description */}
+      <div className="brain-dump-info">
+        <div className="info-content">
+          <span className="info-icon">💡</span>
+          <div className="info-text">
+            <strong>Empty your mind here!</strong> Write down everything on your mind without worrying about organization.
+            Once captured, move tasks to <strong>Eisenhower Matrix</strong> to prioritize them.
+          </div>
+        </div>
       </div>
 
       {/* Search, Sort and Filters */}
@@ -568,6 +605,7 @@ function Backlog() {
                     onToggleComplete={handleToggleComplete}
                     onEditTask={handleEditTask}
                     onDeleteTask={handleDeleteTask}
+                    onPrioritize={handlePrioritize}
                   />
                 ))}
               </div>

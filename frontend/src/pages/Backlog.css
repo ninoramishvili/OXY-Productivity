@@ -44,7 +44,7 @@
 }
 
 .backlog-header h1 {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
   -webkit-background-clip: text;
@@ -59,6 +59,39 @@
   color: var(--text-tertiary);
   margin: 4px 0 0 0;
   font-weight: 500;
+}
+
+/* Brain Dump Info Box */
+.brain-dump-info {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(0, 206, 209, 0.1) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  border-left: 4px solid #3b82f6;
+}
+
+.info-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.info-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.info-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.info-text strong {
+  color: var(--text-primary);
 }
 
 .btn-add-task {
@@ -462,11 +495,37 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   height: 32px;
   margin-top: auto;
   flex-shrink: 0;
   padding-top: 4px;
+}
+
+.btn-prioritize {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(0, 206, 209, 0.15) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  color: #3b82f6;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-prioritize:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(0, 206, 209, 0.25) 100%);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateX(2px);
+}
+
+.task-actions-group {
+  display: flex;
+  gap: 4px;
 }
 
 .task-action-icon {

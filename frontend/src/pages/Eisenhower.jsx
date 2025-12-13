@@ -13,7 +13,8 @@ import {
   Check,
   Clock,
   Star,
-  ArrowRight
+  ArrowRight,
+  Undo2
 } from 'lucide-react';
 import {
   DndContext,
@@ -71,7 +72,7 @@ const QUADRANTS = {
 };
 
 // Draggable Task Card
-function DraggableTask({ task, onToggleComplete, onEdit, onDelete }) {
+function DraggableTask({ task, onToggleComplete, onEdit, onDelete, onUnprioritize }) {
   const {
     attributes,
     listeners,
@@ -110,6 +111,17 @@ function DraggableTask({ task, onToggleComplete, onEdit, onDelete }) {
       </div>
       <div className="task-actions">
         <button 
+          className="task-action-btn back-to-todo"
+          onClick={(e) => {
+            e.stopPropagation();
+            onUnprioritize(task.id);
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          title="Send back to To Do"
+        >
+          <Undo2 size={12} />
+        </button>
+        <button 
           className="task-action-btn"
           onClick={(e) => {
             e.stopPropagation();
@@ -135,7 +147,7 @@ function DraggableTask({ task, onToggleComplete, onEdit, onDelete }) {
 }
 
 // Droppable Quadrant Component
-function DroppableQuadrant({ quadrant, tasks, onToggleComplete, onEdit, onDelete }) {
+function DroppableQuadrant({ quadrant, tasks, onToggleComplete, onEdit, onDelete, onUnprioritize }) {
   const { setNodeRef, isOver } = useDroppable({
     id: quadrant.id,
   });
@@ -167,6 +179,7 @@ function DroppableQuadrant({ quadrant, tasks, onToggleComplete, onEdit, onDelete
               onToggleComplete={onToggleComplete}
               onEdit={onEdit}
               onDelete={onDelete}
+              onUnprioritize={onUnprioritize}
             />
           ))
         )}
@@ -230,7 +243,11 @@ function Eisenhower() {
   // Get tasks for each quadrant
   const getQuadrantTasks = (quadrant) => {
     return tasks.filter(task => 
-      // Only show unscheduled tasks (tasks with dates appear in Day View)
+      // Only show PRIORITIZED and unscheduled tasks
+      // - is_prioritized = true → Eisenhower
+      // - is_prioritized = false → To Do (Brain Dump)
+      // - scheduled_date set → Day View
+      task.is_prioritized &&
       !task.scheduled_date &&
       task.is_urgent === quadrant.isUrgent && 
       task.is_important === quadrant.isImportant
@@ -363,6 +380,18 @@ function Eisenhower() {
     setDeleteConfirm({ isOpen: true, taskId });
   };
 
+  const handleUnprioritize = async (taskId) => {
+    try {
+      const response = await tasksAPI.unprioritize(taskId);
+      if (response.success) {
+        showSuccess('Task sent back to Brain Dump 🧠');
+        loadTasks();
+      }
+    } catch (err) {
+      alert('Failed to send task back');
+    }
+  };
+
   const confirmDelete = async () => {
     try {
       const response = await tasksAPI.deleteTask(deleteConfirm.taskId);
@@ -445,6 +474,7 @@ function Eisenhower() {
                 onToggleComplete={handleToggleComplete}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
+                onUnprioritize={handleUnprioritize}
               />
               <DroppableQuadrant
                 quadrant={QUADRANTS.schedule}
@@ -452,6 +482,7 @@ function Eisenhower() {
                 onToggleComplete={handleToggleComplete}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
+                onUnprioritize={handleUnprioritize}
               />
               <DroppableQuadrant
                 quadrant={QUADRANTS.delegate}
@@ -459,6 +490,7 @@ function Eisenhower() {
                 onToggleComplete={handleToggleComplete}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
+                onUnprioritize={handleUnprioritize}
               />
               <DroppableQuadrant
                 quadrant={QUADRANTS.eliminate}
@@ -466,6 +498,7 @@ function Eisenhower() {
                 onToggleComplete={handleToggleComplete}
                 onEdit={handleEditTask}
                 onDelete={handleDeleteTask}
+                onUnprioritize={handleUnprioritize}
               />
             </div>
           </div>

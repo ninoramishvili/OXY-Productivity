@@ -37,7 +37,7 @@ router.get('/', verifyToken, async (req, res) => {
 
 // Create new task
 router.post('/', verifyToken, async (req, res) => {
-  const { title, description, priority, scheduledDate, scheduledTime, tagIds, isUrgent, isImportant } = req.body;
+  const { title, description, priority, scheduledDate, scheduledTime, tagIds, isUrgent, isImportant, isPrioritized } = req.body;
 
   if (!title) {
     return res.status(400).json({ 
@@ -48,8 +48,8 @@ router.post('/', verifyToken, async (req, res) => {
 
   try {
     const result = await query(
-      `INSERT INTO tasks (user_id, title, description, priority, scheduled_date, scheduled_time, is_urgent, is_important) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+      `INSERT INTO tasks (user_id, title, description, priority, scheduled_date, scheduled_time, is_urgent, is_important, is_prioritized) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
        RETURNING *`,
       [
         req.userId,
@@ -59,7 +59,8 @@ router.post('/', verifyToken, async (req, res) => {
         scheduledDate || null,
         scheduledTime || null,
         isUrgent || false,
-        isImportant || false
+        isImportant || false,
+        isPrioritized || false
       ]
     );
 
@@ -241,9 +242,10 @@ router.put('/:id/eisenhower', verifyToken, async (req, res) => {
   const { isUrgent, isImportant } = req.body;
 
   try {
+    // When moving to Eisenhower, also mark as prioritized
     const result = await query(
       `UPDATE tasks 
-       SET is_urgent = $1, is_important = $2, updated_at = CURRENT_TIMESTAMP 
+       SET is_urgent = $1, is_important = $2, is_prioritized = TRUE, updated_at = CURRENT_TIMESTAMP 
        WHERE id = $3 AND user_id = $4 
        RETURNING *`,
       [isUrgent, isImportant, taskId, req.userId]
@@ -274,6 +276,48 @@ router.put('/:id/eisenhower', verifyToken, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Failed to update Eisenhower quadrant' 
+    });
+  }
+});
+
+// Send task back to To Do (unprioritize)
+router.put('/:id/unprioritize', verifyToken, async (req, res) => {
+  const taskId = parseInt(req.params.id);
+
+  try {
+    const result = await query(
+      `UPDATE tasks 
+       SET is_prioritized = FALSE, is_urgent = FALSE, is_important = FALSE, updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $1 AND user_id = $2 
+       RETURNING *`,
+      [taskId, req.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Task not found' 
+      });
+    }
+
+    // Get tags for the task
+    const tagsResult = await query(
+      `SELECT tags.* FROM tags 
+       JOIN task_tags ON tags.id = task_tags.tag_id 
+       WHERE task_tags.task_id = $1`,
+      [taskId]
+    );
+
+    res.json({ 
+      success: true, 
+      message: 'Task sent back to To Do',
+      task: { ...result.rows[0], tags: tagsResult.rows }
+    });
+  } catch (error) {
+    console.error('Unprioritize task error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to unprioritize task' 
     });
   }
 });
