@@ -409,11 +409,18 @@ function Home({ user }) {
 
   // Get quick tasks (2-minute rule: estimated_minutes <= 2)
   const getQuickTasks = () => {
+    // Include completed quick tasks - they stay in the section
     return getFilteredTasks().filter(task => 
       task.estimated_minutes && 
-      task.estimated_minutes <= 2 && 
-      !task.is_completed
+      task.estimated_minutes <= 2
     );
+  };
+
+  // Calculate total minutes for quick tasks
+  const getQuickTasksTotalMinutes = () => {
+    return getQuickTasks()
+      .filter(t => !t.is_completed)
+      .reduce((sum, task) => sum + (task.estimated_minutes || 0), 0);
   };
 
   // Helper to get local date string (YYYY-MM-DD) without timezone shift
@@ -834,23 +841,32 @@ function Home({ user }) {
           </div>
 
           {/* Quick Wins Section - 2-Minute Rule */}
-          {quickTasks.length > 0 && (
-            <div className="quick-wins-section">
-              <div className="section-header">
-                <h2><span className="section-icon">⚡</span> Quick Wins ({quickTasks.length})</h2>
-                <span className="section-hint">Tasks ≤2 min — do them now!</span>
-              </div>
+          {/* Quick Wins Section - Always visible */}
+          <div className="quick-wins-section">
+            <div className="section-header">
+              <h2>
+                <span className="section-icon">⚡</span> 
+                Quick Wins ({quickTasks.length})
+                {getQuickTasksTotalMinutes() > 0 && (
+                  <span className="total-time">• {getQuickTasksTotalMinutes()}m total</span>
+                )}
+              </h2>
+              <span className="section-hint">Tasks ≤2 min — do them now!</span>
+            </div>
+            {quickTasks.length > 0 ? (
               <div className="quick-wins-list">
                 {quickTasks.map(task => (
-                  <div key={task.id} className="quick-task-card">
+                  <div key={task.id} className={`quick-task-card ${task.is_completed ? 'completed' : ''}`}>
                     <button 
-                      className="quick-complete-btn"
+                      className={`quick-checkbox ${task.is_completed ? 'checked' : ''}`}
                       onClick={() => handleToggleComplete(task)}
-                      title="Complete task"
+                      title={task.is_completed ? 'Mark incomplete' : 'Mark complete'}
                     >
-                      <Check size={16} />
+                      {task.is_completed ? <Check size={14} /> : null}
                     </button>
-                    <span className="quick-task-title">{task.title}</span>
+                    <span className={`quick-task-title ${task.is_completed ? 'completed' : ''}`}>
+                      {task.title}
+                    </span>
                     <span className="quick-task-time">⏱️ {task.estimated_minutes}m</span>
                     <button 
                       className="quick-edit-btn"
@@ -859,11 +875,20 @@ function Home({ user }) {
                     >
                       <Edit2 size={14} />
                     </button>
+                    <button 
+                      className="quick-delete-btn"
+                      onClick={() => handleDeleteTask(task.id)}
+                      title="Delete task"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="empty-quick-wins">No quick tasks yet. Add a task with ≤2 min estimate!</p>
+            )}
+          </div>
 
           {/* Tasks List */}
           <div className="tasks-section">

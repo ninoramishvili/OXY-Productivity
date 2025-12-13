@@ -431,13 +431,20 @@ function Backlog() {
 
   // Get quick tasks (2-minute rule: estimated_minutes <= 2, not scheduled)
   const getQuickTasks = () => {
+    // Include completed quick tasks - they stay in the section
     return tasks.filter(task => 
       !task.scheduled_date && 
       !task.is_prioritized &&
       task.estimated_minutes && 
-      task.estimated_minutes <= 2 && 
-      !task.completed
+      task.estimated_minutes <= 2
     );
+  };
+
+  // Calculate total minutes for quick tasks (only incomplete ones)
+  const getQuickTasksTotalMinutes = () => {
+    return getQuickTasks()
+      .filter(t => !t.completed)
+      .reduce((sum, task) => sum + (task.estimated_minutes || 0), 0);
   };
 
   const quickTasks = getQuickTasks();
@@ -511,23 +518,32 @@ function Backlog() {
       </div>
 
       {/* Quick Wins Section - 2-Minute Rule */}
-      {quickTasks.length > 0 && (
-        <div className="quick-wins-section">
-          <div className="section-header">
-            <h2><span className="section-icon">⚡</span> Quick Wins ({quickTasks.length})</h2>
-            <span className="section-hint">Tasks ≤2 min — do them now!</span>
-          </div>
+      {/* Quick Wins Section - Always visible */}
+      <div className="quick-wins-section">
+        <div className="section-header">
+          <h2>
+            <span className="section-icon">⚡</span> 
+            Quick Wins ({quickTasks.length})
+            {getQuickTasksTotalMinutes() > 0 && (
+              <span className="total-time">• {getQuickTasksTotalMinutes()}m total</span>
+            )}
+          </h2>
+          <span className="section-hint">Tasks ≤2 min — do them now!</span>
+        </div>
+        {quickTasks.length > 0 ? (
           <div className="quick-wins-list">
             {quickTasks.map(task => (
-              <div key={task.id} className="quick-task-card">
+              <div key={task.id} className={`quick-task-card ${task.completed ? 'completed' : ''}`}>
                 <button 
-                  className="quick-complete-btn"
+                  className={`quick-checkbox ${task.completed ? 'checked' : ''}`}
                   onClick={() => handleToggleComplete(task)}
-                  title="Complete task"
+                  title={task.completed ? 'Mark incomplete' : 'Mark complete'}
                 >
-                  <Check size={16} />
+                  {task.completed ? <Check size={14} /> : null}
                 </button>
-                <span className="quick-task-title">{task.title}</span>
+                <span className={`quick-task-title ${task.completed ? 'completed' : ''}`}>
+                  {task.title}
+                </span>
                 <span className="quick-task-time">⏱️ {task.estimated_minutes}m</span>
                 <button 
                   className="quick-edit-btn"
@@ -536,11 +552,20 @@ function Backlog() {
                 >
                   <Edit2 size={14} />
                 </button>
+                <button 
+                  className="quick-delete-btn"
+                  onClick={() => handleDeleteTask(task.id)}
+                  title="Delete task"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="empty-quick-wins">No quick tasks yet. Add a task with ≤2 min estimate!</p>
+        )}
+      </div>
 
       {/* Search, Sort and Filters */}
       <div className="backlog-controls">

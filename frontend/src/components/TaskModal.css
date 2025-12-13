@@ -309,6 +309,22 @@
   gap: 8px;
 }
 
+.quadrant-selector.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.disabled-section label {
+  color: var(--text-tertiary);
+}
+
+.priority-disabled-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: #4ECB71;
+  font-style: italic;
+}
+
 .quadrant-option {
   display: flex;
   flex-direction: column;

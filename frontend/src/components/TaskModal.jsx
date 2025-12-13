@@ -319,15 +319,25 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
             </span>
           </div>
 
-          <div className="form-group form-group-compact">
-            <label>Priority (Eisenhower)</label>
-            <div className="quadrant-selector">
+          <div className={`form-group form-group-compact ${formData.estimatedMinutes && formData.estimatedMinutes <= 2 ? 'disabled-section' : ''}`}>
+            <label>
+              Priority (Eisenhower)
+              {formData.estimatedMinutes && formData.estimatedMinutes <= 2 && (
+                <span className="priority-disabled-hint"> — Skipped for quick tasks (≤2 min)</span>
+              )}
+            </label>
+            <div className={`quadrant-selector ${formData.estimatedMinutes && formData.estimatedMinutes <= 2 ? 'disabled' : ''}`}>
               {QUADRANTS.map(q => (
                 <button
                   key={q.id}
                   type="button"
                   className={`quadrant-option ${formData.quadrant === q.id ? 'selected' : ''}`}
-                  onClick={() => setFormData(prev => ({ ...prev, quadrant: q.id }))}
+                  onClick={() => {
+                    if (!(formData.estimatedMinutes && formData.estimatedMinutes <= 2)) {
+                      setFormData(prev => ({ ...prev, quadrant: q.id }));
+                    }
+                  }}
+                  disabled={formData.estimatedMinutes && formData.estimatedMinutes <= 2}
                   style={{ '--q-color': q.color }}
                 >
                   <span className="q-label">{q.label}</span>

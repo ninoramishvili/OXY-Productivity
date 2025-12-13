@@ -211,6 +211,75 @@
   background: rgba(255, 127, 80, 0.05);
 }
 
+.total-time {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  margin-left: 8px;
+}
+
+.quick-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: transparent;
+  border: 2px solid var(--border-primary);
+  color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.quick-checkbox:hover {
+  border-color: #4ECB71;
+}
+
+.quick-checkbox.checked {
+  background: #4ECB71;
+  border-color: #4ECB71;
+  color: white;
+}
+
+.quick-task-card.completed {
+  opacity: 0.6;
+}
+
+.quick-task-title.completed {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.quick-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-delete-btn:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.empty-quick-wins {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  padding: 16px;
+  font-style: italic;
+}
+
 .btn-add-task {
   background: var(--gradient-primary);
   color: white;
