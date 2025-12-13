@@ -19,6 +19,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
     quadrant: 'doFirst',
     tagIds: [],
     scheduledDate: '',
+    scheduledTime: '',
     estimatedMinutes: ''
   });
   const [errors, setErrors] = useState({});
@@ -44,12 +45,18 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
       if (task.scheduled_date) {
         scheduledDate = task.scheduled_date.split('T')[0];
       }
+      // Get scheduled_time in HH:MM format
+      let scheduledTime = '';
+      if (task.scheduled_time) {
+        scheduledTime = task.scheduled_time.substring(0, 5); // "HH:MM:SS" -> "HH:MM"
+      }
       setFormData({
         title: task.title || '',
         description: task.description || '',
         quadrant: quadrant,
         tagIds: initialTagIds,
         scheduledDate: scheduledDate,
+        scheduledTime: scheduledTime,
         estimatedMinutes: task.estimated_minutes || ''
       });
     } else {
@@ -59,6 +66,7 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
         quadrant: 'doFirst',
         tagIds: [],
         scheduledDate: defaultDate || '',
+        scheduledTime: '',
         estimatedMinutes: ''
       });
     }
@@ -263,9 +271,9 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
 
           <div className="form-group form-group-compact">
             <label htmlFor="scheduledDate">
-              📅 Schedule Date (optional)
+              📅 Schedule Date & Time (optional)
             </label>
-            <div className="date-input-row">
+            <div className="date-time-input-row">
               <input
                 type="date"
                 id="scheduledDate"
@@ -274,19 +282,29 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
                 onChange={handleChange}
                 className="date-input"
               />
+              <input
+                type="time"
+                id="scheduledTime"
+                name="scheduledTime"
+                value={formData.scheduledTime}
+                onChange={handleChange}
+                className="time-input"
+                disabled={!formData.scheduledDate}
+                title={formData.scheduledDate ? "Set time block (Parkinson's Law)" : "Set date first"}
+              />
               {formData.scheduledDate && (
                 <button
                   type="button"
                   className="btn-clear-date"
-                  onClick={() => setFormData(prev => ({ ...prev, scheduledDate: '' }))}
+                  onClick={() => setFormData(prev => ({ ...prev, scheduledDate: '', scheduledTime: '' }))}
                   title="Clear date (moves task to To Do)"
                 >
-                  ✕ Clear
+                  ✕
                 </button>
               )}
             </div>
             <span className="field-hint">
-              Leave empty for To Do & Eisenhower. Set date for Day View.
+              ⏰ Set a specific time to create a time block (Parkinson's Law - deadlines boost focus!)
             </span>
           </div>
 

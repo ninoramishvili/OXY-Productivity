@@ -22,7 +22,9 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
-  Calendar
+  Calendar,
+  List,
+  LayoutGrid
 } from 'lucide-react';
 import {
   DndContext,
@@ -243,6 +245,7 @@ function Home({ user }) {
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, taskId: null });
   const [resetPomodoroConfirm, setResetPomodoroConfirm] = useState({ isOpen: false, taskId: null });
   const [sortBy, setSortBy] = useState('manual');
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
   const [showCelebration, setShowCelebration] = useState(false);
   const [activePomodoroTask, setActivePomodoroTask] = useState(null);
   const [showPomodoroComplete, setShowPomodoroComplete] = useState(false);
@@ -446,6 +449,38 @@ function Home({ user }) {
       .reduce((sum, task) => sum + (task.estimated_minutes || 0), 0);
   };
 
+  // Generate hourly time slots for the calendar view (6 AM to 10 PM)
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 6; hour <= 22; hour++) {
+      slots.push({
+        hour,
+        label: `${hour.toString().padStart(2, '0')}:00`,
+        displayLabel: hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`
+      });
+    }
+    return slots;
+  };
+
+  // Get tasks scheduled for a specific hour
+  const getTasksForHour = (hour) => {
+    return getFilteredTasks().filter(task => {
+      if (!task.scheduled_time) return false;
+      const taskHour = parseInt(task.scheduled_time.split(':')[0], 10);
+      return taskHour === hour;
+    });
+  };
+
+  // Get tasks without a specific time (unscheduled within the day)
+  const getUntimedTasks = () => {
+    return getSortedTasks().filter(task => !task.scheduled_time);
+  };
+
+  // Get tasks with a specific time (time-blocked)
+  const getTimedTasks = () => {
+    return getSortedTasks().filter(task => task.scheduled_time);
+  };
+
   // Helper to get local date string (YYYY-MM-DD) without timezone shift
   const getLocalDateString = (date) => {
     const year = date.getFullYear();
@@ -485,7 +520,8 @@ function Home({ user }) {
         // Create new task - use scheduledDate from form (can be empty for To Do/Eisenhower)
         const createData = {
           ...taskData,
-          scheduledDate: taskData.scheduledDate || null
+          scheduledDate: taskData.scheduledDate || null,
+          scheduledTime: taskData.scheduledTime || null
         };
         const response = await tasksAPI.createTask(createData);
         if (response.success) {
@@ -913,47 +949,155 @@ function Home({ user }) {
             )}
           </div>
 
-          {/* Tasks List */}
+          {/* Tasks Section with View Toggle */}
           <div className="tasks-section">
             <div className="section-header">
               <h2><CheckSquare size={20} /> Tasks ({sortedTasks.length})</h2>
+              <div className="view-toggle">
+                <button 
+                  className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                  onClick={() => setViewMode('list')}
+                  title="List View"
+                >
+                  <List size={18} />
+                </button>
+                <button 
+                  className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
+                  onClick={() => setViewMode('calendar')}
+                  title="Time Blocks (Parkinson's Law)"
+                >
+                  <LayoutGrid size={18} />
+                </button>
+              </div>
             </div>
             
-            {sortedTasks.length === 0 ? (
-              <div className="empty-state">
-                <Sparkles size={48} />
-                <h3>No tasks for {isToday(selectedDate) ? 'today' : 'this day'}</h3>
-                <p>Add a task to get started!</p>
-              </div>
-            ) : (
-              <DndContext 
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext 
-                  items={sortedTasks.map(t => t.id)}
-                  strategy={verticalListSortingStrategy}
+            {viewMode === 'list' ? (
+              // List View
+              sortedTasks.length === 0 ? (
+                <div className="empty-state">
+                  <Sparkles size={48} />
+                  <h3>No tasks for {isToday(selectedDate) ? 'today' : 'this day'}</h3>
+                  <p>Add a task to get started!</p>
+                </div>
+              ) : (
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
                 >
-                  <div className="tasks-list">
-                    {sortedTasks.map(task => (
-                      <SortableTaskCard
-                        key={task.id}
-                        task={task}
-                        isHighlight={highlightedTask?.id === task.id}
-                        isFrog={frogTask?.id === task.id}
-                        onToggleComplete={handleToggleComplete}
-                        onEditTask={handleEditTask}
-                        onDeleteTask={handleDeleteTask}
-                        onToggleHighlight={handleToggleHighlight}
-                        onToggleFrog={handleToggleFrog}
-                        onStartPomodoro={handleStartPomodoro}
-                        onResetPomodoro={handleResetPomodoro}
-                      />
-                    ))}
+                  <SortableContext 
+                    items={sortedTasks.map(t => t.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="tasks-list">
+                      {sortedTasks.map(task => (
+                        <SortableTaskCard
+                          key={task.id}
+                          task={task}
+                          isHighlight={highlightedTask?.id === task.id}
+                          isFrog={frogTask?.id === task.id}
+                          onToggleComplete={handleToggleComplete}
+                          onEditTask={handleEditTask}
+                          onDeleteTask={handleDeleteTask}
+                          onToggleHighlight={handleToggleHighlight}
+                          onToggleFrog={handleToggleFrog}
+                          onStartPomodoro={handleStartPomodoro}
+                          onResetPomodoro={handleResetPomodoro}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              )
+            ) : (
+              // Calendar/Time Block View (Parkinson's Law)
+              <div className="time-block-view">
+                <div className="parkinson-tip">
+                  <span className="tip-icon">⏰</span>
+                  <span className="tip-text">
+                    <strong>Parkinson's Law:</strong> Work expands to fill the time available. 
+                    Set specific time slots to create natural deadlines!
+                  </span>
+                </div>
+                
+                {/* Untimed tasks section */}
+                {getUntimedTasks().length > 0 && (
+                  <div className="untimed-tasks">
+                    <h4>📋 Unscheduled ({getUntimedTasks().length})</h4>
+                    <p className="untimed-hint">Drag to a time slot or edit to set a time</p>
+                    <div className="untimed-list">
+                      {getUntimedTasks().map(task => (
+                        <div 
+                          key={task.id} 
+                          className={`time-block-task untimed ${task.completed ? 'completed' : ''}`}
+                          onClick={() => handleEditTask(task)}
+                        >
+                          <span className="task-time-badge">No time</span>
+                          <span className="task-name">{task.title}</span>
+                          {task.estimated_minutes && (
+                            <span className="task-duration">{task.estimated_minutes}m</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </SortableContext>
-              </DndContext>
+                )}
+
+                {/* Hourly time slots */}
+                <div className="time-slots">
+                  {generateTimeSlots().map(slot => {
+                    const slotTasks = getTasksForHour(slot.hour);
+                    const isCurrentHour = new Date().getHours() === slot.hour && isToday(selectedDate);
+                    
+                    return (
+                      <div 
+                        key={slot.hour} 
+                        className={`time-slot ${isCurrentHour ? 'current-hour' : ''} ${slotTasks.length > 0 ? 'has-tasks' : ''}`}
+                      >
+                        <div className="slot-time">
+                          {slot.displayLabel}
+                        </div>
+                        <div className="slot-content">
+                          {slotTasks.length > 0 ? (
+                            slotTasks.map(task => (
+                              <div 
+                                key={task.id}
+                                className={`time-block-task ${task.completed ? 'completed' : ''}`}
+                                style={{
+                                  height: task.estimated_minutes ? `${Math.max(40, task.estimated_minutes * 1.5)}px` : '40px'
+                                }}
+                                onClick={() => handleEditTask(task)}
+                              >
+                                <div className="task-block-header">
+                                  <button 
+                                    className={`mini-checkbox ${task.completed ? 'checked' : ''}`}
+                                    onClick={(e) => { e.stopPropagation(); handleToggleComplete(task); }}
+                                  >
+                                    {task.completed && <Check size={12} />}
+                                  </button>
+                                  <span className={`task-name ${task.completed ? 'completed' : ''}`}>
+                                    {task.title}
+                                  </span>
+                                </div>
+                                {task.estimated_minutes && (
+                                  <span className="task-duration">{task.estimated_minutes}m</span>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="empty-slot" onClick={() => {
+                              setEditingTask({ scheduled_time: `${slot.label}:00` });
+                              setIsModalOpen(true);
+                            }}>
+                              <Plus size={14} /> Add task
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -990,6 +1134,25 @@ function Home({ user }) {
               <span className="legend-item accurate">✅ On time</span>
               <span className="legend-item slightly-over">📊 Slightly over</span>
               <span className="legend-item over">💡 Under-estimated</span>
+            </div>
+          </div>
+
+          {/* Parkinson's Law Educational Tip */}
+          <div className="technique-tip parkinson-law-tip">
+            <div className="tip-header">
+              <span className="tip-icon">⏰</span>
+              <span className="tip-title">Parkinson's Law</span>
+            </div>
+            <p className="tip-description">
+              Work expands to fill available time. Set specific time blocks to create natural deadlines and boost focus!
+            </p>
+            <div className="tip-action">
+              <button 
+                className="btn-try-technique"
+                onClick={() => setViewMode('calendar')}
+              >
+                <LayoutGrid size={14} /> Try Time Blocks
+              </button>
             </div>
           </div>
         </div>

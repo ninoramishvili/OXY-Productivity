@@ -545,6 +545,9 @@
 }
 
 .tasks-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
 }
 
@@ -555,10 +558,261 @@
   gap: 8px;
 }
 
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-secondary);
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.view-btn.active {
+  background: var(--gradient-primary);
+  color: white;
+}
+
 .tasks-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* ============================================
+   TIME BLOCK VIEW (Parkinson's Law)
+   ============================================ */
+.time-block-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.parkinson-tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(0, 206, 209, 0.08));
+  border-radius: 12px;
+  border-left: 4px solid #3b82f6;
+}
+
+.parkinson-tip .tip-icon {
+  font-size: 20px;
+}
+
+.parkinson-tip .tip-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.parkinson-tip .tip-text strong {
+  color: var(--text-primary);
+}
+
+/* Untimed tasks section */
+.untimed-tasks {
+  background: rgba(255, 127, 80, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px dashed rgba(255, 127, 80, 0.3);
+}
+
+.untimed-tasks h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.untimed-hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 0 0 10px 0;
+}
+
+.untimed-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Time slots */
+.time-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.time-slot {
+  display: flex;
+  min-height: 50px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  transition: all 0.2s ease;
+}
+
+.time-slot:hover {
+  background: var(--bg-tertiary);
+}
+
+.time-slot.current-hour {
+  background: rgba(255, 127, 80, 0.08);
+  border: 1px solid rgba(255, 127, 80, 0.3);
+}
+
+.time-slot.has-tasks {
+  background: rgba(78, 203, 113, 0.05);
+}
+
+.slot-time {
+  width: 70px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  border-right: 2px solid var(--border-primary);
+  flex-shrink: 0;
+}
+
+.time-slot.current-hour .slot-time {
+  color: var(--color-coral);
+}
+
+.slot-content {
+  flex: 1;
+  padding: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Time block task */
+.time-block-task {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+}
+
+.time-block-task:hover {
+  border-color: var(--color-coral);
+  box-shadow: 0 2px 8px rgba(255, 127, 80, 0.15);
+}
+
+.time-block-task.completed {
+  opacity: 0.5;
+}
+
+.time-block-task.untimed {
+  background: var(--bg-tertiary);
+  border-style: dashed;
+}
+
+.task-block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.mini-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid var(--border-primary);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: transparent;
+  flex-shrink: 0;
+}
+
+.mini-checkbox:hover {
+  border-color: #4ECB71;
+}
+
+.mini-checkbox.checked {
+  background: #4ECB71;
+  border-color: #4ECB71;
+  color: white;
+}
+
+.time-block-task .task-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.time-block-task .task-name.completed {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.task-time-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  background: rgba(255, 127, 80, 0.15);
+  color: var(--color-coral);
+  border-radius: 4px;
+}
+
+.task-duration {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  background: rgba(78, 203, 113, 0.15);
+  color: #4ECB71;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+.empty-slot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.empty-slot:hover {
+  background: var(--bg-card);
+  color: var(--color-coral);
 }
 
 .empty-state {
@@ -708,6 +962,34 @@
 
 .planning-fallacy-tip {
   border-left: 3px solid #3b82f6;
+}
+
+.parkinson-law-tip {
+  border-left: 3px solid var(--color-coral);
+}
+
+.tip-action {
+  margin-top: 8px;
+}
+
+.btn-try-technique {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-try-technique:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
 }
 
 /* ============================================
