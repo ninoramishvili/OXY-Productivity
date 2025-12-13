@@ -1067,14 +1067,6 @@ function Home({ user }) {
             ) : (
               // Calendar/Time Block View (Parkinson's Law)
               <div className="time-block-view">
-                <div className="parkinson-tip">
-                  <span className="tip-icon">⏰</span>
-                  <span className="tip-text">
-                    <strong>Parkinson's Law:</strong> Work expands to fill the time available. 
-                    Set specific time slots to create natural deadlines!
-                  </span>
-                </div>
-
                 {/* Quick Navigation Bar */}
                 <div className="time-nav-bar">
                   <button className="time-nav-btn" onClick={() => scrollToTime(6)}>
