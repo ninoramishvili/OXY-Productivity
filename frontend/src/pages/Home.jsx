@@ -1069,26 +1069,45 @@ function Home({ user }) {
                           {slot.displayLabel}
                         </div>
                         <div className="slot-content">
-                          {slotTasks.map(task => (
-                            <div 
-                              key={task.id}
-                              className={`time-block-task ${task.completed ? 'completed' : ''}`}
-                              onClick={() => handleEditTask(task)}
-                            >
-                              <button 
-                                className={`mini-checkbox ${task.completed ? 'checked' : ''}`}
-                                onClick={(e) => { e.stopPropagation(); handleToggleComplete(task); }}
+                          {slotTasks.map(task => {
+                            // Calculate height based on duration (44px per 30 min slot)
+                            const duration = task.estimated_minutes || 30;
+                            const slotsSpan = Math.ceil(duration / 30);
+                            const taskHeight = slotsSpan * 44 - 8; // 44px per slot minus padding
+                            
+                            return (
+                              <div 
+                                key={task.id}
+                                className={`calendar-task-card ${task.completed ? 'completed' : ''}`}
+                                style={{ height: `${taskHeight}px` }}
+                                onClick={() => handleEditTask(task)}
                               >
-                                {task.completed && <Check size={12} />}
-                              </button>
-                              <span className={`task-name ${task.completed ? 'completed' : ''}`}>
-                                {task.title}
-                              </span>
-                              {task.estimated_minutes && (
-                                <span className="task-duration">{task.estimated_minutes}m</span>
-                              )}
-                            </div>
-                          ))}
+                                <div className="calendar-task-header">
+                                  <button 
+                                    className={`task-checkbox ${task.completed ? 'checked' : ''}`}
+                                    onClick={(e) => { e.stopPropagation(); handleToggleComplete(task); }}
+                                  >
+                                    {task.completed && <Check size={14} />}
+                                  </button>
+                                  <span className={`task-title ${task.completed ? 'completed' : ''}`}>
+                                    {task.title}
+                                  </span>
+                                </div>
+                                <div className="calendar-task-meta">
+                                  {task.estimated_minutes && (
+                                    <span className="task-duration-badge">{task.estimated_minutes}m</span>
+                                  )}
+                                  <button 
+                                    className="task-delete-btn"
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteTask(task.id); }}
+                                    title="Delete task"
+                                  >
+                                    <Trash2 size={12} />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
                           <button 
                             className="add-to-slot-btn"
                             onClick={() => {
