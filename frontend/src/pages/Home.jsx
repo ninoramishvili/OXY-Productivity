@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { tasksAPI, tagsAPI, pomodoroAPI } from '../utils/api';
 import TaskModal from '../components/TaskModal';
 import ConfirmModal from '../components/ConfirmModal';
@@ -179,6 +180,19 @@ function SortableTaskCard({ task, isHighlight, isFrog, onToggleComplete, onEditT
 }
 
 function Home({ user }) {
+  const [searchParams] = useSearchParams();
+  
+  // Parse date from URL or use today
+  const getInitialDate = () => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      // Parse YYYY-MM-DD format
+      const [year, month, day] = dateParam.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+    return new Date();
+  };
+
   const [tasks, setTasks] = useState([]);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -195,7 +209,7 @@ function Home({ user }) {
   const [showFloatingTimer, setShowFloatingTimer] = useState(false);
   const [showHighlightCelebration, setShowHighlightCelebration] = useState(false);
   const [showFrogCelebration, setShowFrogCelebration] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(getInitialDate);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -204,6 +218,15 @@ function Home({ user }) {
       },
     })
   );
+
+  // Update selectedDate when URL parameter changes
+  useEffect(() => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      const [year, month, day] = dateParam.split('-').map(Number);
+      setSelectedDate(new Date(year, month - 1, day));
+    }
+  }, [searchParams]);
 
   // Load tasks and tags on mount
   useEffect(() => {
