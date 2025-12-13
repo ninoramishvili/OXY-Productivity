@@ -764,11 +764,28 @@
   transition: all 0.2s ease;
   flex-shrink: 0;
   overflow: hidden;
+  /* Solid background to hide slot lines behind */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 5;
+}
+
+/* Theme-specific solid backgrounds */
+:root[data-theme="dark"] .calendar-task-card {
+  background: #1e293b;
+}
+
+:root[data-theme="light"] .calendar-task-card {
+  background: #ffffff;
+}
+
+:root[data-theme="oxy"] .calendar-task-card {
+  background: #fafbfc;
 }
 
 .calendar-task-card:hover {
   border-color: var(--color-coral);
-  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.2);
 }
 
 .calendar-task-card.completed {
