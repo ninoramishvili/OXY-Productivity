@@ -190,24 +190,7 @@ function Weekly() {
     })
   );
 
-  // Load tasks and tags when component mounts or week changes
-  useEffect(() => {
-    loadTasks();
-    loadTags();
-  }, [weekStart]);
-
-  // Keyboard shortcut for adding task
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'n') {
-        e.preventDefault();
-        handleAddTask(today);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [today]);
-
+  // Define load functions first
   const loadTasks = async () => {
     try {
       const response = await tasksAPI.getTasks();
@@ -231,6 +214,31 @@ function Weekly() {
       console.error('Failed to load tags:', err);
     }
   };
+
+  // Load tasks and tags when component mounts
+  useEffect(() => {
+    loadTasks();
+    loadTags();
+  }, []);
+
+  // Reload tasks when week changes
+  useEffect(() => {
+    if (weekStart) {
+      loadTasks();
+    }
+  }, [weekStart]);
+
+  // Keyboard shortcut for adding task
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        handleAddTask(today);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [today]);
 
   const showSuccess = (message) => {
     setSuccessMessage(message);
