@@ -22,6 +22,7 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Calendar,
   List,
   LayoutGrid
@@ -249,6 +250,10 @@ function Home({ user }) {
   const [showCelebration, setShowCelebration] = useState(false);
   const [activePomodoroTask, setActivePomodoroTask] = useState(null);
   const [showPomodoroComplete, setShowPomodoroComplete] = useState(false);
+  // Collapsible sections
+  const [focusSectionOpen, setFocusSectionOpen] = useState(true);
+  const [quickWinsOpen, setQuickWinsOpen] = useState(true);
+  const [tasksSectionOpen, setTasksSectionOpen] = useState(true);
   const [showFloatingTimer, setShowFloatingTimer] = useState(false);
   const [showHighlightCelebration, setShowHighlightCelebration] = useState(false);
   const [showFrogCelebration, setShowFrogCelebration] = useState(false);
@@ -851,11 +856,20 @@ function Home({ user }) {
         {/* Left Column - Tasks */}
         <div className="tasks-column">
           {/* Focus Sections Row - Highlight & Frog Side by Side */}
+          <div className={`collapsible-section ${focusSectionOpen ? 'open' : 'closed'}`}>
+            <button 
+              className="section-toggle-btn"
+              onClick={() => setFocusSectionOpen(!focusSectionOpen)}
+            >
+              <ChevronDown className={`toggle-icon ${focusSectionOpen ? 'open' : ''}`} size={18} />
+              <span>Focus</span>
+            </button>
+            {focusSectionOpen && (
           <div className="focus-sections-row">
             {/* Daily Highlight Section */}
             <div className="highlight-section compact">
               <div className="section-header">
-                <h2><span className="section-icon">✨</span> Daily Highlight</h2>
+                <h2><span className="section-icon">✨</span> Highlight</h2>
               </div>
               {highlightedTask ? (
                 <div className={`highlight-card compact ${highlightedTask.completed ? 'completed' : ''}`}>
@@ -926,20 +940,23 @@ function Home({ user }) {
               )}
             </div>
           </div>
+            )}
+          </div>
 
-          {/* Quick Wins Section - 2-Minute Rule */}
-          {/* Quick Wins Section - Always visible */}
+          {/* Quick Wins Section - Collapsible */}
+          <div className={`collapsible-section ${quickWinsOpen ? 'open' : 'closed'}`}>
+            <button 
+              className="section-toggle-btn"
+              onClick={() => setQuickWinsOpen(!quickWinsOpen)}
+            >
+              <ChevronDown className={`toggle-icon ${quickWinsOpen ? 'open' : ''}`} size={18} />
+              <span>Quick Wins ({quickTasks.length})</span>
+              {getQuickTasksTotalMinutes() > 0 && (
+                <span className="toggle-meta">{getQuickTasksTotalMinutes()}m</span>
+              )}
+            </button>
+            {quickWinsOpen && (
           <div className="quick-wins-section">
-            <div className="section-header">
-              <h2>
-                <span className="section-icon">⚡</span> 
-                Quick Wins ({quickTasks.length})
-                {getQuickTasksTotalMinutes() > 0 && (
-                  <span className="total-time">• {getQuickTasksTotalMinutes()}m total</span>
-                )}
-              </h2>
-              <span className="section-hint">Tasks ≤2 min — do them now!</span>
-            </div>
             {quickTasks.length > 0 ? (
               <div className="quick-wins-list">
                 {quickTasks.map(task => (
@@ -976,25 +993,35 @@ function Home({ user }) {
               <p className="empty-quick-wins">No quick tasks yet. Add a task with ≤2 min estimate!</p>
             )}
           </div>
+            )}
+          </div>
 
-          {/* Tasks Section with View Toggle */}
+          {/* Tasks Section - Collapsible */}
+          <div className={`collapsible-section ${tasksSectionOpen ? 'open' : 'closed'}`}>
+            <button 
+              className="section-toggle-btn"
+              onClick={() => setTasksSectionOpen(!tasksSectionOpen)}
+            >
+              <ChevronDown className={`toggle-icon ${tasksSectionOpen ? 'open' : ''}`} size={18} />
+              <span>Tasks ({sortedTasks.length})</span>
+            </button>
+            {tasksSectionOpen && (
           <div className="tasks-section">
-            <div className="section-header">
-              <h2><CheckSquare size={20} /> Tasks ({sortedTasks.length})</h2>
+            <div className="section-header compact">
               <div className="view-toggle">
                 <button 
                   className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
                   onClick={() => setViewMode('list')}
                   title="List View"
                 >
-                  <List size={18} />
+                  <List size={16} /> List
                 </button>
                 <button 
                   className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
                   onClick={() => setViewMode('calendar')}
                   title="Time Blocks (Parkinson's Law)"
                 >
-                  <LayoutGrid size={18} />
+                  <LayoutGrid size={16} /> Calendar
                 </button>
               </div>
             </div>
@@ -1050,40 +1077,29 @@ function Home({ user }) {
 
                 {/* Quick Navigation Bar */}
                 <div className="time-nav-bar">
-                  <button 
-                    className="time-nav-btn" 
-                    onClick={() => scrollToTime(6)}
-                    title="Jump to 6:00"
-                  >
-                    🌅 Morning
+                  <button className="time-nav-btn" onClick={() => scrollToTime(6)}>
+                    06:00
                   </button>
-                  <button 
-                    className="time-nav-btn" 
-                    onClick={() => scrollToTime(12)}
-                    title="Jump to 12:00"
-                  >
-                    ☀️ Noon
+                  <button className="time-nav-btn" onClick={() => scrollToTime(9)}>
+                    09:00
                   </button>
-                  <button 
-                    className="time-nav-btn" 
-                    onClick={() => scrollToTime(17)}
-                    title="Jump to 17:00"
-                  >
-                    🌆 Evening
+                  <button className="time-nav-btn" onClick={() => scrollToTime(12)}>
+                    12:00
                   </button>
-                  <button 
-                    className="time-nav-btn" 
-                    onClick={() => scrollToTime(21)}
-                    title="Jump to 21:00"
-                  >
-                    🌙 Night
+                  <button className="time-nav-btn" onClick={() => scrollToTime(15)}>
+                    15:00
+                  </button>
+                  <button className="time-nav-btn" onClick={() => scrollToTime(18)}>
+                    18:00
+                  </button>
+                  <button className="time-nav-btn" onClick={() => scrollToTime(21)}>
+                    21:00
                   </button>
                   <button 
                     className="time-nav-btn now" 
                     onClick={() => scrollToTime(new Date().getHours())}
-                    title="Jump to current time"
                   >
-                    ⏰ Now
+                    Now
                   </button>
                 </div>
                 
@@ -1187,6 +1203,8 @@ function Home({ user }) {
                   })}
                 </div>
               </div>
+            )}
+          </div>
             )}
           </div>
         </div>
