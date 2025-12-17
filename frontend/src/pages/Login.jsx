@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { authAPI } from '../utils/api';
 import ThemeSelector from '../components/ThemeSelector';
 import './Login.css';
@@ -96,6 +97,9 @@ function Login({ onLogin }) {
         <div className="login-footer">
           <p className="demo-info">
             <strong>Demo Account:</strong> demo@example.com / demo123
+          </p>
+          <p className="register-link">
+            Don't have an account? <Link to="/register">Create Account</Link>
           </p>
         </div>
       </div>

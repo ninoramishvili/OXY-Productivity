@@ -1,6 +1,6 @@
-/* OXY Productivity - Login Page with Theme Support */
+/* OXY Productivity - Register Page with Theme Support */
 
-.login-container {
+.register-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -11,35 +11,35 @@
   overflow: hidden;
 }
 
-.login-container::before {
+.register-container::before {
   content: '';
   position: absolute;
   width: 500px;
   height: 500px;
-  background: var(--ambient-coral);
+  background: var(--ambient-teal);
   top: -200px;
-  right: -200px;
+  left: -200px;
   border-radius: 50%;
 }
 
-.login-container::after {
+.register-container::after {
   content: '';
   position: absolute;
   width: 600px;
   height: 600px;
-  background: var(--ambient-teal);
+  background: var(--ambient-coral);
   bottom: -250px;
-  left: -250px;
+  right: -250px;
   border-radius: 50%;
 }
 
-.login-card {
+.register-card {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   box-shadow: var(--shadow-md), 
-              0 0 80px rgba(255, 127, 80, 0.1),
+              0 0 80px rgba(0, 206, 209, 0.1),
               inset 0 0 60px rgba(255, 255, 255, 0.02);
   padding: 48px;
   width: 100%;
@@ -49,14 +49,14 @@
   z-index: 1;
 }
 
-.login-card::before {
+.register-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--gradient-secondary);
+  background: var(--gradient-primary);
   border-radius: 24px 24px 0 0;
 }
 
@@ -71,24 +71,24 @@
   }
 }
 
-.brand-logo {
+.register-card .brand-logo {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
-.logo-icon {
+.register-card .logo-icon {
   font-size: 56px;
   font-weight: 800;
-  background: var(--gradient-secondary);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: 4px;
   margin-bottom: 8px;
-  text-shadow: 0 0 40px rgba(255, 127, 80, 0.3);
+  text-shadow: 0 0 40px rgba(0, 206, 209, 0.3);
 }
 
-.logo-text {
+.register-card .logo-text {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -96,12 +96,12 @@
   text-transform: uppercase;
 }
 
-.login-header {
+.register-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
-.login-header h1 {
+.register-header h1 {
   font-size: 32px;
   font-weight: 700;
   color: var(--text-primary);
@@ -109,25 +109,25 @@
   letter-spacing: -0.5px;
 }
 
-.login-header p {
+.register-header p {
   font-size: 16px;
   color: var(--text-secondary);
   font-weight: 400;
 }
 
-.login-form {
+.register-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-.form-group {
+.register-form .form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.form-group label {
+.register-form .form-group label {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -135,7 +135,7 @@
   letter-spacing: 1px;
 }
 
-.form-group input {
+.register-form .form-group input {
   padding: 16px 18px;
   border: 1px solid var(--border-primary);
   border-radius: 12px;
@@ -146,25 +146,25 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.form-group input:focus {
+.register-form .form-group input:focus {
   outline: none;
-  border-color: rgba(255, 127, 80, 0.5);
+  border-color: rgba(0, 206, 209, 0.5);
   background: var(--bg-input-focus);
-  box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.15),
-              0 0 20px rgba(255, 127, 80, 0.2);
+  box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.15),
+              0 0 20px rgba(0, 206, 209, 0.2);
   transform: translateY(-1px);
 }
 
-.form-group input:disabled {
+.register-form .form-group input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.form-group input::placeholder {
+.register-form .form-group input::placeholder {
   color: var(--text-muted);
 }
 
-.error-message {
+.register-form .error-message {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #ff6b6b;
@@ -175,7 +175,7 @@
   backdrop-filter: blur(10px);
 }
 
-.login-button {
+.register-button {
   background: var(--gradient-primary);
   color: white;
   padding: 16px;
@@ -189,12 +189,12 @@
   margin-top: 8px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(255, 127, 80, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 206, 209, 0.4);
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 
-.login-button::before {
+.register-button::before {
   content: '';
   position: absolute;
   top: 0;
@@ -205,90 +205,52 @@
   transition: left 0.5s;
 }
 
-.login-button:hover:not(:disabled)::before {
+.register-button:hover:not(:disabled)::before {
   left: 100%;
 }
 
-.login-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #FF6347 0%, #FF4500 100%);
-  box-shadow: 0 8px 25px rgba(255, 127, 80, 0.5),
-              0 0 40px rgba(255, 127, 80, 0.3);
+.register-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #00B8BA 0%, #009999 100%);
+  box-shadow: 0 8px 25px rgba(0, 206, 209, 0.5),
+              0 0 40px rgba(0, 206, 209, 0.3);
   transform: translateY(-2px);
 }
 
-.login-button:active:not(:disabled) {
+.register-button:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.login-button:disabled {
+.register-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.demo-button {
-  background: rgba(0, 206, 209, 0.1);
-  color: var(--color-teal);
-  padding: 12px;
-  border: 1px solid rgba(0, 206, 209, 0.3);
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-}
-
-.demo-button:hover:not(:disabled) {
-  background: rgba(0, 206, 209, 0.2);
-  border-color: rgba(0, 206, 209, 0.5);
-  box-shadow: var(--shadow-glow-teal);
-  transform: translateY(-1px);
-}
-
-.demo-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.login-footer {
+.register-footer {
   margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid var(--border-secondary);
   text-align: center;
 }
 
-.demo-info {
-  font-size: 13px;
-  color: var(--text-tertiary);
-  line-height: 1.6;
-}
-
-.demo-info strong {
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.register-link {
-  margin-top: 16px;
+.login-link {
   font-size: 14px;
   color: var(--text-secondary);
 }
 
-.register-link a {
-  color: var(--color-coral);
+.login-link a {
+  color: var(--color-teal);
   text-decoration: none;
   font-weight: 600;
   transition: all 0.2s ease;
 }
 
-.register-link a:hover {
-  color: var(--color-teal);
+.login-link a:hover {
+  color: var(--color-coral);
   text-decoration: underline;
 }
 
-/* Theme Selector on Login Page */
-.login-theme-selector {
+/* Theme Selector on Register Page */
+.register-theme-selector {
   position: fixed;
   top: 24px;
   right: 24px;
@@ -298,17 +260,18 @@
 
 /* Responsive */
 @media (max-width: 480px) {
-  .login-card {
+  .register-card {
     padding: 32px 24px;
   }
 
-  .login-header h1 {
+  .register-header h1 {
     font-size: 28px;
   }
   
-  .login-theme-selector {
+  .register-theme-selector {
     width: 180px;
     top: 16px;
     right: 16px;
   }
 }
+

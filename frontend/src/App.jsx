@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Home from './pages/Home';
 import Backlog from './pages/Backlog';
 import Eisenhower from './pages/Eisenhower';
@@ -37,6 +38,13 @@ function App() {
     setIsAuthenticated(false);
   };
 
+  const handleRegister = (userData, token) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    setIsAuthenticated(true);
+  };
+
   return (
     <Router>
       <Routes>
@@ -46,6 +54,14 @@ function App() {
             isAuthenticated ? 
             <Navigate to="/home" /> : 
             <Login onLogin={handleLogin} />
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            isAuthenticated ? 
+            <Navigate to="/home" /> : 
+            <Register onRegister={handleRegister} />
           } 
         />
         <Route 
