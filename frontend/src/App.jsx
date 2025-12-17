@@ -13,10 +13,16 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Check if user is already logged in (token in localStorage)
+  // Check if user is already logged in (token in localStorage or sessionStorage)
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+    // Check localStorage first (remember me), then sessionStorage
+    let token = localStorage.getItem('token');
+    let userData = localStorage.getItem('user');
+    
+    if (!token) {
+      token = sessionStorage.getItem('token');
+      userData = sessionStorage.getItem('user');
+    }
     
     if (token && userData) {
       setIsAuthenticated(true);
@@ -24,23 +30,36 @@ function App() {
     }
   }, []);
 
-  const handleLogin = (userData, token) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const handleLogin = (userData, token, rememberMe = false) => {
+    // Use localStorage for "remember me", sessionStorage otherwise
+    const storage = rememberMe ? localStorage : sessionStorage;
+    
+    // Clear both storages first to avoid conflicts
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    
+    storage.setItem('token', token);
+    storage.setItem('user', JSON.stringify(userData));
     setUser(userData);
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
+    // Clear both storages
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     setUser(null);
     setIsAuthenticated(false);
   };
 
   const handleRegister = (userData, token) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+    // New registrations use sessionStorage by default
+    sessionStorage.setItem('token', token);
+    sessionStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
     setIsAuthenticated(true);
   };

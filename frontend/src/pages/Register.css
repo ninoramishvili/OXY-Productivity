@@ -164,6 +164,40 @@
   color: var(--text-muted);
 }
 
+/* Password Input Wrapper */
+.register-form .password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.register-form .password-input-wrapper input {
+  width: 100%;
+  padding-right: 48px;
+}
+
+.register-form .password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.register-form .password-toggle:hover {
+  color: var(--text-primary);
+}
+
+.register-form .password-toggle:focus {
+  outline: none;
+}
+
 .register-form .error-message {
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.3);

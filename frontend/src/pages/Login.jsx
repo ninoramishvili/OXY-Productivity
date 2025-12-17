@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authAPI } from '../utils/api';
 import ThemeSelector from '../components/ThemeSelector';
+import { Eye, EyeOff } from 'lucide-react';
 import './Login.css';
 
 function Login({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +22,7 @@ function Login({ onLogin }) {
       const response = await authAPI.login(email, password);
       
       if (response.success) {
-        onLogin(response.user, response.token);
+        onLogin(response.user, response.token, rememberMe);
       } else {
         setError(response.message || 'Login failed');
       }
@@ -67,15 +70,38 @@ function Login({ onLogin }) {
 
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-              disabled={loading}
-            />
+            <div className="password-input-wrapper">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="remember-me-group">
+            <label className="remember-me-label">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                disabled={loading}
+              />
+              <span className="checkbox-custom"></span>
+              <span className="remember-me-text">Remember me</span>
+            </label>
           </div>
 
           {error && <div className="error-message">{error}</div>}
