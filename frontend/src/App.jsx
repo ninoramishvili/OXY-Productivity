@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Backlog from './pages/Backlog';
 import Eisenhower from './pages/Eisenhower';
 import Weekly from './pages/Weekly';
+import Analytics from './pages/Analytics';
 import Layout from './components/Layout';
 import './App.css';
 
@@ -119,6 +120,16 @@ function App() {
             isAuthenticated ? 
             <Layout user={user} onLogout={handleLogout}>
               <Weekly />
+            </Layout> : 
+            <Navigate to="/login" />
+          } 
+        />
+        <Route 
+          path="/analytics" 
+          element={
+            isAuthenticated ? 
+            <Layout user={user} onLogout={handleLogout}>
+              <Analytics />
             </Layout> : 
             <Navigate to="/login" />
           } 

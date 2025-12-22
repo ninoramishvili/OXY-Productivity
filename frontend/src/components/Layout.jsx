@@ -9,7 +9,8 @@ import {
   Grid3X3,
   Calendar,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  PieChart
 } from 'lucide-react';
 import './Layout.css';
 
@@ -76,7 +77,11 @@ function Layout({ user, onLogout, children }) {
             <Grid3X3 className="nav-icon" size={20} />
             {!sidebarCollapsed && <span>Eisenhower</span>}
           </button>
-          <button className="nav-item" title="Analytics">
+          <button 
+            onClick={() => navigate('/analytics')}
+            className={`nav-item ${isActive('/analytics') ? 'active' : ''}`}
+            title="Analytics"
+          >
             <BarChart3 className="nav-icon" size={20} />
             {!sidebarCollapsed && <span>Analytics</span>}
           </button>
