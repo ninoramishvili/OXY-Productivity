@@ -790,11 +790,11 @@
   border-radius: 4px;
 }
 
-/* Individual time slot row - Compact height */
+/* Individual time slot row - 1 hour height */
 .time-slot {
   display: flex;
-  min-height: 32px;
-  height: 32px;
+  min-height: 48px;
+  height: 48px;
   border-bottom: 1px solid var(--border-primary);
   transition: background 0.15s ease;
   position: relative;

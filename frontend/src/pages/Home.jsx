@@ -263,8 +263,8 @@ function Home({ user }) {
   // Quick navigation - scroll to specific time range
   const scrollToTime = (hour) => {
     if (timeSlotsRef.current) {
-      const slotHeight = 33; // 32px slot + 1px border
-      const scrollPosition = hour * 2 * slotHeight; // 2 slots per hour (30 min each)
+      const slotHeight = 49; // 48px slot + 1px border
+      const scrollPosition = hour * slotHeight; // 1 slot per hour
       timeSlotsRef.current.scrollTo({
         top: scrollPosition,
         behavior: 'smooth'
@@ -475,32 +475,30 @@ function Home({ user }) {
       .reduce((sum, task) => sum + (task.estimated_minutes || 0), 0);
   };
 
-  // Generate time slots for the calendar view (24 hours, 30-min intervals, 24h format)
+  // Generate time slots for the calendar view (24 hours, 1-hour intervals, 24h format)
   const generateTimeSlots = () => {
     const slots = [];
     for (let hour = 0; hour < 24; hour++) {
-      for (let min = 0; min < 60; min += 30) {
-        const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
-        
-        slots.push({
-          hour,
-          minute: min,
-          timeKey: `${hour}-${min}`,
-          label: timeStr,
-          displayLabel: timeStr // 24h format: "09:00", "14:30", etc.
-        });
-      }
+      const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+      
+      slots.push({
+        hour,
+        minute: 0,
+        timeKey: `${hour}`,
+        label: timeStr,
+        displayLabel: timeStr // 24h format: "09:00", "14:00", etc.
+      });
     }
     return slots;
   };
 
-  // Get tasks scheduled for a specific time slot (hour and minute)
-  const getTasksForSlot = (hour, minute) => {
+  // Get tasks scheduled for a specific time slot (hour)
+  const getTasksForSlot = (hour) => {
     return getFilteredTasks().filter(task => {
       if (!task.scheduled_time) return false;
-      const [taskHour, taskMin] = task.scheduled_time.split(':').map(Number);
-      // Match tasks that start in this 30-min slot
-      return taskHour === hour && taskMin >= minute && taskMin < minute + 30;
+      const [taskHour] = task.scheduled_time.split(':').map(Number);
+      // Match tasks that start in this hour
+      return taskHour === hour;
     });
   };
 
@@ -1067,34 +1065,6 @@ function Home({ user }) {
             ) : (
               // Calendar/Time Block View (Parkinson's Law)
               <div className="time-block-view">
-                {/* Quick Navigation Bar */}
-                <div className="time-nav-bar">
-                  <button className="time-nav-btn" onClick={() => scrollToTime(6)}>
-                    06:00
-                  </button>
-                  <button className="time-nav-btn" onClick={() => scrollToTime(9)}>
-                    09:00
-                  </button>
-                  <button className="time-nav-btn" onClick={() => scrollToTime(12)}>
-                    12:00
-                  </button>
-                  <button className="time-nav-btn" onClick={() => scrollToTime(15)}>
-                    15:00
-                  </button>
-                  <button className="time-nav-btn" onClick={() => scrollToTime(18)}>
-                    18:00
-                  </button>
-                  <button className="time-nav-btn" onClick={() => scrollToTime(21)}>
-                    21:00
-                  </button>
-                  <button 
-                    className="time-nav-btn now" 
-                    onClick={() => scrollToTime(new Date().getHours())}
-                  >
-                    Now
-                  </button>
-                </div>
-                
                 {/* Untimed tasks section */}
                 {getUntimedTasks().length > 0 && (
                   <div className="untimed-tasks">
@@ -1118,15 +1088,12 @@ function Home({ user }) {
                   </div>
                 )}
 
-                {/* 30-minute time slots */}
+                {/* 1-hour time slots */}
                 <div className="time-slots" ref={timeSlotsRef}>
                   {generateTimeSlots().map(slot => {
-                    const slotTasks = getTasksForSlot(slot.hour, slot.minute);
+                    const slotTasks = getTasksForSlot(slot.hour);
                     const now = new Date();
-                    const isCurrentSlot = now.getHours() === slot.hour && 
-                      now.getMinutes() >= slot.minute && 
-                      now.getMinutes() < slot.minute + 30 && 
-                      isToday(selectedDate);
+                    const isCurrentSlot = now.getHours() === slot.hour && isToday(selectedDate);
                     
                     return (
                       <div 
@@ -1138,10 +1105,10 @@ function Home({ user }) {
                         </div>
                         <div className="slot-content">
                           {slotTasks.map(task => {
-                            // Calculate height based on duration (44px per 30 min slot)
-                            const duration = task.estimated_minutes || 30;
-                            const slotsSpan = Math.ceil(duration / 30);
-                            const taskHeight = slotsSpan * 32 - 4; // 32px per slot minus padding
+                            // Calculate height based on duration (48px per hour)
+                            const duration = task.estimated_minutes || 60;
+                            const slotsSpan = Math.ceil(duration / 60);
+                            const taskHeight = slotsSpan * 48 - 4; // 48px per slot minus padding
                             
                             return (
                               <div 
