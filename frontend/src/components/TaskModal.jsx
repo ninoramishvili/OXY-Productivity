@@ -1,8 +1,28 @@
 import { useState, useEffect } from 'react';
-import { X, Tag as TagIcon, Plus } from 'lucide-react';
+import { X, Tag as TagIcon, Plus, Repeat } from 'lucide-react';
 import { tagsAPI } from '../utils/api';
 import ConfirmModal from './ConfirmModal';
 import './TaskModal.css';
+
+// Recurrence pattern options
+const RECURRENCE_PATTERNS = [
+  { id: 'daily', label: 'Daily', description: 'Every day' },
+  { id: 'weekdays', label: 'Weekdays', description: 'Mon - Fri' },
+  { id: 'weekly', label: 'Weekly', description: 'Same day each week' },
+  { id: 'biweekly', label: 'Bi-weekly', description: 'Every 2 weeks' },
+  { id: 'monthly', label: 'Monthly', description: 'Same date each month' },
+  { id: 'custom', label: 'Custom', description: 'Choose days' },
+];
+
+const WEEKDAYS = [
+  { id: 0, label: 'S', name: 'Sunday' },
+  { id: 1, label: 'M', name: 'Monday' },
+  { id: 2, label: 'T', name: 'Tuesday' },
+  { id: 3, label: 'W', name: 'Wednesday' },
+  { id: 4, label: 'T', name: 'Thursday' },
+  { id: 5, label: 'F', name: 'Friday' },
+  { id: 6, label: 'S', name: 'Saturday' },
+];
 
 // Eisenhower Quadrant definitions
 const QUADRANTS = [
@@ -20,7 +40,11 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
     tagIds: [],
     scheduledDate: '',
     scheduledTime: '',
-    estimatedMinutes: ''
+    estimatedMinutes: '',
+    isRecurring: false,
+    recurrencePattern: '',
+    recurrenceDays: [],
+    recurrenceEndDate: ''
   });
   const [errors, setErrors] = useState({});
   const [newTagName, setNewTagName] = useState('');
@@ -50,6 +74,11 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
       if (task.scheduled_time) {
         scheduledTime = task.scheduled_time.substring(0, 5); // "HH:MM:SS" -> "HH:MM"
       }
+      // Get recurrence end date
+      let recurrenceEndDate = '';
+      if (task.recurrence_end_date) {
+        recurrenceEndDate = task.recurrence_end_date.split('T')[0];
+      }
       setFormData({
         title: task.title || '',
         description: task.description || '',
@@ -57,7 +86,11 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
         tagIds: initialTagIds,
         scheduledDate: scheduledDate,
         scheduledTime: scheduledTime,
-        estimatedMinutes: task.estimated_minutes || ''
+        estimatedMinutes: task.estimated_minutes || '',
+        isRecurring: task.is_recurring || false,
+        recurrencePattern: task.recurrence_pattern || '',
+        recurrenceDays: task.recurrence_days || [],
+        recurrenceEndDate: recurrenceEndDate
       });
     } else {
       setFormData({
@@ -67,7 +100,11 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
         tagIds: [],
         scheduledDate: defaultDate || '',
         scheduledTime: '',
-        estimatedMinutes: ''
+        estimatedMinutes: '',
+        isRecurring: false,
+        recurrencePattern: '',
+        recurrenceDays: [],
+        recurrenceEndDate: ''
       });
     }
     setErrors({});
@@ -128,13 +165,31 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
           // Map quadrant to old priority for backward compatibility
           priority: formData.quadrant === 'doFirst' ? 'high' : 
                    formData.quadrant === 'schedule' ? 'medium' : 
-                   formData.quadrant === 'delegate' ? 'medium' : 'low'
+                   formData.quadrant === 'delegate' ? 'medium' : 'low',
+          // Recurring fields
+          isRecurring: formData.isRecurring,
+          recurrencePattern: formData.isRecurring ? formData.recurrencePattern : null,
+          recurrenceDays: formData.isRecurring && formData.recurrencePattern === 'custom' ? formData.recurrenceDays : null,
+          recurrenceEndDate: formData.isRecurring && formData.recurrenceEndDate ? formData.recurrenceEndDate : null
         };
         await onSave(submitData);
       } finally {
         setIsSaving(false);
       }
     }
+  };
+
+  const toggleRecurrenceDay = (dayId) => {
+    setFormData(prev => {
+      const currentDays = prev.recurrenceDays || [];
+      const isSelected = currentDays.includes(dayId);
+      return {
+        ...prev,
+        recurrenceDays: isSelected 
+          ? currentDays.filter(d => d !== dayId)
+          : [...currentDays, dayId].sort((a, b) => a - b)
+      };
+    });
   };
 
   const handleCreateTag = async () => {
@@ -335,6 +390,83 @@ function TaskModal({ isOpen, onClose, onSave, task, tags, onTagsUpdate, onTasksU
             <span className="field-hint">
               💡 Tasks ≤2 min = Quick Task (do it now!)
             </span>
+          </div>
+
+          {/* Recurring Task Options */}
+          <div className="form-group form-group-compact">
+            <label className="recurring-toggle-label">
+              <button
+                type="button"
+                className={`recurring-toggle ${formData.isRecurring ? 'active' : ''}`}
+                onClick={() => setFormData(prev => ({ 
+                  ...prev, 
+                  isRecurring: !prev.isRecurring,
+                  recurrencePattern: !prev.isRecurring ? 'daily' : ''
+                }))}
+              >
+                <Repeat size={16} />
+                <span>Recurring Task</span>
+              </button>
+            </label>
+            
+            {formData.isRecurring && (
+              <div className="recurring-options">
+                <div className="recurrence-patterns">
+                  {RECURRENCE_PATTERNS.map(pattern => (
+                    <button
+                      key={pattern.id}
+                      type="button"
+                      className={`pattern-btn ${formData.recurrencePattern === pattern.id ? 'selected' : ''}`}
+                      onClick={() => setFormData(prev => ({ ...prev, recurrencePattern: pattern.id }))}
+                    >
+                      <span className="pattern-label">{pattern.label}</span>
+                      <span className="pattern-desc">{pattern.description}</span>
+                    </button>
+                  ))}
+                </div>
+                
+                {formData.recurrencePattern === 'custom' && (
+                  <div className="custom-days">
+                    <span className="custom-days-label">Select days:</span>
+                    <div className="weekday-buttons">
+                      {WEEKDAYS.map(day => (
+                        <button
+                          key={day.id}
+                          type="button"
+                          className={`weekday-btn ${(formData.recurrenceDays || []).includes(day.id) ? 'selected' : ''}`}
+                          onClick={() => toggleRecurrenceDay(day.id)}
+                          title={day.name}
+                        >
+                          {day.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <div className="recurrence-end">
+                  <label htmlFor="recurrenceEndDate">End date (optional):</label>
+                  <input
+                    type="date"
+                    id="recurrenceEndDate"
+                    name="recurrenceEndDate"
+                    value={formData.recurrenceEndDate}
+                    onChange={handleChange}
+                    className="end-date-input"
+                    min={formData.scheduledDate || new Date().toISOString().split('T')[0]}
+                  />
+                  {formData.recurrenceEndDate && (
+                    <button
+                      type="button"
+                      className="btn-clear-end-date"
+                      onClick={() => setFormData(prev => ({ ...prev, recurrenceEndDate: '' }))}
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className={`form-group form-group-compact ${formData.estimatedMinutes && formData.estimatedMinutes <= 2 ? 'disabled-section' : ''}`}>

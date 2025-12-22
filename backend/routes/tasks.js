@@ -37,7 +37,11 @@ router.get('/', verifyToken, async (req, res) => {
 
 // Create new task
 router.post('/', verifyToken, async (req, res) => {
-  const { title, description, priority, scheduledDate, scheduledTime, tagIds, isUrgent, isImportant, isPrioritized, estimatedMinutes } = req.body;
+  const { 
+    title, description, priority, scheduledDate, scheduledTime, tagIds, 
+    isUrgent, isImportant, isPrioritized, estimatedMinutes,
+    isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate
+  } = req.body;
 
   if (!title) {
     return res.status(400).json({ 
@@ -48,8 +52,12 @@ router.post('/', verifyToken, async (req, res) => {
 
   try {
     const result = await query(
-      `INSERT INTO tasks (user_id, title, description, priority, scheduled_date, scheduled_time, is_urgent, is_important, is_prioritized, estimated_minutes) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+      `INSERT INTO tasks (
+        user_id, title, description, priority, scheduled_date, scheduled_time, 
+        is_urgent, is_important, is_prioritized, estimated_minutes,
+        is_recurring, recurrence_pattern, recurrence_days, recurrence_end_date
+      ) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) 
        RETURNING *`,
       [
         req.userId,
@@ -61,7 +69,11 @@ router.post('/', verifyToken, async (req, res) => {
         isUrgent || false,
         isImportant || false,
         isPrioritized || false,
-        estimatedMinutes || null
+        estimatedMinutes || null,
+        isRecurring || false,
+        recurrencePattern || null,
+        recurrenceDays || null,
+        recurrenceEndDate || null
       ]
     );
 
@@ -102,7 +114,10 @@ router.post('/', verifyToken, async (req, res) => {
 // Update task
 router.put('/:id', verifyToken, async (req, res) => {
   const taskId = parseInt(req.params.id);
-  const { title, description, completed, priority, scheduledDate, scheduledTime, tagIds, estimatedMinutes } = req.body;
+  const { 
+    title, description, completed, priority, scheduledDate, scheduledTime, tagIds, estimatedMinutes,
+    isRecurring, recurrencePattern, recurrenceDays, recurrenceEndDate
+  } = req.body;
 
   console.log('Update task request:', { taskId, tagIds });
 
@@ -169,6 +184,26 @@ router.put('/:id', verifyToken, async (req, res) => {
       // Convert empty string or 0 to null
       const estimateValue = (estimatedMinutes === '' || estimatedMinutes === 0) ? null : estimatedMinutes;
       values.push(estimateValue);
+      paramCount++;
+    }
+    if (isRecurring !== undefined) {
+      updates.push(`is_recurring = $${paramCount}`);
+      values.push(isRecurring);
+      paramCount++;
+    }
+    if (recurrencePattern !== undefined) {
+      updates.push(`recurrence_pattern = $${paramCount}`);
+      values.push(recurrencePattern || null);
+      paramCount++;
+    }
+    if (recurrenceDays !== undefined) {
+      updates.push(`recurrence_days = $${paramCount}`);
+      values.push(recurrenceDays || null);
+      paramCount++;
+    }
+    if (recurrenceEndDate !== undefined) {
+      updates.push(`recurrence_end_date = $${paramCount}`);
+      values.push(recurrenceEndDate || null);
       paramCount++;
     }
 
